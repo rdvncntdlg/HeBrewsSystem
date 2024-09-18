@@ -1,0 +1,37 @@
+name: he_brew_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.4.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.2.1
+  provider: ^6.1.2
+  font_awesome_flutter: '>= 9.2.0'
+  http: ^1.2.2
+  shared_preferences: ^2.0.13
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - images/
+    - images/login/
+    - images/iced_drinks/
+    - images/milkshakes/
+    - images/fruit_slush/
+    - images/iced_tea/
+    - images/big_plates/
+    - images/snacks/
+    - images/pasta/
+    - images/sandwiches/
+    - images/profile/
