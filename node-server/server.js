@@ -178,6 +178,51 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
   }
 });
 
+// API route to get products
+app.get('/api/list-products', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM products ORDER BY id');
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Update product route
+app.put('/api/products/:id', upload.single('image'), async (req, res) => {
+  const { id } = req.params;
+  const { name, price } = req.body;
+  const imagePath = req.file ? req.file.path : req.body.existingImage;  // Use existing image if no new image is provided
+
+  if (!name || !price) {
+    return res.status(400).json({ error: 'Name and price are required' });
+  }
+
+  try {
+    const query = `
+      UPDATE products
+      SET name = $1, price = $2, image_path = $3
+      WHERE id = $4
+      RETURNING *;
+    `;
+    const values = [name, price, imagePath, id];
+    const result = await pool.query(query, values);
+
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ error: 'Product not found' });
+    }
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
+
 
 // API route to get categories
 app.get('/api/categories', async (req, res) => {
@@ -189,6 +234,30 @@ app.get('/api/categories', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+app.post('/api/add-categories', upload.single('image'), async (req, res) => {
+  const { name } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Category name is required' });
+  }
+
+  try {
+    // Handle image if provided
+    const imagePath = req.file ? req.file.path : null;
+
+    // Insert the category into the database
+    const query = 'INSERT INTO categories (name, image_path) VALUES ($1, $2) RETURNING *';
+    const values = [name, imagePath];
+    const result = await pool.query(query, values);
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error inserting category:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
 
