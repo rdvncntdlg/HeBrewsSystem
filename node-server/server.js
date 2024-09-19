@@ -383,7 +383,40 @@ app.post('/api/add-categories', upload.single('image'), async (req, res) => {
 });
 
 
+app.get('/api/branches', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM branches');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
 
+app.put('/api/branches/:id', async (req, res) => {
+  const branchId = req.params.id;
+  const { image, name, address, icon } = req.body;
+
+  if (!image || !name || !address || !icon) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE branches SET image = $1, name = $2, address = $3, icon = $4 WHERE id = $5 RETURNING *',
+      [image, name, address, icon, branchId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Branch not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating branch:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 
 app.listen(port, () => {
