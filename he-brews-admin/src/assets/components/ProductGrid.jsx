@@ -24,6 +24,12 @@ function ProductGrid({ selectedCategory }) {
     fetchProducts();
   }, []);
 
+  const handleDeleteProduct = (id) => {
+    setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
+  };
+
+  
+
   // Sort products by id before filtering
   const sortedProducts = [...products].sort((a, b) => a.id - b.id);
 
@@ -44,6 +50,7 @@ function ProductGrid({ selectedCategory }) {
               price={product.price}
               image={`http://localhost:3000/${product.image_path}`}  // Use image_path from the database
               category={product.category}
+              onDelete={handleDeleteProduct}
             />
           ))}
         </div>

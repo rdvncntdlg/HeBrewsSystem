@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import EditProductModal from './EditProductModal';
 
-function ProductCard({ id, name, price, image, category }) {
+function ProductCard({ id, name, price, image, category, onDelete }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => {
@@ -17,9 +17,48 @@ function ProductCard({ id, name, price, image, category }) {
     console.log('Updated product:', updatedProduct);
   };
 
+  const handleDelete = async () => {
+    const confirmed = window.confirm(`Are you sure you want to delete the product "${name}"?`);
+
+    if (confirmed) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          console.log(`Product with ID ${id} deleted successfully`);
+          onDelete(id); // Call the parent component's delete function to update the UI
+        } else {
+          console.error('Failed to delete the product');
+        }
+      } catch (error) {
+        console.error('Error deleting the product:', error);
+      }
+    }
+  };
+
   return (
-    <div className="flex flex-col w-[188px] pb-3.5 mx-auto font-bold bg-white rounded-3xl shadow-[0px_4px_4px_rgba(0,0,0,0.25)] max-md:mt-10">
-      <img loading="lazy" src={image} alt={name} className="object-contain z-10 rounded-3xl aspect-[1.2] w-[188px]" />
+    <div className="flex flex-col w-[188px] pb-3.5 mx-auto font-bold bg-white rounded-3xl shadow-[0px_4px_4px_rgba(0,0,0,0.25)] max-md:mt-10 relative">
+      {/* Delete Button */}
+      <button
+        onClick={handleDelete}
+        aria-label="Delete product"
+        className="absolute top-2 right-2 text-gray-500 hover:text-red-600 z-20"
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/458/458594.png" // X icon
+          alt="Delete"
+          className="w-4 h-4"
+        />
+      </button>
+
+      <img
+        loading="lazy"
+        src={image}
+        alt={name}
+        className="object-contain z-10 rounded-3xl aspect-[1.2] w-[188px]"
+      />
       <div className="flex gap-5 justify-between self-center mt-3.5 max-w-full w-[155px]">
         <div className="flex flex-col">
           <div className="text-base text-black">{name}</div>
@@ -39,12 +78,11 @@ function ProductCard({ id, name, price, image, category }) {
         </button>
       </div>
       <EditProductModal
-  isOpen={isModalOpen}
-  onClose={handleCloseModal}
-  product={{ id, name, price, image, category }} // Pass the product ID here
-  onUpdate={handleSave} // Renamed from onSave to onUpdate to match the function signature in EditProductModal
-/>
-
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        product={{ id, name, price, image, category }}
+        onUpdate={handleSave}
+      />
     </div>
   );
 }

@@ -6,8 +6,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const app = express();
-const port = 3000;
+
 const secretKey = 'your-secret-key'; // Use a strong secret key
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -33,6 +32,9 @@ const pool = new Pool({
   port: 5432,
 });
 
+const app = express();
+const port = 3000;
+
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
@@ -51,7 +53,12 @@ app.post('/login', async (req, res) => {
 
       if (user && user.password === password) {
           // Instead of session, generate a token (could use JWT or something else)
-          const token = 'sample-token';  // This should be a real token in a production environment
+          const token = jwt.sign(
+            { customerId: user.customerid, username: user.username }, 
+            secretKey, 
+            { expiresIn: '1h' } // Set token expiration time
+          );
+           // This should be a real token in a production environment
 
           res.json({ 
               success: true, 
@@ -142,6 +149,103 @@ app.post('/profile/update', async (req, res) => {
   }
 });
 
+app.get('/api/customers', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM customer ORDER BY customerid');
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching customers:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Get a single customer by ID
+app.get('/api/customers/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM customer WHERE customerid = $1', [id]);
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ error: 'Customer not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching customer:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Add a new customer
+app.post('/api/customers', async (req, res) => {
+  const { firstname, lastname, email, address, username, password, phone } = req.body;
+
+  try {
+    // Hash the password with bcrypt
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+
+    const result = await pool.query(
+      'INSERT INTO customer (firstname, lastname, email, address, username, password, phonenumber) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [firstname, lastname, email, address, username, hashedPassword, phone] // Use hashed password here
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error adding customer:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Update a customer
+app.put('/api/customers/:id', async (req, res) => {
+  const { id } = req.params;
+  const { firstname, lastname, email, address, username, password, phone } = req.body;
+
+  try {
+    // Fetch existing customer data to compare passwords
+    const customerQuery = await pool.query('SELECT password FROM customer WHERE customerid = $1', [id]);
+
+    if (customerQuery.rows.length === 0) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    let updatedPassword = customerQuery.rows[0].password; // Default to existing password
+
+    // If a new password is provided, hash it
+    if (password && password !== updatedPassword) {
+      updatedPassword = await bcrypt.hash(password, 10); // Re-hash the new password
+    }
+
+    // Update the customer record with the new or existing password
+    const result = await pool.query(
+      'UPDATE customer SET firstname = $1, lastname = $2, email = $3, address = $4, username = $5, password = $6, phonenumber = $7 WHERE customerid = $8 RETURNING *',
+      [firstname, lastname, email, address, username, updatedPassword, phone, id]
+    );
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+// Delete a customer
+app.delete('/api/customers/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM customer WHERE customerid = $1 RETURNING *', [id]);
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ error: 'Customer not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting customer:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 app.post('/api/products', upload.single('image'), async (req, res) => {
   const { name, price, category } = req.body;
 
@@ -220,6 +324,26 @@ app.put('/api/products/:id', upload.single('image'), async (req, res) => {
   }
 });
 
+
+app.delete('/api/products/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log(`Attempting to delete product with ID: ${id}`); // Log the product ID
+
+  try {
+    const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [parseInt(id, 10)]);
+
+    if (result.rowCount > 0) {
+      console.log('Product deleted successfully:', result.rows[0]); // Log the deleted product
+      res.status(200).json({ success: true, message: 'Product deleted successfully' });
+    } else {
+      console.log('Product not found'); // Log if the product was not found
+      res.status(404).json({ error: 'Product not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting product:', error.message); // Log the error message
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 
