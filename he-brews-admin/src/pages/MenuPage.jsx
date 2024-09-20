@@ -31,13 +31,9 @@ function Menu() {
           + Add Product
         </button>       
       </div>
-      <div className="grid place-items-center h-screen">
-      <CategoryList />
-      
         <div className="flex flex-col items-center gap-4">
+      <CategoryList />
         <ProductGrid />
-          
-        </div>
       </div>
       <MenuModal isOpen={isMenuModalOpen} onClose={closeMenuModal} />
       <CategoryModal isOpen={isCategoryModalOpen} onClose={closeCategoryModal} />

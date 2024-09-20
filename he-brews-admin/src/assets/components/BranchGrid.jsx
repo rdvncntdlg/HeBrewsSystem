@@ -7,6 +7,10 @@ function BranchGrid() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const handleDelete = (id) => {
+    // Logic to refresh the branch list or state
+  };
+
   useEffect(() => {
     async function fetchBranches() {
       try {
@@ -35,10 +39,12 @@ function BranchGrid() {
         {branches.map((branch) => (
           <div key={branch.id} className="h-full">
             <BranchCard
+              id={branch.id}    
               image={branch.image}
               name={branch.name}
               address={branch.address}
               icon={branch.icon}
+              onDelete={handleDelete}
             />
           </div>
         ))}

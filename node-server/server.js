@@ -418,6 +418,44 @@ app.put('/api/branches/:id', async (req, res) => {
   }
 });
 
+app.post('/api/add-branches', upload.fields([{ name: 'image' }, { name: 'icon' }]), async (req, res) => {
+  try {
+    const { name, address } = req.body;
+    const imagePath = req.files['image'][0].path; // Get the uploaded image path
+    const iconPath = req.files['icon'][0].path; // Get the uploaded icon path
+
+    // Insert the branch into the PostgreSQL database
+    const result = await pool.query(
+      'INSERT INTO branches (name, address, image, icon) VALUES ($1, $2, $3, $4) RETURNING *',
+      [name, address, imagePath, iconPath]
+    );
+
+    res.status(201).json({ message: 'Branch added successfully', branch: result.rows[0] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error adding branch' });
+  }
+});
+
+app.delete('/api/branches/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query('DELETE FROM branches WHERE id = $1', [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Branch not found' });
+    }
+
+    res.status(204).send(); // No content
+  } catch (error) {
+    console.error('Error deleting branch:', error);
+    res.status(500).json({ message: 'Error deleting branch', error: error.message });
+  }
+});
+
+
+
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

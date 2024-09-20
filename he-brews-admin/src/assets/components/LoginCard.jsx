@@ -1,25 +1,61 @@
-import React from "react";
-import LoginForm from "./LoginForm";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function LoginCard() {
+function LoginForm() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+  };
+
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/dashboard");
+  };
+
   return (
-    <div className="pr-14 -mb-9 max-w-full rounded-3xl bg-neutral-100 shadow-[6px_12px_14px_rgba(0,0,0,0.25)] w-[504px] max-md:pr-5 max-md:mb-2.5">
-      <div className="flex gap-5 max-md:flex-col">
-        <div className="flex flex-col w-[58%] max-md:ml-0 max-md:w-full">
-          <div className="flex flex-col grow justify-center items-center px-20 py-56 w-full rounded-3xl bg-neutral-950 max-md:px-5 max-md:py-24 max-md:mt-10 max-md:max-w-full">
-            <img
-              src="src/assets/images/logo.png"
-              className="transition-all w-48" // or adjust this as needed
-              alt="Logo"
-            />
-          </div>
-        </div>
-        <div className="flex flex-col ml-5 w-[42%] max-md:ml-0 max-md:w-full">
-          <LoginForm />
-        </div>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit} className="flex flex-col self-stretch my-auto font-medium text-black max-md:mt-10">
+      <h1 className="self-center mt-2 text-2xl font-semibold text-center">
+        Login to Your Account
+      </h1>
+      <label htmlFor="username" className="self-start mt-20 text-base text-center max-md:mt-10">
+        Username
+      </label>
+      <input
+        type="text"
+        id="username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        className="mt-1.5 w-full p-2 border rounded"
+        aria-label="Username"
+        required
+      />
+      <label htmlFor="password" className="self-start mt-7 text-base">
+        Password
+      </label>
+      <input
+        type="password"
+        id="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="mt-1.5 w-full p-2 border rounded"
+        aria-label="Password"
+        required
+      />
+      <a href="#" className="self-end text-xs text-right text-neutral-400">
+        Forgot Password?
+      </a>
+      <button
+        type="submit"
+        className="px-16 py-2.5 mx-5 mt-10 text-sm text-center text-white whitespace-nowrap rounded-xl bg-neutral-950 max-md:px-5 max-md:mx-2.5"
+        onClick={handleClick}
+      >
+        Login
+      </button>
+    </form>
   );
 }
 
-export default LoginCard;
+export default LoginForm;
