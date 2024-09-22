@@ -4,7 +4,7 @@ import Sidebar, { SidebarItem } from "../assets/components/Sidebar";
 import {
   Package,
   LayoutDashboard,
-  Users,
+  ShoppingBag,
   BookOpen,
   ReceiptText,
   Store,
@@ -18,11 +18,10 @@ function SidebarLayout() {
     <div className="App flex h-screen overflow-hidden">
       <Sidebar className="flex-none w-64 h-full bg-white border-r border-gray-200 overflow-y-auto">
         <SidebarItem icon={<LayoutDashboard size={20} />} text="Dashboard" to="/dashboard" active={location.pathname === '/dashboard'} />
-        <SidebarItem icon={<Users size={20} />} text="Users" to="/users" active={location.pathname === '/users'} />
+        <SidebarItem icon={<ShoppingBag size={20} />} text="Orders" to="/orders" active={location.pathname === '/orders'} />
         <SidebarItem icon={<BookOpen size={20} />} text="Menu" to="/menu" active={location.pathname === '/menu'} />
         <SidebarItem icon={<ReceiptText size={20} />} text="Transactions" to="/transactions" active={location.pathname === '/transactions'} />
         <SidebarItem icon={<Package size={20} />} text="Inventory" to="/inventory" active={location.pathname === '/inventory'} />
-        <SidebarItem icon={<Store size={20} />} text="Branch" to="/branch" active={location.pathname === '/branch'} />
         <SidebarItem icon={<Heart size={20} />} text="Feedback" to="/feedback" active={location.pathname === '/feedback'} />
       </Sidebar>
       <div className="flex-1 p-5 bg-gray-100 overflow-auto">

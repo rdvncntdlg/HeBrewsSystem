@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import EditProductModal from './EditProductModal';
 
 function ProductCard({ id, name, price, image, category, onDelete }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -77,12 +76,6 @@ function ProductCard({ id, name, price, image, category, onDelete }) {
           />
         </button>
       </div>
-      <EditProductModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        product={{ id, name, price, image, category }}
-        onUpdate={handleSave}
-      />
     </div>
   );
 }

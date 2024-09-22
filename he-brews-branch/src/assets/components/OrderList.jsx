@@ -30,7 +30,7 @@ const OrderList = () => {
   ];
 
   return (
-    <div className="flex flex-col px-10 pt-4 pb-44 bg-white shadow-lg max-w-[625px] rounded-[30px] max-md:px-5 max-md:pb-24 mt-5">
+    <div className="flex flex-col px-10 pt-10 pb-44 bg-white shadow-lg max-w-[75%] rounded-[30px] max-md:px-5 max-md:pb-24 mt-5">
       <div className="flex flex-col w-full rounded-none max-md:max-w-full">
         {orders.map((order, index) => (
           <OrderCard key={index} {...order} />

@@ -16,7 +16,7 @@ const OrderCard = ({ name, orderId, itemCount, totalPrice, status: initialStatus
   };
 
   return (
-    <div className="flex flex-col px-5 py-4 w-full bg-red-200 rounded-md shadow-[0px_0px_4px_rgba(0,0,0,0.15)] max-md:max-w-full mb-4">
+    <div className="flex flex-col px-5 py-4 w-full bg-custom-brown rounded-md shadow-[0px_0px_4px_rgba(0,0,0,0.15)] max-md:max-w-full mb-4">
       <div className="flex flex-wrap gap-5 justify-between max-md:max-w-full">
         <div className="flex flex-col text-lg font-bold">
           <div className="text-stone-700 max-md:mr-1.5">{name}</div>
