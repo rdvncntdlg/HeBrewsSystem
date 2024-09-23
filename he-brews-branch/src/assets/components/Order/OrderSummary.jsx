@@ -9,8 +9,8 @@ const orderItems = [
 
 function OrderSummary() {
   return (
-    <section className="flex flex-col w-full max-md:w-full">
-      <div className="flex grow max-md:mt-8">
+    <section className="flex flex-col w-full p-4">
+      <div className="flex flex-col grow max-md:mt-8">
         <div className="flex flex-col grow shrink-0 py-5 bg-white rounded-3xl w-full">
           <div className="flex justify-between gap-4 px-4">
             <div className="text-lg font-bold text-black">Order # 00001</div>
@@ -21,18 +21,23 @@ function OrderSummary() {
               <OrderItem key={index} {...item} />
             ))}
           </div>
-          <div className="flex flex-col px-4 pt-3 pb-6 font-semibold bg-black bg-opacity-0">
+          <div className="flex flex-col px-4 pt-3 pb-6 font-semibold">
             <div className="flex justify-between items-start gap-5">
               <div className="flex flex-col text-xs">
                 <div className="text-neutral-500">Sub Total</div>
-                <div className="mt-5 text-neutral-500">Tax 10% ( VAT Included)</div>
+                <div className="mt-5 text-neutral-500">Tax 10% (VAT Included)</div>
               </div>
               <div className="flex flex-col mt-1 text-sm whitespace-nowrap">
                 <div className="text-zinc-700">$50.00</div>
                 <div className="mt-4 text-neutral-700">$5.00</div>
               </div>
             </div>
-            <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/6d9b36ad2a474d601bc876e7aee89dff0a88a0688e5c73229a757d234f4c98d4?placeholderIfAbsent=true&apiKey=f5640191d60f45f28ab9a480644a186e" alt="" className="object-contain mt-5 w-full aspect-[166.67]" />
+            <img 
+              loading="lazy" 
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/6d9b36ad2a474d601bc876e7aee89dff0a88a0688e5c73229a757d234f4c98d4?placeholderIfAbsent=true&apiKey=f5640191d60f45f28ab9a480644a186e" 
+              alt="" 
+              className="object-contain mt-5 w-full h-auto max-h-[200px] rounded-lg" 
+            />
             <div className="flex justify-between mt-3">
               <div className="text-sm text-stone-700">Total</div>
               <div className="text-sm text-lime-500">$55.00</div>

@@ -48,19 +48,17 @@ const products = [
 
 function ProductGrid() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
       {products.map((product) => (
-        <div className="flex justify-center" key={product.id}>
-          <ProductCard 
-            image={product.image} 
-            name={product.name} 
-            price={product.price} 
-            addIcon={product.addIcon} 
-          />
-        </div>
+        <ProductCard 
+          key={product.id}
+          image={product.image} 
+          name={product.name} 
+          price={product.price} 
+          addIcon={product.addIcon} 
+        />
       ))}
     </div>
   );
 }
-
 export default ProductGrid;

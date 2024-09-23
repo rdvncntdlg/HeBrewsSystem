@@ -6,13 +6,15 @@ import OrderSummary from '../assets/components/Order/OrderSummary';
 
 function OrderPage() {
   return (
-    <div className="overflow-hidden max-md:pr-5">
+    <div className="max-md:pr-5">
       <Header text="Order" />
-      <div className="grid grid-cols-[65%_35%] gap-4 w-full h-[calc(100vh-100px)]">
+      <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-4 w-full">
         {/* First section: MenuCategories and ProductGrid (65%) */}
-        <div className="flex flex-col">
+        <div className="flex flex-col h-full">
           <MenuCategories />
-          <ProductGrid />
+          <div className="flex-1 overflow-y-auto">
+            <ProductGrid />
+          </div>
         </div>
 
         {/* Second section: OrderSummary (35%) */}
