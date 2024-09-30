@@ -19,25 +19,18 @@ function StocksTable() {
 
   return (
     <div className="mt-5">
-      <div className="flex flex-col justify-center items-start px-16 py-4 w-full text-sm font-bold text-white rounded-3xl bg-neutral-950 max-md:px-5 max-md:max-w-full">
-        <div className="flex flex-wrap gap-10 justify-center items-start max-md:max-w-full">
-          <div className="text-center">ITEM ID</div>
-          <div className="text-center">NAME</div>
-          <div className="text-center">QUANTITY AVAILABLE</div>
-          <div>SUPPLIER NAME</div>
-        </div>
+      <div className="grid grid-cols-4 gap-4 px-8 py-4 w-full text-sm font-bold text-white bg-neutral-950 rounded-3xl max-md:px-4">
+        <div className="text-left">ITEM ID</div>
+        <div className="text-left">NAME</div>
+        <div className="text-left">QUANTITY</div>
+        <div className="text-left">SUPPLIER</div>
       </div>
       {stockItems.map((item, index) => (
-        <div key={item.id} className={`flex flex-wrap gap-5 justify-between py-2 pr-8 pl-16 w-full text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'} max-md:px-5 max-md:max-w-full`}>
-          <div className="flex gap-10 my-auto max-md:max-w-full">
-            <div>{item.id}</div>
-            <div className="text-center">{item.name}</div>
-            <div className="text-center">{item.quantity}</div>
-          </div>
-          <div className="flex gap-10 text-center">
-            <div className="my-auto">{item.supplier}</div>
-            <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/85034424f58332a137208732a249e0154615534d1dc9f3c1502bd5b32370f2ae?placeholderIfAbsent=true&apiKey=f5640191d60f45f28ab9a480644a186e" alt="" className="object-contain shrink-0 aspect-[1.07] w-[15px]" />
-          </div>
+        <div key={item.id} className={`grid grid-cols-4 gap-4 items-center py-2 px-8 text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'} max-md:px-4`}>
+          <div>{item.id}</div>
+          <div>{item.name}</div>
+          <div>{item.quantity}</div>
+          <div>{item.supplier}</div>
         </div>
       ))}
     </div>
