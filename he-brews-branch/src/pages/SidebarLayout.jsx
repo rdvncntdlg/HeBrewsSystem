@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 function SidebarLayout() {
-  const location = useLocation(); // Get current location
+  const location = useLocation();
 
   return (
     <div className="App flex h-screen overflow-hidden">
@@ -25,7 +25,7 @@ function SidebarLayout() {
         <SidebarItem icon={<Heart size={20} />} text="Feedback" to="/feedback" active={location.pathname === '/feedback'} />
       </Sidebar>
       <div className="flex-1 p-5 bg-gray-100 overflow-auto">
-        <Outlet /> {/* Render child routes here */}
+        <Outlet />
       </div>
     </div>
   );

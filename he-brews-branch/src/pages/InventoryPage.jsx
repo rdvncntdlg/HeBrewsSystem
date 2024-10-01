@@ -4,7 +4,11 @@ import StocksTable from '../assets/components/StocksTable';
 import SuppliersTable from '../assets/components/SupplierTable';
 
 function Inventory() {
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for controlling modal visibility
+  // State to hold stocks and suppliers data
+  const [stocks, setStocks] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [formValues, setFormValues] = useState({
     id: '',
     name: '',
@@ -12,41 +16,53 @@ function Inventory() {
     supplier: ''
   });
 
-  // Handle input changes in the modal form
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
 
-  // Handle form submission from modal
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("New Stock Item:", formValues);
-    // Add logic to update the StocksTable with new item if needed
-    setIsModalOpen(false); // Close the modal after submission
+
+    // Add new stock to the stocks list
+    setStocks([...stocks, formValues]);
+
+    // Add supplier if it's not already in the suppliers list
+    if (!suppliers.some(supplier => supplier.name === formValues.supplier)) {
+      setSuppliers([...suppliers, { id: `SUPP${suppliers.length + 1}`, name: formValues.supplier, phone: '' }]);
+    }
+
+    // Clear form and close modal
+    setFormValues({
+      id: '',
+      name: '',
+      quantity: '',
+      supplier: ''
+    });
+    setIsModalOpen(false);
   };
 
   return (
     <main className="flex flex-col ml-5 w-[95%] max-md:ml-0 max-md:w-full">
       <div className="flex flex-col self-stretch my-auto w-full text-black max-md:mt-10 max-md:max-w-full">
         <Header text="Inventory" />
-        
-        {/* Button to open modal */}
+
         <button
           onClick={() => setIsModalOpen(true)}
-          className="self-end px-4 py-2 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+          className="self-end px-4 py-2 mt-8 text-white bg-gray-900 rounded-lg hover:bg-gray-700"
         >
           Add New Stock
         </button>
 
         <section>
           <h2 className="self-start mt-14 text-3xl font-bold max-md:mt-10">Stocks</h2>
-          <StocksTable />
+          <StocksTable stockItems={stocks} />
         </section>
 
         <section>
           <h2 className="self-start mt-9 text-3xl font-bold">Suppliers</h2>
-          <SuppliersTable />
+          <SuppliersTable suppliers={suppliers} />
         </section>
       </div>
 
