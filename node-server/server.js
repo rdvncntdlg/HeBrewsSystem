@@ -27,7 +27,7 @@ const upload = multer({
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: 'he_brews',
+  database: 'hebrews',
   password: 'password',
   port: 5432,
 });
@@ -48,26 +48,34 @@ app.post('/login', async (req, res) => {
   }
 
   try {
-      const result = await pool.query('SELECT customerid, firstname, lastname, password, username FROM customer WHERE username = $1', [username]);
+      const result = await pool.query('SELECT customer_id, firstname, lastname, password, username FROM customertbl WHERE username = $1', [username]);
       const user = result.rows[0];
 
-      if (user && user.password === password) {
-          // Instead of session, generate a token (could use JWT or something else)
-          const token = jwt.sign(
-            { customerId: user.customerid, username: user.username }, 
-            secretKey, 
-            { expiresIn: '1h' } // Set token expiration time
-          );
-           // This should be a real token in a production environment
+      if (user) {
+          const passwordMatch = await bcrypt.compare(password, user.password); // Compare the password
+          
+          if (passwordMatch) {
+              // Generate a token (e.g., JWT)
+              const token = jwt.sign(
+                { username: user.username,
+                  firstname: user.firstname,  // include firstname in the token payload
+                  lastname: user.lastname }, 
+                secretKey, 
+                { expiresIn: '1h' } // Set token expiration time
+              );
 
-          res.json({ 
-              success: true, 
-              message: 'Login successful', 
-              token, // Return token to client
-              customerId: user.customerid, 
-              firstname: user.firstname,
-
-          });
+              res.json({ 
+                  success: true, 
+                  message: 'Login successful', 
+                  token, 
+                  customerId: user.customerid, 
+                  firstname: user.firstname,
+                  lastname: user.lastname,
+                  username: user.username
+              });
+          } else {
+              res.status(401).json({ success: false, message: 'Invalid username or password' });
+          }
       } else {
           res.status(401).json({ success: false, message: 'Invalid username or password' });
       }
@@ -83,14 +91,26 @@ const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (token == null) return res.status(401).json({ success: false, message: 'Token is missing' });
+  if (token == null) {
+    return res.status(401).json({ success: false, message: 'Token is missing' });
+  }
 
   jwt.verify(token, secretKey, (err, user) => {
-    if (err) return res.status(403).json({ success: false, message: 'Forbidden' });
-    req.user = user;
+    if (err) {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+
+    // Assuming user contains firstname and lastname
+    req.user = {
+      username: user.username,  // assuming username is part of the token payload
+      firstname: user.firstname,  // include firstname
+      lastname: user.lastname     // include lastname
+    };
+
     next();
   });
 };
+
 
 app.post('/register', async (req, res) => {
     const { firstName, lastName, email, username, password, address, phone } = req.body;
@@ -104,23 +124,14 @@ app.post('/register', async (req, res) => {
   
       // Insert the user and get the new customer_id
       const result = await pool.query(
-        `INSERT INTO customer (firstname, lastname, email, username, password, address, phonenumber)
-         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING customerid`,
+        `INSERT INTO customertbl (firstname, lastname, email, username, password, address, phonenumber)
+         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING customer_id`,
         [firstName, lastName, email, username, hashedPassword, address, phone]
       );
   
-      const customerId = result.rows[0].customerid;
+      const customerId = result.rows[0];
   
-      // Format the ID as CUS00001, CUS00002, etc.
-      const formattedId = `CUS${String(customerId).padStart(5, '0')}`;
-  
-      // Update the customer record with the formatted ID
-      await pool.query(
-        `UPDATE customer SET customer_id_formatted = $1 WHERE customerid = $2`,
-        [formattedId, customerId]
-      );
-  
-      res.status(200).json({ success: true, message: 'Registration successful', customerId: formattedId });
+      res.status(200).json({ success: true, message: 'Registration successful', customerId });
     } catch (error) {
       console.error('Error during registration:', error);
       res.status(500).json({ success: false, message: 'Server error', details: error.message });
@@ -271,7 +282,7 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
     }
 
     // Insert the product into the database
-    const query = 'INSERT INTO products (name, price, category, category_id, image_path) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    const query = 'INSERT INTO menutbl (itemname, price, category, category_id, image_path) VALUES ($1, $2, $3, $4, $5) RETURNING *';
     const values = [name, price, category, categoryId, req.file.path];
     const result = await pool.query(query, values);
 
@@ -285,7 +296,7 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
 // API route to get products
 app.get('/api/list-products', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM products ORDER BY id');
+    const result = await pool.query('SELECT * FROM menutbl ORDER BY menu_id');
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -305,9 +316,9 @@ app.put('/api/products/:id', upload.single('image'), async (req, res) => {
 
   try {
     const query = `
-      UPDATE products
-      SET name = $1, price = $2, image_path = $3
-      WHERE id = $4
+      UPDATE menutbl
+      SET itemname = $1, price = $2, imageurl = $3
+      WHERE menu_id = $4
       RETURNING *;
     `;
     const values = [name, price, imagePath, id];
@@ -351,7 +362,7 @@ app.delete('/api/products/:id', async (req, res) => {
 // API route to get categories
 app.get('/api/categories', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM categories ORDER BY name');
+    const result = await pool.query('SELECT * FROM categorytbl ORDER BY category_id');
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error fetching categories', error);
@@ -454,7 +465,99 @@ app.delete('/api/branches/:id', async (req, res) => {
   }
 });
 
+app.post('/api/orderitems', async (req, res) => {
+  const { productId, orderId } = req.body;
 
+  try {
+    // Check if the orderId already exists in ordertbl
+    const existingOrder = await pool.query(
+      'SELECT * FROM ordertbl WHERE order_id = $1',
+      [orderId]
+    );
+
+    let order;
+    
+    // If the orderId doesn't exist, insert it
+    if (existingOrder.rows.length === 0) {
+      order = await pool.query(
+        'INSERT INTO ordertbl (order_id) VALUES ($1) RETURNING *',
+        [orderId]
+      );
+    } else {
+      order = existingOrder;
+    }
+
+    // Insert into orderitemtbl (regardless of whether orderId was new or existing)
+    const result = await pool.query(
+      'INSERT INTO orderitemtbl (order_id, menu_id) VALUES ($1, $2) RETURNING *',
+      [orderId, productId]
+    );
+
+    // Respond with both the order and order item information
+    res.status(201).json({
+      order: order.rows[0], // Whether new or existing, return the order details
+      result: result.rows[0], // Newly inserted order item
+    });
+  } catch (error) {
+    console.error('Error adding order item:', error);
+    res.status(500).json({ error: 'Failed to add order item' });
+  }
+});
+
+
+app.get('/api/order/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT oi.*, m.itemname, m.price 
+       FROM orderitemtbl oi 
+       JOIN menutbl m ON oi.menu_id = m.menu_id 
+       WHERE oi.order_id = $1`,
+      [orderId]
+    );
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching order items:', error.message, error.stack); // Add more details to the error logging
+    res.status(500).json({ error: 'Failed to fetch order items' });
+  }
+});
+
+app.get('/api/menu', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM menutbl');
+    res.json(result.rows); // Send rows as JSON response
+  } catch (error) {
+    console.error('Error fetching menu items:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Increase item quantity
+app.post('/api/order/increase/:orderitem_id', async (req, res) => {
+  const { orderitem_id } = req.params;
+  try {
+    // Logic to increase quantity in the database
+    await pool.query('UPDATE orderitemtbl SET quantity = quantity + 1 WHERE orderitem_id = $1', [orderitem_id]);
+    res.status(200).send('Quantity increased');
+  } catch (error) {
+    console.error('Error increasing quantity:', error);
+    res.status(500).send('Error increasing quantity');
+  }
+});
+
+// Decrease item quantity
+app.post('/api/order/decrease/:orderitem_id', async (req, res) => {
+  const { orderitem_id } = req.params;
+  try {
+    // Logic to decrease quantity (ensure it doesn't go below 1)
+    await pool.query('UPDATE orderitemtbl SET quantity = GREATEST(quantity - 1, 1) WHERE orderitem_id = $1', [orderitem_id]);
+    res.status(200).send('Quantity decreased');
+  } catch (error) {
+    console.error('Error decreasing quantity:', error);
+    res.status(500).send('Error decreasing quantity');
+  }
+});
 
 
 app.listen(port, () => {

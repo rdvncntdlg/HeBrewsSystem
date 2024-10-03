@@ -17,7 +17,7 @@ function MenuCategories() {
         {categories.map((category, index) => (
           <div key={index} className={`flex flex-col ${category.isActive ? 'px-2.5 py-2 text-xs font-bold leading-loose text-center text-black bg-orange-200 rounded-xl' : ''}`}>
             <img loading="lazy" src={category.icon} alt="" className="object-contain aspect-square w-[30px]" />
-            <div className={`${category.isActive ? 'self-start' : 'text-xs font-bold leading-loose text-center text-white'}`}>{category.name}</div>
+            <div className={`${category.isActive ? 'self-start' : 'text-xs font-bold leading-loose text-center text-white'}`}>{category.categoryname}</div>
           </div>
         ))}
       </div>

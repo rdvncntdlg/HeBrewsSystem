@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 
-function ProductGrid({ selectedCategory }) {
+function ProductGrid({ selectedCategoryId }) {
   const [products, setProducts] = useState([]);
 
   // Fetch products from the server when the component mounts
@@ -15,7 +15,7 @@ function ProductGrid({ selectedCategory }) {
           return;
         }
         const data = await response.json();
-        setProducts(data); // Set products in the state
+        setProducts(data);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -28,14 +28,12 @@ function ProductGrid({ selectedCategory }) {
     setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
   };
 
-  
-
   // Sort products by id before filtering
   const sortedProducts = [...products].sort((a, b) => a.id - b.id);
 
-  // Filter products based on the selected category
-  const filteredProducts = selectedCategory
-    ? sortedProducts.filter(product => product.category === selectedCategory)
+  // Filter products based on the selected category_id
+  const filteredProducts = selectedCategoryId
+    ? sortedProducts.filter(product => product.category_id === selectedCategoryId)
     : sortedProducts;
 
   return (
@@ -45,11 +43,12 @@ function ProductGrid({ selectedCategory }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
           {filteredProducts.map((product, index) => (
             <ProductCard
-              id={product.id}
-              name={product.name}
+              key={index}
+              id={product.menu_id}
+              name={product.itemname}
               price={product.price}
-              image={`http://localhost:3000/${product.image_path}`}  // Use image_path from the database
-              category={product.category}
+              image={`http://localhost:3000/${product.imageurl}`}
+              category={product.category_id}
               onDelete={handleDeleteProduct}
             />
           ))}

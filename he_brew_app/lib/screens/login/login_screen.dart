@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class LoginScreen extends StatelessWidget {
@@ -29,6 +30,14 @@ class LoginScreen extends StatelessWidget {
         final data = jsonDecode(response.body);
 
         if (response.statusCode == 200 && data['success']) {
+          // Extract the token from the response
+          String token = data['token'];
+
+          // Save the token using SharedPreferences
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('auth_token', token); // Save the token locally
+
+          // Navigate to the home screen (or profile)
           Navigator.pushReplacementNamed(context, '/home');
         } else {
           showDialog(

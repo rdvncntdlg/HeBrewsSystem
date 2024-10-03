@@ -45,6 +45,7 @@ function EditProductModal({ isOpen, onClose, product, onUpdate }) {
       onUpdate(updatedProduct);
       onClose(); // Close the modal on successful update
       // Optionally reload the page
+       
       window.location.reload(); // Reload the page
     } catch (error) {
       console.error('Error updating product:', error);

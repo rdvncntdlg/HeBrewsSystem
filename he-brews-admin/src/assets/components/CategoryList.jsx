@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 function CategoryList({ onFilter }) {
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   // Fetch categories from the database when the component mounts
   useEffect(() => {
@@ -10,7 +10,7 @@ function CategoryList({ onFilter }) {
       try {
         const response = await fetch('http://localhost:3000/api/categories');
         const data = await response.json();
-        setCategories(data); // Set the categories from the API response
+        setCategories(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -19,9 +19,10 @@ function CategoryList({ onFilter }) {
     fetchCategories();
   }, []);
 
+  // Handle category click
   const handleClick = (category) => {
-    setSelectedCategory(category.name);  // Update to use category name
-    onFilter(category.name);  // Call the filtering function passed as a prop
+    setSelectedCategoryId(category.category_id);
+    onFilter(category.category_id); // Use category_id for filtering
   };
 
   return (
@@ -31,14 +32,14 @@ function CategoryList({ onFilter }) {
           <li key={index} className="inline">
             <button
               onClick={() => handleClick(category)}
-              className={`text-base text-zinc-600 bg-transparent border-none cursor-pointer focus:outline-none w-32 h-12 flex items-center justify-center ${selectedCategory === category.name ? 'font-bold' : ''}`}
+              className={`text-base text-zinc-600 bg-transparent border-none cursor-pointer focus:outline-none w-32 h-12 flex items-center justify-center ${selectedCategoryId === category.category_id ? 'font-bold' : ''}`}
             >
-              {category.name}
+              {category.categoryname}
               {category.image_path && (
                 <img
                   loading="lazy"
-                  src={`http://localhost:3000/${category.image_path}`}  // Adjust the image path as necessary
-                  alt={category.name}
+                  src={`http://localhost:3000/${category.image_path}`}
+                  alt={category.categoryname}
                   className="object-contain inline-block z-0 shrink-0 w-3 h-3 aspect-square"
                 />
               )}

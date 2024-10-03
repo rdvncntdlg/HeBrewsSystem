@@ -18,91 +18,92 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String _name = 'Loading...';
   String _username = 'Loading...';
-  
+
   @override
   void initState() {
     super.initState();
     _fetchUserData();
   }
 
+  Future<void> saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+  }
 
-Future<void> saveToken(String token) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('auth_token', token);
-}
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('auth_token');
+  }
 
-Future<String?> getToken() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('auth_token');
-}
   Future<void> login(String username, String password) async {
-  final url = Uri.parse('http://localhost:3000/profile');
-  
-  final response = await http.post(url, body: json.encode({
-    'username': username,
-    'password': password,
-  }), headers: {
-    'Content-Type': 'application/json',
-  });
+    final url = Uri.parse('http://localhost:3000/profile');
 
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    final token = data['token']; // Get the token from response
-
-    // Save token locally (could use shared_preferences)
-    await SharedPreferences.getInstance().then((prefs) {
-      prefs.setString('auth_token', token);
-    });
-
-    // Navigate to profile screen or whatever you need
-  } else {
-    // Handle login failure
-  }
-}
-
-
-Future<void> _fetchUserData() async {
-  final url = Uri.parse('http://localhost:3000/profile');
-
-  // Get stored token
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('auth_token');
-
-  if (token == null) {
-    // Handle the case where there's no token (user is not logged in)
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
-    return;
-  }
-
-  try {
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',  // Use token in Authorization header
-        'Content-Type': 'application/json',
-      },
-    );
+    final response = await http.post(url,
+        body: json.encode({
+          'username': username,
+          'password': password,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        });
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      setState(() {
-        _name = '${data['user']['firstname']} ${data['user']['lastname']}';
-        _username = data['user']['username'];
+       print(data);
+      final token = data['token']; // Get the token from response
+
+      // Save token locally (could use shared_preferences)
+      await SharedPreferences.getInstance().then((prefs) {
+        prefs.setString('auth_token', token);
       });
+
+      // Navigate to profile screen or whatever you need
     } else {
-      throw Exception('Failed to load user data');
+      // Handle login failure
     }
-  } catch (error) {
-    print('Error fetching user data: $error');
-    setState(() {
-      _name = 'Error loading name';
-      _username = 'Error loading username';
-    });
   }
-}
 
+  Future<void> _fetchUserData() async {
+    final url = Uri.parse('http://localhost:3000/profile');
 
+    // Get stored token
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
 
+    if (token == null) {
+      // Handle the case where there's no token (user is not logged in)
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      return;
+    }
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token', // Use token in Authorization header
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          _name =
+              '${data['user']['firstname'] ?? 'First Name'} ${data['user']['lastname'] ?? 'Last Name'}';
+          _username = data['user']['username'] ?? 'Username';
+        });
+      } else {
+        throw Exception('Failed to load user data');
+      }
+    } catch (error) {
+      print('Error fetching user data: $error');
+      setState(() {
+        _name = 'Error loading name';
+        _username = 'Error loading username';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +144,8 @@ Future<void> _fetchUserData() async {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const PaymentMethodsScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const PaymentMethodsScreen()),
                     );
                   },
                 ),
@@ -153,7 +155,10 @@ Future<void> _fetchUserData() async {
                   title: 'Address',
                   subtitle: 'Manage your addresses',
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const AddressScreen()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AddressScreen()));
                   },
                 ),
                 const SizedBox(height: 16),
@@ -162,7 +167,10 @@ Future<void> _fetchUserData() async {
                   title: 'My Orders',
                   subtitle: 'View your order history',
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const OrderScreen()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const OrderScreen()));
                   },
                 ),
                 const SizedBox(height: 16),
@@ -183,7 +191,11 @@ Future<void> _fetchUserData() async {
     );
   }
 
-  Widget _buildFeatureBox({required IconData icon, required String title, String? subtitle, required VoidCallback onTap}) {
+  Widget _buildFeatureBox(
+      {required IconData icon,
+      required String title,
+      String? subtitle,
+      required VoidCallback onTap}) {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
@@ -205,7 +217,8 @@ Future<void> _fetchUserData() async {
 
   void _showEditProfileDialog(BuildContext context) {
     TextEditingController nameController = TextEditingController(text: _name);
-    TextEditingController usernameController = TextEditingController(text: _username);
+    TextEditingController usernameController =
+        TextEditingController(text: _username);
 
     showDialog(
       context: context,
@@ -249,12 +262,14 @@ Future<void> _fetchUserData() async {
 
   Future<void> _updateProfile(String newName, String newUsername) async {
     final url = Uri.parse('http://your-backend-api-url/profile/update');
-    final response = await http.post(url, body: json.encode({
-      'name': newName,
-      'username': newUsername,
-    }), headers: {
-      'Content-Type': 'application/json',
-    });
+    final response = await http.post(url,
+        body: json.encode({
+          'name': newName,
+          'username': newUsername,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        });
 
     if (response.statusCode == 200) {
       // Update local state with new values
