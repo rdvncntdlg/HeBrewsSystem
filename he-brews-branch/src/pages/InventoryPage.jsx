@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import Header from '../assets/components/Header';
 import StocksTable from '../assets/components/StocksTable';
 import SuppliersTable from '../assets/components/SupplierTable';
+import ExpiryTable from '../assets/components/ExpiryTable'; // Import the new ExpiryTable component
 
 function Inventory() {
-  // State to hold stocks and suppliers data
   const [stocks, setStocks] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [formValues, setFormValues] = useState({
     id: '',
     name: '',
     quantity: '',
-    supplier: ''
+    supplier: '',
+    expirationDate: '' // Added expiration date field
   });
 
   const handleInputChange = (e) => {
@@ -21,27 +21,32 @@ function Inventory() {
     setFormValues({ ...formValues, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Add new stock to the stocks list
     setStocks([...stocks, formValues]);
 
-    // Add supplier if it's not already in the suppliers list
     if (!suppliers.some(supplier => supplier.name === formValues.supplier)) {
       setSuppliers([...suppliers, { id: `SUPP${suppliers.length + 1}`, name: formValues.supplier, phone: '' }]);
     }
 
-    // Clear form and close modal
     setFormValues({
       id: '',
       name: '',
       quantity: '',
-      supplier: ''
+      supplier: '',
+      expirationDate: '' // Reset expiration date
     });
     setIsModalOpen(false);
   };
+
+  // Filter stocks that will expire soon (for demo, we assume items expiring within 30 days)
+  const expiringItems = stocks.filter((item) => {
+    const expirationDate = new Date(item.expirationDate);
+    const today = new Date();
+    const timeDiff = expirationDate - today;
+    return timeDiff > 0 && timeDiff <= 30 * 24 * 60 * 60 * 1000; // Items expiring in the next 30 days
+  });
 
   return (
     <main className="flex flex-col ml-5 w-[95%] max-md:ml-0 max-md:w-full">
@@ -63,6 +68,11 @@ function Inventory() {
         <section>
           <h2 className="self-start mt-9 text-3xl font-bold">Suppliers</h2>
           <SuppliersTable suppliers={suppliers} />
+        </section>
+
+        {/* Expiry Table */}
+        <section>
+          <ExpiryTable expiringItems={expiringItems} />
         </section>
       </div>
 
@@ -114,6 +124,19 @@ function Inventory() {
                   type="text"
                   name="supplier"
                   value={formValues.supplier}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                  required
+                />
+              </div>
+
+              {/* New Expiration Date field */}
+              <div className="mb-4">
+                <label htmlFor="expirationDate" className="block text-sm font-medium text-gray-700">Expiration Date</label>
+                <input
+                  type="date"
+                  name="expirationDate"
+                  value={formValues.expirationDate}
                   onChange={handleInputChange}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                   required
