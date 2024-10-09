@@ -29,16 +29,16 @@ function CustomerTable() {
         fetchCustomers();
     }, []);
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (customer_id) => {
         if (window.confirm("Are you sure you want to delete this customer?")) {
             try {
-                const response = await fetch(`http://localhost:3000/api/customers/${id}`, {
+                const response = await fetch(`http://localhost:3000/api/customers/${customer_id}`, {
                     method: 'DELETE',
                 });
 
                 if (response.ok) {
                     // Remove deleted customer from the list
-                    setCustomers(customers.filter(customer => customer.customerid !== id));
+                    setCustomers(customers.filter(customer => customer.customer_id !== customer_id));
                 } else {
                     throw new Error('Failed to delete customer');
                 }
@@ -57,7 +57,7 @@ function CustomerTable() {
 
     // Update customer data after editing
     const handleUpdateCustomer = (updatedCustomer) => {
-        setCustomers(customers.map(c => (c.customerid === updatedCustomer.customerid ? updatedCustomer : c)));
+        setCustomers(customers.map(c => (c.customer_id === updatedCustomer.customer_id ? updatedCustomer : c)));
         setIsEditModalOpen(false);
     };
 
@@ -84,8 +84,8 @@ function CustomerTable() {
                 </thead>
                 <tbody>
                     {customers.map((customer) => (
-                        <tr key={customer.customerid} className="text-center">
-                            <td className="py-2 px-4 border-b">{customer.customerid}</td>
+                        <tr key={customer.customer_id} className="text-center">
+                            <td className="py-2 px-4 border-b">{customer.customer_id}</td>
                             <td className="py-2 px-4 border-b">{customer.firstname}</td>
                             <td className="py-2 px-4 border-b">{customer.lastname}</td>
                             <td className="py-2 px-4 border-b">{customer.email}</td>
@@ -97,7 +97,7 @@ function CustomerTable() {
                                 />
                                 <Trash
                                     className="text-custom-black cursor-pointer"
-                                    onClick={() => handleDelete(customer.customerid)}
+                                    onClick={() => handleDelete(customer.customer_id)}
                                 />
                             </td>
 

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import UsersPage from './pages/UsersPage';
+import Employees from './pages/Employees';
 import Menu from './pages/MenuPage';
 import Transactions from './pages/TransactionsPage';
 import Inventory from './pages/InventoryPage';
@@ -23,7 +24,8 @@ function App() {
         {/* Routes with sidebar */}
         <Route element={<SidebarLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/users" element={<UsersPage />} />
+          <Route path="/customers" element={<UsersPage />} />
+          <Route path="/employees" element={<Employees />} />
           <Route path="/menu" element={<Menu />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/inventory" element={<Inventory />} />

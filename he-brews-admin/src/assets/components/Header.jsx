@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MoreVertical } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function Header({ text }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  
+  // State for admin profile data
+  const [adminProfile, setAdminProfile] = useState({ firstname: '', lastname: '', position: '' });
 
   // Toggle dropdown visibility
   const toggleDropdown = () => {
@@ -18,9 +21,46 @@ function Header({ text }) {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Fetch admin profile data
+  useEffect(() => {
+    const fetchAdminProfile = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found for authentication.');
+        return;
+      }
+    
+      try {
+        const response = await fetch('http://localhost:3000/admin-profile', { // Ensure the URL is correct
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+            'Content-Type': 'application/json', // Specify the content type
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Network response was not ok: ${response.statusText}`);
+        }
+    
+        const data = await response.json();
+        setAdminProfile({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          position: data.position,
+        });
+      } catch (error) {
+        console.error('Error fetching admin profile:', error);
+      }      
+  };
+    
+
+    fetchAdminProfile();
   }, []);
 
   // Handle logout click
@@ -36,8 +76,8 @@ function Header({ text }) {
       <h1 className="my-auto text-4xl font-bold">{text}</h1>
       <div className="flex gap-2 text-right items-center">
         <div className="flex flex-col my-auto">
-          <div className="text-base font-bold">Candor, Valerie Myca L.</div>
-          <div className="self-end text-sm max-md:mr-0.5">Administrator</div>
+          <div className="text-base font-bold">{`${adminProfile.firstname} ${adminProfile.lastname}`}</div>
+          <div className="self-end text-sm max-md:mr-0.5">{adminProfile.position}</div>
         </div>
         <img
           loading="lazy"

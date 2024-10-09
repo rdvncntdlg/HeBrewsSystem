@@ -68,7 +68,7 @@ app.post('/login', async (req, res) => {
                   success: true, 
                   message: 'Login successful', 
                   token, 
-                  customerId: user.customerid, 
+                  customer_id: user.customer_id, 
                   firstname: user.firstname,
                   lastname: user.lastname,
                   username: user.username
@@ -104,12 +104,94 @@ const authenticateToken = (req, res, next) => {
     req.user = {
       username: user.username,  // assuming username is part of the token payload
       firstname: user.firstname,  // include firstname
-      lastname: user.lastname     // include lastname
+      lastname: user.lastname    // include lastname
     };
 
     next();
   });
 };
+
+const authenticateadminToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) {
+    return res.status(401).json({ success: false, message: 'Token is missing' });
+  }
+
+  jwt.verify(token, secretKey, (err, user) => {
+    if (err) {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+
+    // Assuming user contains firstname, lastname, and position
+    req.user = {
+      username: user.username,  // Assuming username is part of the token payload
+      firstname: user.firstname, // Include firstname
+      lastname: user.lastname,   // Include lastname
+      position: user.position    // Include position
+    };
+
+    next();
+  });
+};
+
+
+app.post('/admin-login', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Log to verify request data
+    console.log("Login attempt by:", username);
+
+    // Fetch the user from the database
+    const result = await pool.query('SELECT * FROM employeetbl WHERE username = $1', [username]);
+
+    // Check if user exists
+    if (result.rows.length === 0) {
+      return res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
+
+    const user = result.rows[0];
+
+    // Check if the password matches and if the user is an admin
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch || user.position !== 'Admin') {
+      return res.status(401).json({ success: false, message: 'Invalid username or password or not an admin' });
+    }
+
+    // Generate JWT token with position included
+    const token = jwt.sign(
+      { 
+        id: user.employee_id, 
+        username: user.username, 
+        firstname: user.firstname, 
+        lastname: user.lastname,
+        position: user.position // Include position in the token payload
+      },
+      secretKey, // Use the hardcoded secret key
+      { expiresIn: '1h' }
+    );
+
+    return res.json({ 
+      success: true, 
+      message: 'Login successful', 
+      token, 
+      employee_id: user.employee_id, 
+      username: user.username,
+      position: user.position 
+    });
+  } catch (error) {
+    // Log the error for debugging
+    console.error("Error during admin login:", error);
+
+    // Return a 500 Internal Server Error with error details
+    return res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
+
+
+
 
 
 app.post('/register', async (req, res) => {
@@ -129,14 +211,18 @@ app.post('/register', async (req, res) => {
         [firstName, lastName, email, username, hashedPassword, address, phone]
       );
   
-      const customerId = result.rows[0];
+      const customer_id = result.rows[0];
   
-      res.status(200).json({ success: true, message: 'Registration successful', customerId });
+      res.status(200).json({ success: true, message: 'Registration successful', customer_id });
     } catch (error) {
       console.error('Error during registration:', error);
       res.status(500).json({ success: false, message: 'Server error', details: error.message });
     }
   });
+
+  app.get('/admin-profile', authenticateadminToken, (req, res) => {
+    res.json({ success: true, user: req.user });
+  })
 
 // Protected route
 app.get('/profile', authenticateToken, (req, res) => {
@@ -144,12 +230,12 @@ app.get('/profile', authenticateToken, (req, res) => {
 });
 
 app.post('/profile/update', async (req, res) => {
-  const { customerid, firstname, username } = req.body;
+  const { customer_id, firstname, username } = req.body;
 
   try {
       const result = await pool.query(
-          'UPDATE customer SET firstname = $1, username = $2 WHERE customerid = $3 RETURNING *',
-          [firstname, username, customerid]
+          'UPDATE customertbl SET firstname = $1, username = $2 WHERE customer_id = $3 RETURNING *',
+          [firstname, username, customer_id]
       );
       
       const updatedUser = result.rows[0];
@@ -162,7 +248,7 @@ app.post('/profile/update', async (req, res) => {
 
 app.get('/api/customers', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM customer ORDER BY customerid');
+    const result = await pool.query('SELECT * FROM customertbl ORDER BY customer_id');
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Error fetching customers:', error);
@@ -174,7 +260,7 @@ app.get('/api/customers', async (req, res) => {
 app.get('/api/customers/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM customer WHERE customerid = $1', [id]);
+    const result = await pool.query('SELECT * FROM customertbl WHERE customer_id = $1', [id]);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
     } else {
@@ -195,7 +281,7 @@ app.post('/api/customers', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
 
     const result = await pool.query(
-      'INSERT INTO customer (firstname, lastname, email, address, username, password, phonenumber) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      'INSERT INTO customertbl (firstname, lastname, email, address, username, password, phonenumber) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
       [firstname, lastname, email, address, username, hashedPassword, phone] // Use hashed password here
     );
 
@@ -213,7 +299,7 @@ app.put('/api/customers/:id', async (req, res) => {
 
   try {
     // Fetch existing customer data to compare passwords
-    const customerQuery = await pool.query('SELECT password FROM customer WHERE customerid = $1', [id]);
+    const customerQuery = await pool.query('SELECT password FROM customertbl WHERE customer_id = $1', [id]);
 
     if (customerQuery.rows.length === 0) {
       return res.status(404).json({ error: 'Customer not found' });
@@ -228,7 +314,7 @@ app.put('/api/customers/:id', async (req, res) => {
 
     // Update the customer record with the new or existing password
     const result = await pool.query(
-      'UPDATE customer SET firstname = $1, lastname = $2, email = $3, address = $4, username = $5, password = $6, phonenumber = $7 WHERE customerid = $8 RETURNING *',
+      'UPDATE customertbl SET firstname = $1, lastname = $2, email = $3, address = $4, username = $5, password = $6, phonenumber = $7 WHERE customer_id = $8 RETURNING *',
       [firstname, lastname, email, address, username, updatedPassword, phone, id]
     );
 
@@ -244,7 +330,7 @@ app.put('/api/customers/:id', async (req, res) => {
 app.delete('/api/customers/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query('DELETE FROM customer WHERE customerid = $1 RETURNING *', [id]);
+    const result = await pool.query('DELETE FROM customertbl WHERE customer_id = $1 RETURNING *', [id]);
     if (result.rows.length > 0) {
       res.status(200).json(result.rows[0]);
     } else {
@@ -252,6 +338,67 @@ app.delete('/api/customers/:id', async (req, res) => {
     }
   } catch (error) {
     console.error('Error deleting customer:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/employees', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM employeetbl ORDER BY employee_id');
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/api/employees', async (req, res) => {
+  const { firstname, lastname, email, address, username, password, phonenumber, position } = req.body;
+
+  // Validate input
+  if (!firstname || !lastname || !email || !username || !phonenumber) {
+    return res.status(400).json({ error: 'All fields except Password are required.' });
+  }
+
+  try {
+    // Hash the password
+    const saltRounds = 10; // You can adjust the salt rounds as needed
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const result = await pool.query(
+      'INSERT INTO employeetbl (firstname, lastname, email, address, username, password, phone_number, position) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+      [firstname, lastname, email, address, username, hashedPassword, phonenumber, position] // Use hashedPassword instead of password
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error adding employee:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.put('/api/employees/:employeeid', async (req, res) => {
+  const { employeeid } = req.params;
+  const { firstname, lastname, email, position, username, password, phonenumber } = req.body;
+  try {
+    const result = await pool.query(
+      'UPDATE employeetbl SET firstname = $1, lastname = $2, email = $3, position = $4, username = $5, password = $6, phone_number = $7 WHERE employee_id = $8 RETURNING *',
+      [firstname, lastname, email, position, username, password, phonenumber, employeeid]
+    );
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating employee:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/api/employees/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM employeetbl WHERE employee_id = $1', [id]);
+    res.status(204).send(); // No content
+  } catch (error) {
+    console.error('Error deleting employee:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

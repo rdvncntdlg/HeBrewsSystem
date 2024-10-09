@@ -1,40 +1,42 @@
 import React, { useState, useEffect } from 'react';
 
-function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
-  const [customer, setCustomer] = useState({
-    customer_id: '', // Add customer ID to the state
+function EditEmployeeModal({ isOpen, onClose, onUpdate, employeeData }) {
+  const [employee, setEmployee] = useState({
+    employee_id: '', // Ensure you have this field in the state
     firstname: '',
     lastname: '',
     email: '',
     address: '',
-    username: '',
+    position: '', 
     password: '',
     phonenumber: ''
   });
   
   const [error, setError] = useState(null);
 
-  // Pre-fill form fields with customer data when the modal is opened
+  // Pre-fill form fields with employee data when the modal is opened
   useEffect(() => {
-    if (customerData) {
-      setCustomer(customerData);
+    console.log("Employee Data Received:", employeeData); // Debugging
+    if (employeeData) {
+        setEmployee(employeeData);
     }
-  }, [customerData]);
+}, [employeeData]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCustomer((prevCustomer) => ({
-      ...prevCustomer,
+    setEmployee((prevEmployee) => ({
+      ...prevEmployee,
       [name]: value,
     }));
   };
 
   const validateForm = () => {
-    if (!customer.firstname || !customer.lastname || !customer.email || !customer.username || !customer.phonenumber) {
+    if (!employee.firstname || !employee.lastname || !employee.email || !employee.position || !employee.phonenumber) {
       setError("All fields except 'Password' are required.");
       return false;
     }
-    if (!/\S+@\S+\.\S+/.test(customer.email)) {
+    if (!/\S+@\S+\.\S+/.test(employee.email)) {
       setError("Please enter a valid email address.");
       return false;
     }
@@ -50,24 +52,24 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/customers/${customer.customer_id}`, {
+      const response = await fetch(`http://localhost:3000/api/employees/${employee.employee_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(customer),
+        body: JSON.stringify(employee),
       });
 
       if (response.ok) {
-        const updatedCustomer = await response.json();
-        onUpdate(updatedCustomer); // Notify parent component of the update
+        const updatedEmployee = await response.json();
+        onUpdate(updatedEmployee); // Notify parent component of the update
         onClose(); // Close modal
       } else {
-        throw new Error('Failed to update customer');
+        throw new Error('Failed to update employee');
       }
     } catch (error) {
-      console.error('Error updating customer:', error);
-      setError("Error updating customer. Please try again.");
+      console.error('Error updating employee:', error);
+      setError("Error updating employee. Please try again.");
     }
   };
 
@@ -75,16 +77,28 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
     isOpen && (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
         <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-lg font-bold mb-4">Edit Customer</h2>
+          <h2 className="text-lg font-bold mb-4">Edit Employee</h2>
           {error && <p className="text-red-500 mb-4">{error}</p>}
+          
+          {/* Display Employee ID */}
+          <div className="mb-4">
+            <label className="block text-gray-700">Employee ID</label>
+            <input
+              type="text"
+              name="employee_id"
+              value={employee.employee_id}
+              readOnly
+              className="border border-gray-300 p-2 w-full rounded bg-gray-100"
+            />
+          </div>
+
           <form onSubmit={handleSubmit}>
-            <input type="hidden" name="customer_id" value={customer.customer_id} /> {/* Hidden input for customer ID */}
             <div className="mb-4">
               <label className="block text-gray-700">First Name</label>
               <input
                 type="text"
                 name="firstname"
-                value={customer.firstname}
+                value={employee.firstname}
                 onChange={handleChange}
                 required
                 className="border border-gray-300 p-2 w-full rounded"
@@ -95,7 +109,7 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
               <input
                 type="text"
                 name="lastname"
-                value={customer.lastname}
+                value={employee.lastname}
                 onChange={handleChange}
                 required
                 className="border border-gray-300 p-2 w-full rounded"
@@ -106,7 +120,7 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
               <input
                 type="email"
                 name="email"
-                value={customer.email}
+                value={employee.email}
                 onChange={handleChange}
                 required
                 className="border border-gray-300 p-2 w-full rounded"
@@ -117,17 +131,17 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
               <input
                 type="text"
                 name="address"
-                value={customer.address}
+                value={employee.address}
                 onChange={handleChange}
                 className="border border-gray-300 p-2 w-full rounded"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Username</label>
+              <label className="block text-gray-700">Position</label>
               <input
                 type="text"
-                name="username"
-                value={customer.username}
+                name="position"
+                value={employee.position}
                 onChange={handleChange}
                 required
                 className="border border-gray-300 p-2 w-full rounded"
@@ -138,7 +152,7 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
               <input
                 type="password"
                 name="password"
-                value={customer.password}
+                value={employee.password}
                 onChange={handleChange}
                 className="border border-gray-300 p-2 w-full rounded"
               />
@@ -148,7 +162,7 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
               <input
                 type="tel"
                 name="phonenumber"
-                value={customer.phonenumber}
+                value={employee.phonenumber}
                 onChange={handleChange}
                 required
                 className="border border-gray-300 p-2 w-full rounded"
@@ -166,7 +180,7 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
                 type="submit"
                 className="bg-blue-500 text-white px-4 py-2 rounded"
               >
-                Update Customer
+                Update Employee
               </button>
             </div>
           </form>
@@ -176,4 +190,4 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
   );
 }
 
-export default EditCustomerModal;
+export default EditEmployeeModal;
