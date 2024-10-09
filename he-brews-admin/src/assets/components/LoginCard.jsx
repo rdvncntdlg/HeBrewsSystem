@@ -5,14 +5,32 @@ function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-  };
-
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate("/dashboard");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    
+    try {
+      const response = await fetch("http://localhost:3000/admin-login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Store the token in local storage or a state management tool
+        localStorage.setItem("token", data.token);
+        navigate("/dashboard"); // Only navigate if login is successful
+      } else {
+        alert(data.message); // Show error message
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
@@ -50,7 +68,6 @@ function LoginForm() {
       <button
         type="submit"
         className="px-16 py-2.5 mx-5 mt-10 text-sm text-center text-white whitespace-nowrap rounded-xl bg-neutral-950 max-md:px-5 max-md:mx-2.5"
-        onClick={handleClick}
       >
         Login
       </button>

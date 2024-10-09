@@ -9,6 +9,7 @@ import {
   ReceiptText,
   Store,
   Heart,
+  Contact,
 } from "lucide-react";
 
 function SidebarLayout() {
@@ -18,7 +19,8 @@ function SidebarLayout() {
     <div className="App flex h-screen overflow-hidden">
       <Sidebar className="flex-none w-64 h-full bg-white border-r border-gray-200 overflow-y-auto">
         <SidebarItem icon={<LayoutDashboard size={20} />} text="Dashboard" to="/dashboard" active={location.pathname === '/dashboard'} />
-        <SidebarItem icon={<Users size={20} />} text="Users" to="/users" active={location.pathname === '/users'} />
+        <SidebarItem icon={<Users size={20} />} text="Customers" to="/customers" active={location.pathname === '/customers'} />
+        <SidebarItem icon={<Contact size={20} />} text="Employee" to="/employees" active={location.pathname === '/employees'} />
         <SidebarItem icon={<BookOpen size={20} />} text="Menu" to="/menu" active={location.pathname === '/menu'} />
         <SidebarItem icon={<ReceiptText size={20} />} text="Transactions" to="/transactions" active={location.pathname === '/transactions'} />
         <SidebarItem icon={<Package size={20} />} text="Inventory" to="/inventory" active={location.pathname === '/inventory'} />
