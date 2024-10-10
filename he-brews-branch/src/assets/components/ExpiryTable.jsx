@@ -1,20 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function ExpiryTable({ expiringItems }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Number of items to display per page
+
+  // Sort the items by expiration date in ascending order
+  const sortedItems = [...expiringItems].sort((a, b) => 
+    new Date(a.expirationDate) - new Date(b.expirationDate)
+  );
+
+  // Calculate total pages
+  const totalPages = Math.ceil(sortedItems.length / itemsPerPage);
+
+  // Get current items for the page
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedItems.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Pagination Handlers
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
-    <div className="w-[100%] mx-auto mt-8 p-4 bg-white shadow-md rounded-lg"> {/* Box container with padding */}
-      <h2 className="text-2xl font-bold mb-4 text-red-600">Expiration Alert</h2> {/* Title with reduced size */}
+    <div className="w-full mx-auto mt-1 p-4 bg-white shadow-md rounded-lg overflow-hidden"> 
+      <h2 className="text-2xl text-black mb-4">Expiration Alert</h2>
       
       {/* Header Row */}
-      <div className="grid grid-cols-2 gap-4 px-8 py-4 text-sm font-bold text-white bg-neutral-950 rounded-lg">
+      <div className="grid grid-cols-2 gap-4 px-4 py-4 text-sm font-bold text-gray-700 bg-transparent rounded-lg">
         <div className="text-left">ITEM ID</div>
         <div className="text-left">EXPIRATION DATE</div>
       </div>
 
       {/* Expiring Items Rows */}
-      {expiringItems.length > 0 ? (
-        expiringItems.map((item, index) => (
-          <div key={item.id} className={`grid grid-cols-2 gap-4 items-center py-2 px-8 text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'}`}>
+      {currentItems.length > 0 ? (
+        currentItems.map((item, index) => (
+          <div key={item.id} className={`grid grid-cols-2 gap-4 items-center py-2 px-4 text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'}`}>
             <div>{item.id}</div>
             <div>{item.expirationDate}</div>
           </div>
@@ -22,6 +51,19 @@ function ExpiryTable({ expiringItems }) {
       ) : (
         <div className="text-center py-4 text-gray-500">No items expiring soon.</div>
       )}
+
+      {/* Pagination Controls */}
+      <div className="flex justify-between mt-4">
+        <button onClick={prevPage} disabled={currentPage === 1} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition duration-300">
+          Previous
+        </button>
+        <div className="flex items-center">
+          <span className="text-sm text-gray-700">Page {currentPage} of {totalPages}</span>
+        </div>
+        <button onClick={nextPage} disabled={currentPage === totalPages} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition duration-300">
+          Next
+        </button>
+      </div>
     </div>
   );
 }

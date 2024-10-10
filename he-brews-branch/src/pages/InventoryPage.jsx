@@ -72,39 +72,51 @@ function Inventory() {
 
   return (
     <div className="h-screen overflow-hidden">
-      <main className="flex flex-row w-full h-full overflow-y-auto">
-        <div className="flex flex-col w-[60%] px-4">
-          <Header text="Inventory" />
+      {/* Header spans the full width */}
+      <Header text="Inventory" />
+      
+      {/* Add New Stock Button placed under the header on the right side */}
+      <div className="flex justify-end items-center mt-4 mb-6 px-4">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2 text-white bg-gray-900 rounded-lg hover:bg-gray-700 transition duration-300"
+        >
+          Add New Stock
+        </button>
+      </div>
 
-          {/* Add New Stock Button at the top of the left column */}
-          <div className="mb-4">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 text-white bg-gray-900 rounded-lg hover:bg-gray-700 transition duration-300"
-            >
-              Add New Stock
-            </button>
-          </div>
-
+      <main className="flex flex-col lg:flex-row w-full h-full overflow-hidden"> {/* Added overflow-hidden here */}
+        {/* Left side: Stocks and Suppliers */}
+        <div className="flex flex-col w-full lg:w-[60%] px-4 overflow-hidden"> {/* Added overflow-hidden here */}
           <section className="mt-4">
             <h2 className="text-3xl font-bold">Stocks</h2>
-            <StocksTable stockItems={stocks} />
+            <div className="overflow-x-auto">
+              <StocksTable stockItems={stocks} />
+            </div>
           </section>
 
           <section className="mt-16">
             <h2 className="text-3xl font-bold">Suppliers</h2>
-            <SuppliersTable suppliers={suppliers} />
+            <div className="overflow-x-auto">
+              <SuppliersTable suppliers={suppliers} />
+            </div>
           </section>
         </div>
 
-        <div className="flex flex-col w-[40%] px-4">
-          <section className="mt-16">
-            {/* Expiry Table below the button */}
-            <ExpiryTable expiringItems={expiringItems} />
+        {/* Right side: Expiring Items */}
+        <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden"> {/* Added overflow-hidden here */}
+          <section className="mt-0"> {/* Set margin top to 0 for closer alignment */}
+            <div>
+              <ExpiryTable 
+                expiringItems={expiringItems}
+                className="rounded-lg" // Adjusting the border of the table
+              />
+            </div>
           </section>
         </div>
       </main>
 
+      {/* Modal for adding a new stock item */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50 transition-opacity duration-300">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
