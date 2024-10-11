@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 
 function SuppliersTable({ suppliers }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;  // Set to 10 items per page
 
   // Calculate total pages
   const totalPages = Math.ceil(suppliers.length / itemsPerPage);
 
   // Get the current suppliers for the page
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentSuppliers = suppliers.slice(indexOfFirstItem, indexOfLastItem);
+  const indexOfLastSupplier = currentPage * itemsPerPage;
+  const indexOfFirstSupplier = indexOfLastSupplier - itemsPerPage;
+  const currentSuppliers = suppliers.slice(indexOfFirstSupplier, indexOfLastSupplier);
 
   // Handle next page
   const handleNextPage = () => {
@@ -33,7 +33,7 @@ function SuppliersTable({ suppliers }) {
         <div className="text-left">NAME</div>
         <div className="text-left">PHONE NUMBER</div>
       </div>
-      
+
       {currentSuppliers.length > 0 ? (
         currentSuppliers.map((supplier, index) => (
           <div

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 function StocksTable({ stockItems }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;  // Set to 10 items per page
 
   // Calculate total pages
   const totalPages = Math.ceil(stockItems.length / itemsPerPage);
