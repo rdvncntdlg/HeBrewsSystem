@@ -543,7 +543,7 @@ app.post('/api/add-categories', upload.single('image'), async (req, res) => {
 
 app.get('/api/branches', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM branches');
+    const result = await pool.query('SELECT * FROM branchtbl');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -561,7 +561,7 @@ app.put('/api/branches/:id', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'UPDATE branches SET image = $1, name = $2, address = $3, icon = $4 WHERE id = $5 RETURNING *',
+      'UPDATE branchtbl SET image = $1, name = $2, address = $3, icon = $4 WHERE id = $5 RETURNING *',
       [image, name, address, icon, branchId]
     );
 
@@ -584,7 +584,7 @@ app.post('/api/add-branches', upload.fields([{ name: 'image' }, { name: 'icon' }
 
     // Insert the branch into the PostgreSQL database
     const result = await pool.query(
-      'INSERT INTO branches (name, address, image, icon) VALUES ($1, $2, $3, $4) RETURNING *',
+      'INSERT INTO branchtbl (name, address, +, icon) VALUES ($1, $2, $3, $4) RETURNING *',
       [name, address, imagePath, iconPath]
     );
 
@@ -599,7 +599,7 @@ app.delete('/api/branches/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await pool.query('DELETE FROM branches WHERE id = $1', [id]);
+    const result = await pool.query('DELETE FROM branchtbl WHERE id = $1', [id]);
 
     if (result.rowCount === 0) {
       return res.status(404).json({ message: 'Branch not found' });
@@ -607,6 +607,7 @@ app.delete('/api/branches/:id', async (req, res) => {
 
     res.status(204).send(); // No content
   } catch (error) {
+    
     console.error('Error deleting branch:', error);
     res.status(500).json({ message: 'Error deleting branch', error: error.message });
   }
