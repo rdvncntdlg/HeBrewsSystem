@@ -8,13 +8,20 @@ function SuppliersTable({ suppliers }) {
         <div className="text-left">NAME</div>
         <div className="text-left">PHONE NUMBER</div>
       </div>
-      {suppliers.map((supplier, index) => (
-        <div key={supplier.id} className={`grid grid-cols-3 gap-4 items-center py-2 px-8 text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'} max-md:px-4`}>
-          <div>{supplier.id}</div>
-          <div>{supplier.name}</div>
-          <div>{supplier.phone || 'N/A'}</div>
-        </div>
-      ))}
+      {suppliers.length > 0 ? (
+        suppliers.map((supplier, index) => (
+          <div
+            key={supplier.id}
+            className={`grid grid-cols-3 gap-4 items-center py-2 px-8 text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'} max-md:px-4`}
+          >
+            <div>{supplier.id}</div>
+            <div>{supplier.name}</div>
+            <div>{supplier.phone || 'N/A'}</div>
+          </div>
+        ))
+      ) : (
+        <div className="text-center py-4 text-gray-500">No suppliers available</div>
+      )}
     </div>
   );
 }

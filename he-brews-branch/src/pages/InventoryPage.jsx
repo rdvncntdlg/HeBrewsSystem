@@ -2,19 +2,37 @@ import React, { useState } from 'react';
 import Header from '../assets/components/Header';
 import StocksTable from '../assets/components/StocksTable';
 import SuppliersTable from '../assets/components/SupplierTable';
-import ExpiryTable from '../assets/components/ExpiryTable'; // Import the new ExpiryTable component
+import ExpiryTable from '../assets/components/ExpiryTable';
 
 function Inventory() {
   const [stocks, setStocks] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const [formValues, setFormValues] = useState({
     id: '',
     name: '',
     quantity: '',
     supplier: '',
-    expirationDate: '' // Added expiration date field
+    supplierPhone: '',
+    expirationDate: ''
   });
+
+  const validateForm = () => {
+    const errors = {};
+    const today = new Date();
+
+    if (!formValues.id) errors.id = "ID is required.";
+    if (!formValues.name) errors.name = "Name is required.";
+    if (formValues.quantity <= 0) errors.quantity = "Quantity must be positive.";
+    if (!formValues.supplier) errors.supplier = "Supplier is required.";
+    if (new Date(formValues.expirationDate) <= today) {
+      errors.expirationDate = "Expiration date must be in the future.";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,10 +42,14 @@ function Inventory() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!validateForm()) {
+      return;
+    }
+
     setStocks([...stocks, formValues]);
 
     if (!suppliers.some(supplier => supplier.name === formValues.supplier)) {
-      setSuppliers([...suppliers, { id: `SUPP${suppliers.length + 1}`, name: formValues.supplier, phone: '' }]);
+      setSuppliers([...suppliers, { id: `SUPP${suppliers.length + 1}`, name: formValues.supplier, phone: formValues.supplierPhone }]);
     }
 
     setFormValues({
@@ -35,50 +57,68 @@ function Inventory() {
       name: '',
       quantity: '',
       supplier: '',
-      expirationDate: '' // Reset expiration date
+      supplierPhone: '',
+      expirationDate: ''
     });
     setIsModalOpen(false);
   };
 
-  // Filter stocks that will expire soon (for demo, we assume items expiring within 30 days)
   const expiringItems = stocks.filter((item) => {
     const expirationDate = new Date(item.expirationDate);
     const today = new Date();
     const timeDiff = expirationDate - today;
-    return timeDiff > 0 && timeDiff <= 30 * 24 * 60 * 60 * 1000; // Items expiring in the next 30 days
+    return timeDiff > 0 && timeDiff <= 30 * 24 * 60 * 60 * 1000;
   });
 
   return (
-    <main className="flex flex-col ml-5 w-[95%] max-md:ml-0 max-md:w-full">
-      <div className="flex flex-col self-stretch my-auto w-full text-black max-md:mt-10 max-md:max-w-full">
-        <Header text="Inventory" />
-
+    <div className="h-screen overflow-hidden">
+      {/* Header spans the full width */}
+      <Header text="Inventory" />
+      
+      {/* Add New Stock Button placed under the header on the right side */}
+      <div className="flex justify-end items-center mt-4 mb-6 px-4">
         <button
           onClick={() => setIsModalOpen(true)}
-          className="self-end px-4 py-2 mt-8 text-white bg-gray-900 rounded-lg hover:bg-gray-700"
+          className="px-4 py-2 text-white bg-gray-900 rounded-lg hover:bg-gray-700 transition duration-300"
         >
           Add New Stock
         </button>
-
-        <section>
-          <h2 className="self-start mt-14 text-3xl font-bold max-md:mt-10">Stocks</h2>
-          <StocksTable stockItems={stocks} />
-        </section>
-
-        <section>
-          <h2 className="self-start mt-9 text-3xl font-bold">Suppliers</h2>
-          <SuppliersTable suppliers={suppliers} />
-        </section>
-
-        {/* Expiry Table */}
-        <section>
-          <ExpiryTable expiringItems={expiringItems} />
-        </section>
       </div>
 
-      {/* Modal Box */}
+      <main className="flex flex-col lg:flex-row w-full h-full overflow-hidden"> {/* Added overflow-hidden here */}
+        {/* Left side: Stocks and Suppliers */}
+        <div className="flex flex-col w-full lg:w-[60%] px-4 overflow-hidden"> {/* Added overflow-hidden here */}
+          <section className="mt-4">
+            <h2 className="text-3xl font-bold">Stocks</h2>
+            <div className="overflow-x-auto">
+              <StocksTable stockItems={stocks} />
+            </div>
+          </section>
+
+          <section className="mt-16">
+            <h2 className="text-3xl font-bold">Suppliers</h2>
+            <div className="overflow-x-auto">
+              <SuppliersTable suppliers={suppliers} />
+            </div>
+          </section>
+        </div>
+
+        {/* Right side: Expiring Items */}
+        <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden"> {/* Added overflow-hidden here */}
+          <section className="mt-0"> {/* Set margin top to 0 for closer alignment */}
+            <div>
+              <ExpiryTable 
+                expiringItems={expiringItems}
+                className="rounded-lg" // Adjusting the border of the table
+              />
+            </div>
+          </section>
+        </div>
+      </main>
+
+      {/* Modal for adding a new stock item */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50 transition-opacity duration-300">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
             <h2 className="text-2xl font-bold mb-4">Add New Stock Item</h2>
             <form onSubmit={handleSubmit}>
@@ -92,6 +132,7 @@ function Inventory() {
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                   required
                 />
+                {formErrors.id && <p className="text-red-500 text-sm">{formErrors.id}</p>}
               </div>
 
               <div className="mb-4">
@@ -104,6 +145,7 @@ function Inventory() {
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                   required
                 />
+                {formErrors.name && <p className="text-red-500 text-sm">{formErrors.name}</p>}
               </div>
 
               <div className="mb-4">
@@ -116,6 +158,7 @@ function Inventory() {
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                   required
                 />
+                {formErrors.quantity && <p className="text-red-500 text-sm">{formErrors.quantity}</p>}
               </div>
 
               <div className="mb-4">
@@ -128,9 +171,20 @@ function Inventory() {
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                   required
                 />
+                {formErrors.supplier && <p className="text-red-500 text-sm">{formErrors.supplier}</p>}
               </div>
 
-              {/* New Expiration Date field */}
+              <div className="mb-4">
+                <label htmlFor="supplierPhone" className="block text-sm font-medium text-gray-700">Supplier Phone</label>
+                <input
+                  type="text"
+                  name="supplierPhone"
+                  value={formValues.supplierPhone}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                />
+              </div>
+
               <div className="mb-4">
                 <label htmlFor="expirationDate" className="block text-sm font-medium text-gray-700">Expiration Date</label>
                 <input
@@ -141,19 +195,20 @@ function Inventory() {
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
                   required
                 />
+                {formErrors.expirationDate && <p className="text-red-500 text-sm">{formErrors.expirationDate}</p>}
               </div>
 
               <div className="flex justify-end space-x-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition duration-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
                 >
                   Save
                 </button>
@@ -162,7 +217,7 @@ function Inventory() {
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }
 

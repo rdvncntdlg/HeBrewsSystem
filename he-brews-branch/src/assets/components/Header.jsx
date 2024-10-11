@@ -25,9 +25,7 @@ function Header({ text }) {
 
   // Handle logout click
   const handleLogout = () => {
-    // Perform any logout logic here, such as clearing authentication tokens
 
-    // Redirect to login page
     navigate('/');
   };
 
