@@ -1,19 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 function AddBranchModal({ onClose }) {
   const [branchName, setBranchName] = useState('');
   const [branchAddress, setBranchAddress] = useState('');
   const [branchImage, setBranchImage] = useState(null);
-  const [branchIcon, setBranchIcon] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // State for storing latitude and longitude
+  const [latLng, setLatLng] = useState({ lat: null, lng: null });
+
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
 
   const handleImageChange = (e) => {
     setBranchImage(e.target.files[0]);
   };
 
-  const handleIconChange = (e) => {
-    setBranchIcon(e.target.files[0]);
+  const handleMapClick = (event) => {
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    setLatLng({ lat, lng });
+
+    // Move the marker to the new position
+    if (markerRef.current) {
+      markerRef.current.setPosition(event.latLng);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -26,7 +38,8 @@ function AddBranchModal({ onClose }) {
     formData.append('name', branchName);
     formData.append('address', branchAddress);
     formData.append('image', branchImage);
-    formData.append('icon', branchIcon);
+    formData.append('latitude', latLng.lat);
+    formData.append('longitude', latLng.lng);
 
     try {
       const response = await fetch('http://localhost:3000/api/add-branches', {
@@ -47,6 +60,40 @@ function AddBranchModal({ onClose }) {
       setError(error.message || 'Error adding branch');
     }
   };
+
+  // Load Google Maps script and initialize map
+  useEffect(() => {
+    const loadGoogleMaps = () => {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places`;
+      script.async = true;
+  
+      script.onerror = () => {
+        console.error('Google Maps script failed to load.');
+      };
+  
+      document.body.appendChild(script);
+  
+      script.onload = () => {
+        const map = new window.google.maps.Map(mapRef.current, {
+          center: { lat: -34.397, lng: 150.644 }, // Default center
+          zoom: 8,
+        });
+  
+        // Add a marker
+        markerRef.current = new window.google.maps.Marker({
+          position: map.getCenter(),
+          map: map,
+        });
+  
+        // Add click event listener to the map
+        map.addListener('click', handleMapClick);
+      };
+    };
+  
+    loadGoogleMaps();
+  }, []);
+  
 
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
@@ -72,6 +119,7 @@ function AddBranchModal({ onClose }) {
               onChange={(e) => setBranchAddress(e.target.value)} 
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm" 
               required
+              placeholder="Enter branch address" // Optional placeholder
             />
           </div>
 
@@ -82,17 +130,14 @@ function AddBranchModal({ onClose }) {
               onChange={handleImageChange} 
               className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:border-gray-300" 
               accept="image/*"
+              required // Make it required if needed
             />
           </div>
 
+          {/* Map for selecting location */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Branch Icon</label>
-            <input 
-              type="file" 
-              onChange={handleIconChange} 
-              className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:border-gray-300" 
-              accept="image/*"
-            />
+            <label className="block text-sm font-medium text-gray-700">Select Location</label>
+            <div ref={mapRef} style={{ height: '300px', width: '100%' }}></div>
           </div>
 
           {error && <div className="text-red-500">{error}</div>}
