@@ -28,21 +28,23 @@ function SuppliersTable({ suppliers }) {
 
   return (
     <div className="mt-3">
+      {/* Table Header */}
       <div className="grid grid-cols-3 gap-4 px-8 py-4 w-full text-sm font-bold text-white bg-neutral-950 rounded-3xl max-md:px-4">
-        <div className="text-left">SUPPLIER ID</div>
-        <div className="text-left">NAME</div>
-        <div className="text-left">PHONE NUMBER</div>
+        <div className="text-center">SUPPLIER ID</div>  {/* Centered text */}
+        <div className="text-center">NAME</div>         {/* Centered text */}
+        <div className="text-center">PHONE NUMBER</div> {/* Centered text */}
       </div>
 
+      {/* Table Body */}
       {currentSuppliers.length > 0 ? (
         currentSuppliers.map((supplier, index) => (
           <div
             key={supplier.id}
             className={`grid grid-cols-3 gap-4 items-center py-2 px-8 text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'} max-md:px-4`}
           >
-            <div>{supplier.id}</div>
-            <div>{supplier.name}</div>
-            <div>{supplier.phone || 'N/A'}</div>
+            <div className="text-center">{supplier.id}</div>  {/* Centered text */}
+            <div className="text-center">{supplier.name}</div> {/* Centered text */}
+            <div className="text-center">{supplier.phone || 'N/A'}</div> {/* Centered text */}
           </div>
         ))
       ) : (

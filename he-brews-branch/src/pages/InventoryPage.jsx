@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import Header from '../assets/components/Header';
 import StocksTable from '../assets/components/StocksTable';
 import SuppliersTable from '../assets/components/SupplierTable';
@@ -26,6 +26,9 @@ function Inventory() {
     if (!formValues.name) errors.name = "Name is required.";
     if (formValues.quantity <= 0) errors.quantity = "Quantity must be positive.";
     if (!formValues.supplier) errors.supplier = "Supplier is required.";
+    if (formValues.supplierPhone && !/^\d{11}$/.test(formValues.supplierPhone)) {
+      errors.supplierPhone = "Phone number must be exactly 11 digits and contain only numbers.";
+    }
     if (new Date(formValues.expirationDate) <= today) {
       errors.expirationDate = "Expiration date must be in the future.";
     }
@@ -85,9 +88,9 @@ function Inventory() {
         </button>
       </div>
 
-      <main className="flex flex-col lg:flex-row w-full h-full overflow-hidden"> {/* Added overflow-hidden here */}
+      <main className="flex flex-col lg:flex-row w-full h-full overflow-hidden">
         {/* Left side: Stocks and Suppliers */}
-        <div className="flex flex-col w-full lg:w-[60%] px-4 overflow-hidden"> {/* Added overflow-hidden here */}
+        <div className="flex flex-col w-full lg:w-[60%] px-4 overflow-hidden">
           <section className="mt-4">
             <h2 className="text-3xl font-bold">Stocks</h2>
             <div className="overflow-x-auto">
@@ -104,12 +107,12 @@ function Inventory() {
         </div>
 
         {/* Right side: Expiring Items */}
-        <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden"> {/* Added overflow-hidden here */}
-          <section className="mt-0"> {/* Set margin top to 0 for closer alignment */}
+        <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden">
+          <section className="mt-0">
             <div>
               <ExpiryTable 
                 expiringItems={expiringItems}
-                className="rounded-lg" // Adjusting the border of the table
+                className="rounded-lg"
               />
             </div>
           </section>
@@ -177,12 +180,15 @@ function Inventory() {
               <div className="mb-4">
                 <label htmlFor="supplierPhone" className="block text-sm font-medium text-gray-700">Supplier Phone</label>
                 <input
-                  type="text"
+                  type="tel" // Changed to "tel"
                   name="supplierPhone"
                   value={formValues.supplierPhone}
                   onChange={handleInputChange}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                  maxLength={11} // Limit input to 11 digits
+                  required
                 />
+                {formErrors.supplierPhone && <p className="text-red-500 text-sm">{formErrors.supplierPhone}</p>}
               </div>
 
               <div className="mb-4">
