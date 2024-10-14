@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class BranchSelection extends StatelessWidget {
-  const BranchSelection({Key? key}) : super(key: key); 
+  const BranchSelection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +44,8 @@ class BranchSelection extends StatelessWidget {
 
               // Branch Cards
               Wrap(
-                spacing: 20,
-                runSpacing: 20,
+                spacing: 15,  // Reduced spacing between cards
+                runSpacing: 15,
                 alignment: WrapAlignment.center,
                 children: [
                   branchCard(
@@ -62,7 +62,7 @@ class BranchSelection extends StatelessWidget {
                   ),
                   branchCard(
                     context: context,
-                    imageUrl: 'images/branches/bauan.jpg',
+                    imageUrl: 'assets/images/bauan_branch.jpg',
                     branchName: 'BAUAN BRANCH',
                     location: 'Bauan St, Lipa',
                   ),
@@ -81,56 +81,89 @@ class BranchSelection extends StatelessWidget {
     required String branchName,
     required String location,
   }) {
-    final Size size = MediaQuery.of(context).size;
+    final double cardSize = MediaQuery.of(context).size.width * 0.35; // Reduced size to 35% of screen width
 
-    return Container(
-      width: size.width * 0.35, // Reduced width for the cards
-      height: size.height * 0.25, // Increased height for the cards
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-            ),
-            child: Image.asset(
-              imageUrl,
-              width: double.infinity,
-              height: size.height * 0.15, // Adjust image height
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  branchName,
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+    return GestureDetector(
+      onTap: () {
+        // Show dialog on branch selection
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Confirm Selection', style: GoogleFonts.poppins()),
+              content: Text('Do you want to select $branchName?', style: GoogleFonts.poppins()),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel', style: GoogleFonts.poppins()),
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  location,
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.grey[600],
-                  ),
+                TextButton(
+                  onPressed: () {
+                    // Handle branch selection
+                    Navigator.of(context).pop();
+                    // Proceed to the next page or functionality here
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('$branchName selected'))
+                    );
+                  },
+                  child: Text('Select', style: GoogleFonts.poppins()),
                 ),
               ],
+            );
+          },
+        );
+      },
+      child: Container(
+        width: cardSize,
+        height: cardSize, // Make it square
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15),
+              ),
+              child: Image.asset(
+                imageUrl,
+                width: double.infinity,
+                height: cardSize * 0.55, // Adjust image height to 55% of card height
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0), // Adjust padding
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    branchName,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,  // Reduced font size
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    location,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,  // Reduced font size
+                      fontWeight: FontWeight.normal,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
