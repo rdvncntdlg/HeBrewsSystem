@@ -62,7 +62,7 @@ class BranchSelection extends StatelessWidget {
                   ),
                   branchCard(
                     context: context,
-                    imageUrl: 'assets/images/bauan_branch.jpg',
+                    imageUrl: 'images/branches/bauan.jpg',
                     branchName: 'BAUAN BRANCH',
                     location: 'Bauan St, Lipa',
                   ),
@@ -84,7 +84,8 @@ class BranchSelection extends StatelessWidget {
     final Size size = MediaQuery.of(context).size;
 
     return Container(
-      width: size.width * 0.4, // Responsive width
+      width: size.width * 0.35, // Reduced width for the cards
+      height: size.height * 0.25, // Increased height for the cards
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15.0),
@@ -100,7 +101,7 @@ class BranchSelection extends StatelessWidget {
             child: Image.asset(
               imageUrl,
               width: double.infinity,
-              height: size.height * 0.2, // Adjust image height
+              height: size.height * 0.15, // Adjust image height
               fit: BoxFit.cover,
             ),
           ),
