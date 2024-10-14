@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:he_brew_app/screens/home/home_screen.dart'; // Import HomeScreen
 
 class BranchSelection extends StatelessWidget {
   const BranchSelection({Key? key}) : super(key: key);
@@ -50,19 +51,19 @@ class BranchSelection extends StatelessWidget {
                 children: [
                   branchCard(
                     context: context,
-                    imageUrl: 'assets/images/lawas_branch.jpg',
+                    imageUrl: 'images/branches/lawas.jpg',
                     branchName: 'LAWAS BRANCH',
                     location: 'Malvar St, Lawas',
                   ),
                   branchCard(
                     context: context,
-                    imageUrl: 'assets/images/main_branch.jpg',
+                    imageUrl: 'images/branches/burgos.jpg',
                     branchName: 'MAIN BRANCH',
                     location: 'ABC St, Telic',
                   ),
                   branchCard(
                     context: context,
-                    imageUrl: 'assets/images/bauan_branch.jpg',
+                    imageUrl: 'images/branches/bauan.jpg',
                     branchName: 'BAUAN BRANCH',
                     location: 'Bauan St, Lipa',
                   ),
@@ -81,7 +82,7 @@ class BranchSelection extends StatelessWidget {
     required String branchName,
     required String location,
   }) {
-    final double cardSize = MediaQuery.of(context).size.width * 0.35; // Reduced size to 35% of screen width
+    final double cardSize = MediaQuery.of(context).size.width * 0.25; // Reduced size to 25% of screen width
 
     return GestureDetector(
       onTap: () {
@@ -101,11 +102,13 @@ class BranchSelection extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Handle branch selection
+                    // Close dialog and navigate to HomeScreen
                     Navigator.of(context).pop();
-                    // Proceed to the next page or functionality here
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('$branchName selected'))
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(), // Redirect to HomeScreen
+                      ),
                     );
                   },
                   child: Text('Select', style: GoogleFonts.poppins()),
@@ -145,7 +148,7 @@ class BranchSelection extends StatelessWidget {
                   Text(
                     branchName,
                     style: GoogleFonts.poppins(
-                      fontSize: 14,  // Reduced font size
+                      fontSize: 12,  // Reduced font size
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -154,7 +157,7 @@ class BranchSelection extends StatelessWidget {
                   Text(
                     location,
                     style: GoogleFonts.poppins(
-                      fontSize: 12,  // Reduced font size
+                      fontSize: 10,  // Reduced font size
                       fontWeight: FontWeight.normal,
                       color: Colors.grey[600],
                     ),

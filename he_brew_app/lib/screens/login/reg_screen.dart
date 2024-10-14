@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:he_brew_app/screens/branch/branches.dart';
 
 class RegScreen extends StatelessWidget {
   const RegScreen({super.key});
@@ -37,8 +38,8 @@ class RegistrationForm extends StatefulWidget {
 class _RegistrationFormState extends State<RegistrationForm> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _firstNameController = TextEditingController(); // Changed
-  final TextEditingController _lastNameController = TextEditingController();  // Changed
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
@@ -48,8 +49,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
 
   @override
   void dispose() {
-    _firstNameController.dispose(); // Changed
-    _lastNameController.dispose();  // Changed
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -65,8 +66,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
         Uri.parse('http://localhost:3000/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'firstName': _firstNameController.text, // Changed
-          'lastName': _lastNameController.text,   // Changed
+          'firstName': _firstNameController.text,
+          'lastName': _lastNameController.text,
           'email': _emailController.text,
           'username': _usernameController.text,
           'password': _passwordController.text,
@@ -78,7 +79,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data['success']) {
-        Navigator.pushReplacementNamed(context, '/home');
+        // Navigate to BranchSelection screen after successful registration
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const BranchSelection(), // Redirect to BranchSelection
+          ),
+        );
       } else {
         showDialog(
           context: context,
@@ -128,28 +135,28 @@ class _RegistrationFormState extends State<RegistrationForm> {
           ),
           const SizedBox(height: 20),
           TextFormField(
-            controller: _firstNameController, // Changed
+            controller: _firstNameController,
             decoration: const InputDecoration(
-              labelText: 'First Name', // Changed
+              labelText: 'First Name',
               border: OutlineInputBorder(),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter your first name'; // Changed
+                return 'Please enter your first name';
               }
               return null;
             },
           ),
           const SizedBox(height: 10),
           TextFormField(
-            controller: _lastNameController, // Changed
+            controller: _lastNameController,
             decoration: const InputDecoration(
-              labelText: 'Last Name', // Changed
+              labelText: 'Last Name',
               border: OutlineInputBorder(),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter your last name'; // Changed
+                return 'Please enter your last name';
               }
               return null;
             },
@@ -246,7 +253,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
           ElevatedButton(
             onPressed: _register,
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+              backgroundColor:MaterialStateProperty.all<Color>(Colors.black),
               minimumSize: MaterialStateProperty.all<Size>(const Size(50, 60)),
             ),
             child: const Text(
