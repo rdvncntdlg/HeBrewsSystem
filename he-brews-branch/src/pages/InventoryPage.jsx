@@ -103,10 +103,9 @@ function Inventory() {
           </section>
         </div>
 
-        {/* Right side: Expiring Items */}
         <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden">
           <section className="mt-0 flex justify-end">
-            <div className="overflow-x-auto w-full max-w-md"> {/* Added flex and max-w-md */}
+            <div className="overflow-x-auto w-full max-w-lg"> 
               <ExpiryTable 
                 expiringItems={expiringItems}
                 className="rounded-lg"

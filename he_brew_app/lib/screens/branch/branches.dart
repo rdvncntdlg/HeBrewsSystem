@@ -27,10 +27,6 @@ class BranchSelection extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: Text(
-          'Select a Branch',
-          style: GoogleFonts.poppins(color: Colors.white),
-        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -38,12 +34,12 @@ class BranchSelection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo
+              // Reduced Logo Size
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20.0),
                 child: Image.asset(
                   'images/cream_logo.png', // Path to the logo image
-                  width: 150, // Adjust width as necessary
+                  width: MediaQuery.of(context).size.width * 0.4, // Reduced width for the logo
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey,
@@ -57,29 +53,40 @@ class BranchSelection extends StatelessWidget {
                   },
                 ),
               ),
-              Text(
-                'Select a branch:',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              const SizedBox(height: 30),
+              // Layout without the "Select a branch" title
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  double screenWidth = constraints.maxWidth;
 
-              // Centering the Branch Cards
-              Center(
-                child: Wrap(
-                  spacing: 15, // Spacing between cards
-                  runSpacing: 15,
-                  alignment: WrapAlignment.center,
-                  children: branches.map((branch) {
-                    return branchCard(
-                      context: context,
-                      branch: branch,
-                    );
-                  }).toList(),
-                ),
+                  // For screen widths above 600, we will show the last card below the first two
+                  bool isWideScreen = screenWidth > 600;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // First and second cards in a row
+                          branchCard(context: context, branch: branches[0]),
+                          const SizedBox(width: 20),
+                          branchCard(context: context, branch: branches[1]),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+                      // Third card below the row (stacked)
+                      if (isWideScreen)
+                        branchCard(context: context, branch: branches[2])
+                      else
+                        Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            branchCard(context: context, branch: branches[2]),
+                          ],
+                        ),
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -92,7 +99,8 @@ class BranchSelection extends StatelessWidget {
     required BuildContext context,
     required Branch branch,
   }) {
-    final double cardSize = MediaQuery.of(context).size.width * 0.20; // Size of the card
+    final double cardWidth = MediaQuery.of(context).size.width * 0.4; // 40% of screen width
+    final double cardHeight = cardWidth * 1.1; // Maintain a good aspect ratio
 
     return GestureDetector(
       onTap: () {
@@ -129,8 +137,8 @@ class BranchSelection extends StatelessWidget {
         );
       },
       child: Container(
-        width: cardSize,
-        height: cardSize * 1.05, // Slightly taller for better aspect ratio
+        width: cardWidth,
+        height: cardHeight,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),
@@ -146,7 +154,7 @@ class BranchSelection extends StatelessWidget {
               child: Image.asset(
                 branch.imageUrl,
                 width: double.infinity,
-                height: cardSize * 0.65,
+                height: cardHeight * 0.6, // Responsive image height
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
@@ -162,14 +170,14 @@ class BranchSelection extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(6.0),
+              padding: const EdgeInsets.all(10.0), // Increased padding for better text spacing
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     branch.name,
                     style: GoogleFonts.poppins(
-                      fontSize: 14,
+                      fontSize: 14, // Adjusted font size for branch name
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -178,7 +186,7 @@ class BranchSelection extends StatelessWidget {
                   Text(
                     branch.location,
                     style: GoogleFonts.poppins(
-                      fontSize: 12,
+                      fontSize: 12, // Adjusted font size for location
                       fontWeight: FontWeight.normal,
                       color: Colors.grey[600],
                     ),
