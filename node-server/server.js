@@ -607,7 +607,7 @@ app.delete('/api/branches/:id', async (req, res) => {
 
     res.status(204).send(); // No content
   } catch (error) {
-    
+
     console.error('Error deleting branch:', error);
     res.status(500).json({ message: 'Error deleting branch', error: error.message });
   }
@@ -707,6 +707,32 @@ app.post('/api/order/decrease/:orderitem_id', async (req, res) => {
   }
 });
 
+app.get('/api/inventory', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM inventorytbl');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching inventory:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Add a new inventory item
+app.post('/api/inventory', async (req, res) => {
+  const { branch_id, itemname, quantity, expirationdate } = req.body;
+
+  try {
+    const newItem = await pool.query(
+      'INSERT INTO inventorytbl (branch_id, itemname, quantity, expirationdate) VALUES ($1, $2, $3, $4) RETURNING *',
+      [branch_id, itemname, quantity, expirationdate]
+    );
+
+    res.status(201).json(newItem.rows[0]);
+  } catch (error) {
+    console.error('Error adding inventory item:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

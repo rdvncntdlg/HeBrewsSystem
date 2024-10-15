@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
 import Header from '../assets/components/Header';
 import StocksTable from '../assets/components/StocksTable';
-import SuppliersTable from '../assets/components/SupplierTable';
 import ExpiryTable from '../assets/components/ExpiryTable';
 
 function Inventory() {
-  const [stocks, setStocks] = useState([]);
-  const [suppliers, setSuppliers] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
+  const [stocks, setStocks] = useState([]); // State for stocks
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [formErrors, setFormErrors] = useState({}); // State for form errors
   const [formValues, setFormValues] = useState({
     id: '',
     name: '',
     quantity: '',
-    supplier: '',
-    supplierPhone: '',
     expirationDate: ''
   });
 
@@ -25,7 +21,6 @@ function Inventory() {
     if (!formValues.id) errors.id = "ID is required.";
     if (!formValues.name) errors.name = "Name is required.";
     if (formValues.quantity <= 0) errors.quantity = "Quantity must be positive.";
-    if (!formValues.supplier) errors.supplier = "Supplier is required.";
     if (new Date(formValues.expirationDate) <= today) {
       errors.expirationDate = "Expiration date must be in the future.";
     }
@@ -48,16 +43,11 @@ function Inventory() {
 
     setStocks([...stocks, formValues]);
 
-    if (!suppliers.some(supplier => supplier.name === formValues.supplier)) {
-      setSuppliers([...suppliers, { id: `SUPP${suppliers.length + 1}`, name: formValues.supplier, phone: formValues.supplierPhone }]);
-    }
-
+    // Reset form values and close the modal
     setFormValues({
       id: '',
       name: '',
       quantity: '',
-      supplier: '',
-      supplierPhone: '',
       expirationDate: ''
     });
     setIsModalOpen(false);
@@ -72,10 +62,8 @@ function Inventory() {
 
   return (
     <div className="h-screen overflow-hidden">
-      {/* Header spans the full width */}
       <Header text="Inventory" />
-      
-      {/* Add New Stock Button placed under the header on the right side */}
+
       <div className="flex justify-end items-center mt-4 mb-6 px-4">
         <button
           onClick={() => setIsModalOpen(true)}
@@ -85,38 +73,28 @@ function Inventory() {
         </button>
       </div>
 
-      <main className="flex flex-col lg:flex-row w-full h-full overflow-hidden"> {/* Added overflow-hidden here */}
-        {/* Left side: Stocks and Suppliers */}
-        <div className="flex flex-col w-full lg:w-[60%] px-4 overflow-hidden"> {/* Added overflow-hidden here */}
+      <main className="flex flex-col lg:flex-row w-full h-full overflow-hidden">
+        <div className="flex flex-col w-full lg:w-[100%] px-4 overflow-hidden">
           <section className="mt-4">
             <h2 className="text-3xl font-bold">Stocks</h2>
             <div className="overflow-x-auto">
               <StocksTable stockItems={stocks} />
             </div>
           </section>
-
-          <section className="mt-16">
-            <h2 className="text-3xl font-bold">Suppliers</h2>
-            <div className="overflow-x-auto">
-              <SuppliersTable suppliers={suppliers} />
-            </div>
-          </section>
         </div>
 
-        {/* Right side: Expiring Items */}
-        <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden"> {/* Added overflow-hidden here */}
-          <section className="mt-0"> {/* Set margin top to 0 for closer alignment */}
+        <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden">
+          <section className="mt-0">
             <div>
               <ExpiryTable 
                 expiringItems={expiringItems}
-                className="rounded-lg" // Adjusting the border of the table
+                className="rounded-lg"
               />
             </div>
           </section>
         </div>
       </main>
 
-      {/* Modal for adding a new stock item */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50 transition-opacity duration-300">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
@@ -159,30 +137,6 @@ function Inventory() {
                   required
                 />
                 {formErrors.quantity && <p className="text-red-500 text-sm">{formErrors.quantity}</p>}
-              </div>
-
-              <div className="mb-4">
-                <label htmlFor="supplier" className="block text-sm font-medium text-gray-700">Supplier</label>
-                <input
-                  type="text"
-                  name="supplier"
-                  value={formValues.supplier}
-                  onChange={handleInputChange}
-                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-                  required
-                />
-                {formErrors.supplier && <p className="text-red-500 text-sm">{formErrors.supplier}</p>}
-              </div>
-
-              <div className="mb-4">
-                <label htmlFor="supplierPhone" className="block text-sm font-medium text-gray-700">Supplier Phone</label>
-                <input
-                  type="text"
-                  name="supplierPhone"
-                  value={formValues.supplierPhone}
-                  onChange={handleInputChange}
-                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-                />
               </div>
 
               <div className="mb-4">

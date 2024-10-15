@@ -1,29 +1,62 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-function StocksTable({ stockItems }) {
+function StocksTable() {
+  const [stockItems, setStockItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchStockItems = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/inventory');
+        if (!response.ok) {
+          throw new Error('Failed to fetch stock items');
+        }
+        const data = await response.json();
+        setStockItems(data); // Assuming data is an array of stock items
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStockItems();
+  }, []);
+
   return (
     <div className="mt-5">
-      <div className="grid grid-cols-4 gap-4 px-8 py-4 w-full text-sm font-bold text-white bg-neutral-950 rounded-3xl max-md:px-4">
-        <div className="text-left">ITEM ID</div>
-        <div className="text-left">NAME</div>
-        <div className="text-left">QUANTITY</div>
-        <div className="text-left">SUPPLIER</div>
-      </div>
-
-      {stockItems.length > 0 ? (
-        stockItems.map((item, index) => (
-          <div
-            key={item.id}
-            className={`grid grid-cols-4 gap-4 items-center py-2 px-8 text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'} max-md:px-4`}
-          >
-            <div>{item.id}</div>
-            <div>{item.name}</div>
-            <div>{item.quantity}</div>
-            <div>{item.supplier}</div>
-          </div>
-        ))
+      {loading ? (
+        <div className="text-center py-4 text-gray-500">Loading...</div>
+      ) : error ? (
+        <div className="text-center py-4 text-red-500">{error}</div>
       ) : (
-        <div className="text-center py-4 text-gray-500">No stock items available</div>
+        <table className="min-w-full bg-neutral-950 rounded-3xl">
+          <thead>
+            <tr className="text-sm font-bold text-white bg-neutral-800">
+              <th className="px-8 py-4 text-left">ITEM ID</th>
+              <th className="px-8 py-4 text-left">NAME</th>
+              <th className="px-8 py-4 text-left">QUANTITY</th>
+              <th className="px-8 py-4 text-left">EXPIRATION DATE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stockItems.length > 0 ? (
+              stockItems.map((item, index) => (
+                <tr key={item.inventory_id} className={`${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'} text-xs`}>
+                  <td className="px-8 py-2">{item.inventory_id}</td>
+                  <td className="px-8 py-2">{item.itemname}</td>
+                  <td className="px-8 py-2">{item.quantity}</td>
+                  <td className="px-8 py-2">{new Date(item.expirationdate).toLocaleDateString()}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center py-4 text-gray-500">No stock items available</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       )}
     </div>
   );

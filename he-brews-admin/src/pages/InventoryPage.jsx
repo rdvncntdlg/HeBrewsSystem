@@ -1,7 +1,6 @@
 import React from 'react';
 import Header from '../assets/components/Header';
 import StocksTable from '../assets/components/StocksTable';
-import SuppliersTable from '../assets/components/SupplierTable';
 
 function Inventory() {
     return (
@@ -11,10 +10,6 @@ function Inventory() {
             <section>
               <h2 className="self-start mt-14 text-3xl font-bold max-md:mt-10">Stocks</h2>
               <StocksTable />
-            </section>
-            <section>
-              <h2 className="self-start mt-9 text-3xl font-bold">Suppliers</h2>
-              <SuppliersTable />
             </section>
           </div>
         </main>
