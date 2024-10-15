@@ -24,7 +24,7 @@ function Inventory() {
 
     if (!formValues.id) errors.id = "ID is required.";
     if (!formValues.name) errors.name = "Name is required.";
-    if (formValues.quantity < 0) errors.quantity = "Quantity cannot be negative.";
+    if (formValues.quantity <= 0) errors.quantity = "Quantity must be positive.";
     if (!formValues.supplier) errors.supplier = "Supplier is required.";
     if (formValues.supplierPhone && !/^\d{11}$/.test(formValues.supplierPhone)) {
       errors.supplierPhone = "Phone number must be exactly 11 digits and contain only numbers.";
@@ -39,19 +39,7 @@ function Inventory() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    // For quantity, allow only non-negative integers
-    if (name === 'quantity') {
-      const numericValue = Math.max(0, parseInt(value, 10)) || ''; // Ensure value is non-negative
-      setFormValues({ ...formValues, [name]: numericValue });
-    } 
-    // For supplierPhone, allow only numeric input
-    else if (name === 'supplierPhone') {
-      const numericValue = value.replace(/[^0-9]/g, '').slice(0, 11);
-      setFormValues({ ...formValues, [name]: numericValue });
-    } else {
-      setFormValues({ ...formValues, [name]: value });
-    }
+    setFormValues({ ...formValues, [name]: value });
   };
 
   const handleSubmit = (e) => {
@@ -115,9 +103,10 @@ function Inventory() {
           </section>
         </div>
 
+        {/* Right side: Expiring Items */}
         <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden">
-          <section className="mt-0">
-            <div>
+          <section className="mt-0 flex justify-end">
+            <div className="overflow-x-auto w-full max-w-md"> {/* Added flex and max-w-md */}
               <ExpiryTable 
                 expiringItems={expiringItems}
                 className="rounded-lg"
