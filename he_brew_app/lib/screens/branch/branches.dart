@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:he_brew_app/screens/home/home_screen.dart'; // Import HomeScreen
+import 'package:he_brew_app/screens/nav_bar.dart'; // Import the nav_bar.dart
+
+class Branch {
+  final String imageUrl;
+  final String name;
+  final String location;
+
+  Branch({required this.imageUrl, required this.name, required this.location});
+}
 
 class BranchSelection extends StatelessWidget {
   const BranchSelection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Sample branch data
+    final List<Branch> branches = [
+      Branch(imageUrl: 'images/branches/lawas.jpg', name: 'LAWAS BRANCH', location: 'Malvar St, Lawas'),
+      Branch(imageUrl: 'images/branches/burgos.jpg', name: 'MAIN BRANCH', location: 'ABC St, Telic'),
+      Branch(imageUrl: 'images/branches/bauan.jpg', name: 'BAUAN BRANCH', location: 'Bauan St, Lipa'),
+    ];
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -23,16 +38,25 @@ class BranchSelection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo and Title
-              Text(
-                'HE BREWS CAFE',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+              // Logo
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Image.asset(
+                  'images/cream_logo.png', // Path to the logo image
+                  width: 150, // Adjust width as necessary
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey,
+                      child: Center(
+                        child: Text(
+                          'Logo not available',
+                          style: GoogleFonts.poppins(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 20),
               Text(
                 'Select a branch:',
                 style: GoogleFonts.poppins(
@@ -43,31 +67,19 @@ class BranchSelection extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              // Branch Cards
-              Wrap(
-                spacing: 15,  // Reduced spacing between cards
-                runSpacing: 15,
-                alignment: WrapAlignment.center,
-                children: [
-                  branchCard(
-                    context: context,
-                    imageUrl: 'images/branches/lawas.jpg',
-                    branchName: 'LAWAS BRANCH',
-                    location: 'Malvar St, Lawas',
-                  ),
-                  branchCard(
-                    context: context,
-                    imageUrl: 'images/branches/burgos.jpg',
-                    branchName: 'MAIN BRANCH',
-                    location: 'ABC St, Telic',
-                  ),
-                  branchCard(
-                    context: context,
-                    imageUrl: 'images/branches/bauan.jpg',
-                    branchName: 'BAUAN BRANCH',
-                    location: 'Bauan St, Lipa',
-                  ),
-                ],
+              // Centering the Branch Cards
+              Center(
+                child: Wrap(
+                  spacing: 15, // Spacing between cards
+                  runSpacing: 15,
+                  alignment: WrapAlignment.center,
+                  children: branches.map((branch) {
+                    return branchCard(
+                      context: context,
+                      branch: branch,
+                    );
+                  }).toList(),
+                ),
               ),
             ],
           ),
@@ -78,11 +90,9 @@ class BranchSelection extends StatelessWidget {
 
   Widget branchCard({
     required BuildContext context,
-    required String imageUrl,
-    required String branchName,
-    required String location,
+    required Branch branch,
   }) {
-    final double cardSize = MediaQuery.of(context).size.width * 0.25; // Reduced size to 25% of screen width
+    final double cardSize = MediaQuery.of(context).size.width * 0.20; // Size of the card
 
     return GestureDetector(
       onTap: () {
@@ -92,7 +102,7 @@ class BranchSelection extends StatelessWidget {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Confirm Selection', style: GoogleFonts.poppins()),
-              content: Text('Do you want to select $branchName?', style: GoogleFonts.poppins()),
+              content: Text('Do you want to select ${branch.name}?', style: GoogleFonts.poppins()),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -102,12 +112,12 @@ class BranchSelection extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Close dialog and navigate to HomeScreen
+                    // Close dialog and navigate to NavBar
                     Navigator.of(context).pop();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const HomeScreen(), // Redirect to HomeScreen
+                        builder: (context) => const BottomNavBar(), // Redirect to NavBar
                       ),
                     );
                   },
@@ -120,7 +130,7 @@ class BranchSelection extends StatelessWidget {
       },
       child: Container(
         width: cardSize,
-        height: cardSize, // Make it square
+        height: cardSize * 1.05, // Slightly taller for better aspect ratio
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),
@@ -134,30 +144,41 @@ class BranchSelection extends StatelessWidget {
                 topRight: Radius.circular(15),
               ),
               child: Image.asset(
-                imageUrl,
+                branch.imageUrl,
                 width: double.infinity,
-                height: cardSize * 0.55, // Adjust image height to 55% of card height
+                height: cardSize * 0.65,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey, // Placeholder color if image fails to load
+                    child: Center(
+                      child: Text(
+                        'Image not available',
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0), // Adjust padding
+              padding: const EdgeInsets.all(6.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    branchName,
+                    branch.name,
                     style: GoogleFonts.poppins(
-                      fontSize: 12,  // Reduced font size
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    location,
+                    branch.location,
                     style: GoogleFonts.poppins(
-                      fontSize: 10,  // Reduced font size
+                      fontSize: 12,
                       fontWeight: FontWeight.normal,
                       color: Colors.grey[600],
                     ),

@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 
 function StocksTable({ stockItems }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;  // Set to 10 items per page
+  const itemsPerPage = 10; // Set to 10 items per page
+
+  // Check for unique stock IDs
+  const uniqueStockItems = [...new Map(stockItems.map(item => [item.id, item])).values()];
 
   // Calculate total pages
-  const totalPages = Math.ceil(stockItems.length / itemsPerPage);
+  const totalPages = Math.ceil(uniqueStockItems.length / itemsPerPage);
 
   // Get the current stock items for the page
-  const indexOfLastItem = currentPage * itemsPerPage;  // Last item index for current page
+  const indexOfLastItem = currentPage * itemsPerPage; // Last item index for current page
   const indexOfFirstItem = indexOfLastItem - itemsPerPage; // First item index for current page
-  const currentItems = stockItems.slice(indexOfFirstItem, indexOfLastItem); // Get items for current page
+  const currentItems = uniqueStockItems.slice(indexOfFirstItem, indexOfLastItem); // Get items for current page
 
   // Handle next page
   const handleNextPage = () => {

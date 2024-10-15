@@ -24,7 +24,7 @@ function Inventory() {
 
     if (!formValues.id) errors.id = "ID is required.";
     if (!formValues.name) errors.name = "Name is required.";
-    if (formValues.quantity <= 0) errors.quantity = "Quantity must be positive.";
+    if (formValues.quantity < 0) errors.quantity = "Quantity cannot be negative.";
     if (!formValues.supplier) errors.supplier = "Supplier is required.";
     if (formValues.supplierPhone && !/^\d{11}$/.test(formValues.supplierPhone)) {
       errors.supplierPhone = "Phone number must be exactly 11 digits and contain only numbers.";
@@ -39,7 +39,19 @@ function Inventory() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormValues({ ...formValues, [name]: value });
+
+    // For quantity, allow only non-negative integers
+    if (name === 'quantity') {
+      const numericValue = Math.max(0, parseInt(value, 10)) || ''; // Ensure value is non-negative
+      setFormValues({ ...formValues, [name]: numericValue });
+    } 
+    // For supplierPhone, allow only numeric input
+    else if (name === 'supplierPhone') {
+      const numericValue = value.replace(/[^0-9]/g, '').slice(0, 11);
+      setFormValues({ ...formValues, [name]: numericValue });
+    } else {
+      setFormValues({ ...formValues, [name]: value });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -75,10 +87,8 @@ function Inventory() {
 
   return (
     <div className="h-screen overflow-hidden">
-      {/* Header spans the full width */}
       <Header text="Inventory" />
       
-      {/* Add New Stock Button placed under the header on the right side */}
       <div className="flex justify-end items-center mt-4 mb-6 px-4">
         <button
           onClick={() => setIsModalOpen(true)}
@@ -89,7 +99,6 @@ function Inventory() {
       </div>
 
       <main className="flex flex-col lg:flex-row w-full h-full overflow-hidden">
-        {/* Left side: Stocks and Suppliers */}
         <div className="flex flex-col w-full lg:w-[60%] px-4 overflow-hidden">
           <section className="mt-4">
             <h2 className="text-3xl font-bold">Stocks</h2>
@@ -106,7 +115,6 @@ function Inventory() {
           </section>
         </div>
 
-        {/* Right side: Expiring Items */}
         <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden">
           <section className="mt-0">
             <div>
@@ -119,7 +127,6 @@ function Inventory() {
         </div>
       </main>
 
-      {/* Modal for adding a new stock item */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 z-50 transition-opacity duration-300">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
@@ -180,12 +187,12 @@ function Inventory() {
               <div className="mb-4">
                 <label htmlFor="supplierPhone" className="block text-sm font-medium text-gray-700">Supplier Phone</label>
                 <input
-                  type="tel" // Changed to "tel"
+                  type="tel"
                   name="supplierPhone"
                   value={formValues.supplierPhone}
                   onChange={handleInputChange}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-                  maxLength={11} // Limit input to 11 digits
+                  maxLength={11}
                   required
                 />
                 {formErrors.supplierPhone && <p className="text-red-500 text-sm">{formErrors.supplierPhone}</p>}
