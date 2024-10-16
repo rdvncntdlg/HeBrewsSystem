@@ -1,37 +1,3 @@
-<<<<<<< HEAD
-import React, { useEffect, useState } from 'react';
-
-function StocksTable() {
-  const [stockItems, setStockItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchStockItems = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/inventory');
-        if (!response.ok) {
-          throw new Error('Failed to fetch stock items');
-        }
-        const data = await response.json();
-        setStockItems(data); // Assuming data is an array of stock items
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStockItems();
-  }, []);
-
-  return (
-    <div className="mt-5">
-      {loading ? (
-        <div className="text-center py-4 text-gray-500">Loading...</div>
-      ) : error ? (
-        <div className="text-center py-4 text-red-500">{error}</div>
-=======
 import React, { useState } from 'react';
 
 function StocksTable({ stockItems }) {
@@ -85,7 +51,6 @@ function StocksTable({ stockItems }) {
             <div className="text-center">{item.supplier}</div>
           </div>
         ))
->>>>>>> bb3bb46608ec10b2c5777c4df1feca7441b361de
       ) : (
         <table className="min-w-full bg-neutral-950 rounded-3xl">
           <thead>

@@ -28,7 +28,7 @@ const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
   database: 'hebrews',
-  password: 'admin1234',
+  password: 'password',
   port: 5432,
 });
 
@@ -731,6 +731,39 @@ app.post('/api/inventory', async (req, res) => {
   } catch (error) {
     console.error('Error adding inventory item:', error);
     res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/api/stock-requests/Pending', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT request_id, branch_id, request_date, status, processed_date FROM stockrequeststbl WHERE status = $1',
+      ['Pending']
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/stock-requests/Approved', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT request_id, branch_id, request_date, status, processed_date FROM stockrequeststbl WHERE status = $1', ['Approved']);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/stock-requests/Completed', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT request_id, branch_id, request_date, status, processed_date FROM stockrequeststbl WHERE status = $1', ['Completed']);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
