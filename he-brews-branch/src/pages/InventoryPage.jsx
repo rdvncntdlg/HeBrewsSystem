@@ -70,7 +70,11 @@ function Inventory() {
   return (
     <div className="h-screen overflow-hidden">
       <Header text="Inventory" />
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> 192f9f7e375f6ad6bf5a31ac4c48ef3e10a561af
       <div className="flex justify-end items-center mt-4 mb-6 px-4">
         <button
           onClick={() => setIsModalOpen(true)}
@@ -82,9 +86,12 @@ function Inventory() {
 
       <main className="flex flex-col lg:flex-row w-full h-full overflow-hidden">
 <<<<<<< HEAD
+<<<<<<< HEAD
         <div className="flex flex-col w-full lg:w-[100%] px-4 overflow-hidden">
 =======
         {/* Left side: Stocks and Suppliers */}
+=======
+>>>>>>> 192f9f7e375f6ad6bf5a31ac4c48ef3e10a561af
         <div className="flex flex-col w-full lg:w-[60%] px-4 overflow-hidden">
 >>>>>>> bb3bb46608ec10b2c5777c4df1feca7441b361de
           <section className="mt-4">
@@ -96,12 +103,15 @@ function Inventory() {
         </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         {/* Right side: Expiring Items */}
 >>>>>>> bb3bb46608ec10b2c5777c4df1feca7441b361de
+=======
+>>>>>>> 192f9f7e375f6ad6bf5a31ac4c48ef3e10a561af
         <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden">
-          <section className="mt-0">
-            <div>
+          <section className="mt-0 flex justify-end">
+            <div className="overflow-x-auto w-full max-w-lg"> 
               <ExpiryTable 
                 expiringItems={expiringItems}
                 className="rounded-lg"
@@ -173,12 +183,12 @@ function Inventory() {
               <div className="mb-4">
                 <label htmlFor="supplierPhone" className="block text-sm font-medium text-gray-700">Supplier Phone</label>
                 <input
-                  type="tel" // Changed to "tel"
+                  type="tel"
                   name="supplierPhone"
                   value={formValues.supplierPhone}
                   onChange={handleInputChange}
                   className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
-                  maxLength={11} // Limit input to 11 digits
+                  maxLength={11}
                   required
                 />
                 {formErrors.supplierPhone && <p className="text-red-500 text-sm">{formErrors.supplierPhone}</p>}

@@ -1,21 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:he_brew_app/screens/home/home_screen.dart'; // Import HomeScreen
+import 'package:he_brew_app/screens/nav_bar.dart'; // Import the nav_bar.dart
+
+class Branch {
+  final String imageUrl;
+  final String name;
+  final String location;
+
+  Branch({required this.imageUrl, required this.name, required this.location});
+}
 
 class BranchSelection extends StatelessWidget {
   const BranchSelection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Sample branch data
+    final List<Branch> branches = [
+      Branch(imageUrl: 'images/branches/lawas.jpg', name: 'LAWAS BRANCH', location: 'Malvar St, Lawas'),
+      Branch(imageUrl: 'images/branches/burgos.jpg', name: 'MAIN BRANCH', location: 'ABC St, Telic'),
+      Branch(imageUrl: 'images/branches/bauan.jpg', name: 'BAUAN BRANCH', location: 'Bauan St, Lipa'),
+    ];
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: Text(
-          'Select a Branch',
-          style: GoogleFonts.poppins(color: Colors.white),
-        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -23,51 +34,59 @@ class BranchSelection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Logo and Title
-              Text(
-                'HE BREWS CAFE',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+              // Reduced Logo Size
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Image.asset(
+                  'images/cream_logo.png', // Path to the logo image
+                  width: MediaQuery.of(context).size.width * 0.4, // Reduced width for the logo
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey,
+                      child: Center(
+                        child: Text(
+                          'Logo not available',
+                          style: GoogleFonts.poppins(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 20),
-              Text(
-                'Select a branch:',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                ),
-              ),
-              const SizedBox(height: 30),
+              // Layout without the "Select a branch" title
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  double screenWidth = constraints.maxWidth;
 
-              // Branch Cards
-              Wrap(
-                spacing: 15,  // Reduced spacing between cards
-                runSpacing: 15,
-                alignment: WrapAlignment.center,
-                children: [
-                  branchCard(
-                    context: context,
-                    imageUrl: 'images/branches/lawas.jpg',
-                    branchName: 'LAWAS BRANCH',
-                    location: 'Malvar St, Lawas',
-                  ),
-                  branchCard(
-                    context: context,
-                    imageUrl: 'images/branches/burgos.jpg',
-                    branchName: 'MAIN BRANCH',
-                    location: 'ABC St, Telic',
-                  ),
-                  branchCard(
-                    context: context,
-                    imageUrl: 'images/branches/bauan.jpg',
-                    branchName: 'BAUAN BRANCH',
-                    location: 'Bauan St, Lipa',
-                  ),
-                ],
+                  // For screen widths above 600, we will show the last card below the first two
+                  bool isWideScreen = screenWidth > 600;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // First and second cards in a row
+                          branchCard(context: context, branch: branches[0]),
+                          const SizedBox(width: 20),
+                          branchCard(context: context, branch: branches[1]),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+                      // Third card below the row (stacked)
+                      if (isWideScreen)
+                        branchCard(context: context, branch: branches[2])
+                      else
+                        Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            branchCard(context: context, branch: branches[2]),
+                          ],
+                        ),
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -78,11 +97,10 @@ class BranchSelection extends StatelessWidget {
 
   Widget branchCard({
     required BuildContext context,
-    required String imageUrl,
-    required String branchName,
-    required String location,
+    required Branch branch,
   }) {
-    final double cardSize = MediaQuery.of(context).size.width * 0.25; // Reduced size to 25% of screen width
+    final double cardWidth = MediaQuery.of(context).size.width * 0.4; // 40% of screen width
+    final double cardHeight = cardWidth * 1.1; // Maintain a good aspect ratio
 
     return GestureDetector(
       onTap: () {
@@ -92,7 +110,7 @@ class BranchSelection extends StatelessWidget {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Confirm Selection', style: GoogleFonts.poppins()),
-              content: Text('Do you want to select $branchName?', style: GoogleFonts.poppins()),
+              content: Text('Do you want to select ${branch.name}?', style: GoogleFonts.poppins()),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -102,12 +120,12 @@ class BranchSelection extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Close dialog and navigate to HomeScreen
+                    // Close dialog and navigate to NavBar
                     Navigator.of(context).pop();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const HomeScreen(), // Redirect to HomeScreen
+                        builder: (context) => const BottomNavBar(), // Redirect to NavBar
                       ),
                     );
                   },
@@ -119,8 +137,8 @@ class BranchSelection extends StatelessWidget {
         );
       },
       child: Container(
-        width: cardSize,
-        height: cardSize, // Make it square
+        width: cardWidth,
+        height: cardHeight,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),
@@ -134,30 +152,41 @@ class BranchSelection extends StatelessWidget {
                 topRight: Radius.circular(15),
               ),
               child: Image.asset(
-                imageUrl,
+                branch.imageUrl,
                 width: double.infinity,
-                height: cardSize * 0.55, // Adjust image height to 55% of card height
+                height: cardHeight * 0.6, // Responsive image height
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey, // Placeholder color if image fails to load
+                    child: Center(
+                      child: Text(
+                        'Image not available',
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0), // Adjust padding
+              padding: const EdgeInsets.all(10.0), // Increased padding for better text spacing
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    branchName,
+                    branch.name,
                     style: GoogleFonts.poppins(
-                      fontSize: 12,  // Reduced font size
+                      fontSize: 14, // Adjusted font size for branch name
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    location,
+                    branch.location,
                     style: GoogleFonts.poppins(
-                      fontSize: 10,  // Reduced font size
+                      fontSize: 12, // Adjusted font size for location
                       fontWeight: FontWeight.normal,
                       color: Colors.grey[600],
                     ),
