@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import Header from '../assets/components/Header';
 import StocksTable from '../assets/components/StocksTable';
 import ExpiryTable from '../assets/components/ExpiryTable';
@@ -21,6 +21,13 @@ function Inventory() {
     if (!formValues.id) errors.id = "ID is required.";
     if (!formValues.name) errors.name = "Name is required.";
     if (formValues.quantity <= 0) errors.quantity = "Quantity must be positive.";
+<<<<<<< HEAD
+=======
+    if (!formValues.supplier) errors.supplier = "Supplier is required.";
+    if (formValues.supplierPhone && !/^\d{11}$/.test(formValues.supplierPhone)) {
+      errors.supplierPhone = "Phone number must be exactly 11 digits and contain only numbers.";
+    }
+>>>>>>> bb3bb46608ec10b2c5777c4df1feca7441b361de
     if (new Date(formValues.expirationDate) <= today) {
       errors.expirationDate = "Expiration date must be in the future.";
     }
@@ -74,7 +81,12 @@ function Inventory() {
       </div>
 
       <main className="flex flex-col lg:flex-row w-full h-full overflow-hidden">
+<<<<<<< HEAD
         <div className="flex flex-col w-full lg:w-[100%] px-4 overflow-hidden">
+=======
+        {/* Left side: Stocks and Suppliers */}
+        <div className="flex flex-col w-full lg:w-[60%] px-4 overflow-hidden">
+>>>>>>> bb3bb46608ec10b2c5777c4df1feca7441b361de
           <section className="mt-4">
             <h2 className="text-3xl font-bold">Stocks</h2>
             <div className="overflow-x-auto">
@@ -83,6 +95,10 @@ function Inventory() {
           </section>
         </div>
 
+<<<<<<< HEAD
+=======
+        {/* Right side: Expiring Items */}
+>>>>>>> bb3bb46608ec10b2c5777c4df1feca7441b361de
         <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden">
           <section className="mt-0">
             <div>
@@ -140,6 +156,36 @@ function Inventory() {
               </div>
 
               <div className="mb-4">
+<<<<<<< HEAD
+=======
+                <label htmlFor="supplier" className="block text-sm font-medium text-gray-700">Supplier</label>
+                <input
+                  type="text"
+                  name="supplier"
+                  value={formValues.supplier}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                  required
+                />
+                {formErrors.supplier && <p className="text-red-500 text-sm">{formErrors.supplier}</p>}
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="supplierPhone" className="block text-sm font-medium text-gray-700">Supplier Phone</label>
+                <input
+                  type="tel" // Changed to "tel"
+                  name="supplierPhone"
+                  value={formValues.supplierPhone}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-lg w-full"
+                  maxLength={11} // Limit input to 11 digits
+                  required
+                />
+                {formErrors.supplierPhone && <p className="text-red-500 text-sm">{formErrors.supplierPhone}</p>}
+              </div>
+
+              <div className="mb-4">
+>>>>>>> bb3bb46608ec10b2c5777c4df1feca7441b361de
                 <label htmlFor="expirationDate" className="block text-sm font-medium text-gray-700">Expiration Date</label>
                 <input
                   type="date"

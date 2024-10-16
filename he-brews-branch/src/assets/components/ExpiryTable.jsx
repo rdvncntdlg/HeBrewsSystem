@@ -36,16 +36,16 @@ function ExpiryTable({ expiringItems }) {
       
       {/* Header Row */}
       <div className="grid grid-cols-2 gap-4 px-4 py-4 text-sm font-bold text-gray-700 bg-transparent rounded-lg">
-        <div className="text-left">ITEM ID</div>
-        <div className="text-left">EXPIRATION DATE</div>
+        <div className="text-center">ITEM ID</div>
+        <div className="text-center">EXPIRATION DATE</div>
       </div>
 
       {/* Expiring Items Rows */}
       {currentItems.length > 0 ? (
-        currentItems.map((item, index) => (
-          <div key={item.id} className={`grid grid-cols-2 gap-4 items-center py-2 px-4 text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'}`}>
-            <div>{item.id}</div>
-            <div>{item.expirationDate}</div>
+        currentItems.map((item) => (
+          <div key={item.id} className="grid grid-cols-2 gap-4 items-center py-2 px-4 text-xs bg-white">
+            <div className="text-center">{item.id}</div>
+            <div className="text-center">{item.expirationDate}</div>
           </div>
         ))
       ) : (
