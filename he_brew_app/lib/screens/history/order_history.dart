@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'sample_data.dart';
 
 class HistoryScreen extends StatelessWidget {
-  const HistoryScreen({Key? key});
+  const HistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Order History',
           style: TextStyle(
             fontWeight: FontWeight.bold,

@@ -100,7 +100,7 @@ class AddressScreen extends StatelessWidget {
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all<Color>(
-                    Color.fromARGB(255, 255, 255, 255)),
+                    const Color.fromARGB(255, 255, 255, 255)),
                 foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
               ),
               child: const Text('Cancel'),

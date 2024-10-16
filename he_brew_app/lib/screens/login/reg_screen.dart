@@ -42,7 +42,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -83,7 +84,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const BranchSelection(), // Redirect to BranchSelection
+            builder: (context) =>
+                const BranchSelection(), // Redirect to BranchSelection
           ),
         );
       } else {
@@ -253,8 +255,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
           ElevatedButton(
             onPressed: _register,
             style: ButtonStyle(
-              backgroundColor:MaterialStateProperty.all<Color>(Colors.black),
-              minimumSize: MaterialStateProperty.all<Size>(const Size(50, 60)),
+              backgroundColor: WidgetStateProperty.all<Color>(Colors.black),
+              minimumSize: WidgetStateProperty.all<Size>(const Size(50, 60)),
             ),
             child: const Text(
               'SIGN UP',

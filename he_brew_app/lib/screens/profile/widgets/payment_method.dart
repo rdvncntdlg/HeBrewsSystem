@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:he_brew_app/screens/profile/widgets/add_payment_method.dart'; 
+import 'package:he_brew_app/screens/profile/widgets/add_payment_method.dart';
 
 class PaymentMethodsScreen extends StatelessWidget {
   const PaymentMethodsScreen({super.key});
@@ -121,7 +121,7 @@ class PaymentMethodsScreen extends StatelessWidget {
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all<Color>(
-                    Color.fromARGB(255, 255, 255, 255)),
+                    const Color.fromARGB(255, 255, 255, 255)),
                 foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
               ),
               child: const Text('Cancel'),
@@ -157,7 +157,7 @@ class PaymentMethodsScreen extends StatelessWidget {
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all<Color>(
-                    Color.fromARGB(255, 255, 255, 255)),
+                    const Color.fromARGB(255, 255, 255, 255)),
                 foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
               ),
               child: const Text('Cancel'),

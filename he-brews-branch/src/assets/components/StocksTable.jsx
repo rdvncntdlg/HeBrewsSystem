@@ -30,28 +30,6 @@ function StocksTable({ stockItems }) {
 
   return (
     <div className="mt-5">
-      {/* Table Header */}
-      <div className="grid grid-cols-4 gap-5 px-10 py-4 w-full text-sm font-bold text-white bg-neutral-950 rounded-3xl max-md:px-4">
-        <div className="text-center">ITEM ID</div>  {/* Centered text */}
-        <div className="text-center">NAME</div>     {/* Centered text */}
-        <div className="text-center">QUANTITY</div> {/* Centered text */}
-        <div className="text-center">SUPPLIER</div> {/* Centered text */}
-      </div>
-
-      {/* Table Body */}
-      {currentItems.length > 0 ? (
-        currentItems.map((item, index) => (
-          <div
-            key={item.id}
-            className={`grid grid-cols-4 gap-4 items-center py-2 px-8 text-xs ${index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'} max-md:px-4`}
-          >
-            <div className="text-center">{item.id}</div>
-            <div className="text-center">{item.name}</div>
-            <div className="text-center">{item.quantity}</div>
-            <div className="text-center">{item.supplier}</div>
-          </div>
-        ))
-      ) : (
         <table className="min-w-full bg-neutral-950 rounded-3xl">
           <thead>
             <tr className="text-sm font-bold text-white bg-neutral-800">
@@ -78,7 +56,6 @@ function StocksTable({ stockItems }) {
             )}
           </tbody>
         </table>
-      )}
 
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-4">

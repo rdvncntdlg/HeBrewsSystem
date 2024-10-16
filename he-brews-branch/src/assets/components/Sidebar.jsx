@@ -11,7 +11,7 @@ export default function Sidebar({ children }) {
     <aside className="h-screen">
       <nav className="h-full flex flex-col bg-custom-black border-r shadow-xl">
         <div className="p-6 pb-10 flex justify-between items-center">
-          <img
+        <img
             src="src/assets/images/logo.png"
             className={`overflow-hidden transition-all ${
               expanded ? "w-44 pr-2" : "w-0 pl-2"

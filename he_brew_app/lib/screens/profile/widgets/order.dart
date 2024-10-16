@@ -42,12 +42,12 @@ class OrderScreen extends StatelessWidget {
       subtitle: Text('Total: $totalAmount'),
       trailing: ElevatedButton(
         onPressed: onCancel,
-        child: const Text('Cancel'),
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.all<Color>(
               const Color.fromARGB(255, 0, 0, 0)),
           foregroundColor: WidgetStateProperty.all<Color>(Colors.white),
         ),
+        child: const Text('Cancel'),
       ),
     );
   }
@@ -66,9 +66,9 @@ class OrderScreen extends StatelessWidget {
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all<Color>(
-                    Color.fromARGB(255, 0, 0, 0)),
+                    const Color.fromARGB(255, 0, 0, 0)),
                 foregroundColor: WidgetStateProperty.all<Color>(
-                    Color.fromARGB(255, 255, 255, 255)),
+                    const Color.fromARGB(255, 255, 255, 255)),
               ),
               child: const Text('Yes'),
             ),
@@ -78,7 +78,7 @@ class OrderScreen extends StatelessWidget {
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all<Color>(
-                    Color.fromARGB(255, 255, 255, 255)),
+                    const Color.fromARGB(255, 255, 255, 255)),
                 foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
               ),
               child: const Text('No'),

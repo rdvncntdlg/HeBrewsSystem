@@ -29,7 +29,7 @@ const pool = new Pool({
   host: 'localhost',
   database: 'hebrews',
   password: 'password',
-  port: 5432,
+  port: 5433,
 });
 
 const app = express();

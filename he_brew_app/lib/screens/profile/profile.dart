@@ -49,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-       print(data);
+      print(data);
       final token = data['token']; // Get the token from response
 
       // Save token locally (could use shared_preferences)
@@ -72,8 +72,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (token == null) {
       // Handle the case where there's no token (user is not logged in)
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()));
       return;
     }
 

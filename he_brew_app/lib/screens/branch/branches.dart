@@ -11,15 +11,24 @@ class Branch {
 }
 
 class BranchSelection extends StatelessWidget {
-  const BranchSelection({Key? key}) : super(key: key);
+  const BranchSelection({super.key});
 
   @override
   Widget build(BuildContext context) {
     // Sample branch data
     final List<Branch> branches = [
-      Branch(imageUrl: 'images/branches/lawas.jpg', name: 'LAWAS BRANCH', location: 'Malvar St, Lawas'),
-      Branch(imageUrl: 'images/branches/burgos.jpg', name: 'MAIN BRANCH', location: 'ABC St, Telic'),
-      Branch(imageUrl: 'images/branches/bauan.jpg', name: 'BAUAN BRANCH', location: 'Bauan St, Lipa'),
+      Branch(
+          imageUrl: 'images/branches/lawas.jpg',
+          name: 'LAWAS BRANCH',
+          location: 'Malvar St, Lawas'),
+      Branch(
+          imageUrl: 'images/branches/burgos.jpg',
+          name: 'MAIN BRANCH',
+          location: 'ABC St, Telic'),
+      Branch(
+          imageUrl: 'images/branches/bauan.jpg',
+          name: 'BAUAN BRANCH',
+          location: 'Bauan St, Lipa'),
     ];
 
     return Scaffold(
@@ -39,7 +48,8 @@ class BranchSelection extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 20.0),
                 child: Image.asset(
                   'images/cream_logo.png', // Path to the logo image
-                  width: MediaQuery.of(context).size.width * 0.4, // Reduced width for the logo
+                  width: MediaQuery.of(context).size.width *
+                      0.4, // Reduced width for the logo
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey,
@@ -99,7 +109,8 @@ class BranchSelection extends StatelessWidget {
     required BuildContext context,
     required Branch branch,
   }) {
-    final double cardWidth = MediaQuery.of(context).size.width * 0.4; // 40% of screen width
+    final double cardWidth =
+        MediaQuery.of(context).size.width * 0.4; // 40% of screen width
     final double cardHeight = cardWidth * 1.1; // Maintain a good aspect ratio
 
     return GestureDetector(
@@ -110,7 +121,8 @@ class BranchSelection extends StatelessWidget {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Confirm Selection', style: GoogleFonts.poppins()),
-              content: Text('Do you want to select ${branch.name}?', style: GoogleFonts.poppins()),
+              content: Text('Do you want to select ${branch.name}?',
+                  style: GoogleFonts.poppins()),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -125,7 +137,8 @@ class BranchSelection extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const BottomNavBar(), // Redirect to NavBar
+                        builder: (context) =>
+                            const BottomNavBar(), // Redirect to NavBar
                       ),
                     );
                   },
@@ -158,7 +171,8 @@ class BranchSelection extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    color: Colors.grey, // Placeholder color if image fails to load
+                    color:
+                        Colors.grey, // Placeholder color if image fails to load
                     child: Center(
                       child: Text(
                         'Image not available',
@@ -170,7 +184,8 @@ class BranchSelection extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(10.0), // Increased padding for better text spacing
+              padding: const EdgeInsets.all(
+                  10.0), // Increased padding for better text spacing
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
