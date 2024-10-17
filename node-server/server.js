@@ -29,7 +29,7 @@ const pool = new Pool({
   host: 'localhost',
   database: 'hebrews',
   password: 'password',
-  port: 5432,
+  port: 5433,
 });
 
 const app = express();
@@ -850,6 +850,52 @@ app.get('/api/stock-requests/Completed', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/stocks', authenticateEmployeeToken, async (req, res) => {
+  const { branch } = req.user;
+
+  try {
+    // Query the database for stock items of the specific branch
+    const result = await pool.query(
+      `SELECT i.inventory_id, i.quantity, i.expirationdate, s.itemname FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = $1;`,
+      [branch]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching stock items:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.get('/expiring-items', authenticateEmployeeToken, async (req, res) => {
+  const { branch } = req.user;
+
+  try {
+    // Query the database for stock items of the specific branch
+    const result = await pool.query(
+      `SELECT i.inventory_id, s.itemname, i.expirationdate FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = $1 AND i.expirationdate <= NOW() + INTERVAL '30 days' ORDER BY i.expirationdate ASC`,[branch]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching stock items:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.get('/alert-stock', authenticateEmployeeToken, async (req, res) => {
+  const { branch } = req.user;
+
+  try {
+    // Query the database for stock items of the specific branch
+    const result = await pool.query(
+      `SELECT s.itemname, SUM(i.quantity) AS total_quantity FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = $1 GROUP BY s.itemname HAVING SUM(i.quantity) < 20 ORDER BY s.itemname ASC`,[branch]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching stock items:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

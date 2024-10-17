@@ -4,7 +4,7 @@ import StocksTable from '../assets/components/StocksTable';
 import ExpiryTable from '../assets/components/ExpiryTable';
 import StockAlertTable from '../assets/components/StockAlertTable';
 
-function Inventory({ branch }) { // Accept branch as a prop
+function Inventory() { // Accept branch as a prop
   const [stocks, setStocks] = useState([]); // State for stocks
 
   return (
@@ -16,8 +16,7 @@ function Inventory({ branch }) { // Accept branch as a prop
           <section className="mt-4">
             <h2 className="text-3xl font-bold">Stocks</h2>
             <div className="overflow-x-auto">
-              {/* Pass branch_id to StocksTable */}
-              <StocksTable branch_id={branch} />
+              <StocksTable />
             </div>
           </section>
         </div>
@@ -25,8 +24,8 @@ function Inventory({ branch }) { // Accept branch as a prop
         <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden">
           <section className="mt-0 flex justify-end">
             <div className="overflow-x-auto w-full max-w-lg"> 
-              {/* Assuming you have ExpiryTable and StockAlertTable that can use expiringItems */}
-              
+              <ExpiryTable />
+              <StockAlertTable />
             </div>
           </section>
         </div>

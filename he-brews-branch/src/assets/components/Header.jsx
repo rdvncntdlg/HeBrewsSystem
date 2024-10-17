@@ -78,7 +78,7 @@ function Header({ text }) {
           <>
             <div className="flex flex-col my-auto">
               <div className="text-base font-bold">{`${profileData.firstname} ${profileData.lastname}`}</div>
-              <div className="self-end text-sm max-md:mr-0.5">{profileData.branch}</div>
+              <div className="self-end text-sm max-md:mr-0.5">{profileData.position}</div>
             </div>
             <img
               loading="lazy"
