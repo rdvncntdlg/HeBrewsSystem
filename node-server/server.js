@@ -29,7 +29,7 @@ const pool = new Pool({
   host: 'localhost',
   database: 'hebrews',
   password: 'password',
-  port: 5433,
+  port: 5432,
 });
 
 const app = express();
@@ -136,6 +136,38 @@ const authenticateadminToken = (req, res, next) => {
   });
 };
 
+// Authentication middleware for employee
+const authenticateEmployeeToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) {
+    return res.status(401).json({ success: false, message: 'Token is missing' });
+  }
+
+  jwt.verify(token, secretKey, (err, user) => {
+    if (err) {
+      return res.status(403).json({ success: false, message: 'Forbidden' });
+    }
+
+    // Assuming user contains firstname, lastname, and position
+    req.user = {
+      username: user.username,  // Assuming username is part of the token payload
+      firstname: user.firstname, // Include firstname
+      lastname: user.lastname,   // Include lastname
+      position: user.position,
+      branch: user.branch_id    // Include position
+    };
+
+    next();
+  });
+};
+
+app.get('/employee-profile', authenticateEmployeeToken, (req, res) => {
+  res.json({ success: true, user: req.user });
+});
+
+
 
 app.post('/admin-login', async (req, res) => {
   const { username, password } = req.body;
@@ -190,7 +222,61 @@ app.post('/admin-login', async (req, res) => {
   }
 });
 
+app.post('/branch-login', async (req, res) => {
+  const { username, password } = req.body;
 
+  try {
+    // Log to verify request data
+    console.log("Branch login attempt by:", username);
+
+    // Fetch the employee from the employeestbl
+    const result = await pool.query('SELECT * FROM employeetbl WHERE username = $1', [username]);
+
+    // Check if employee exists
+    if (result.rows.length === 0) {
+      return res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
+
+    const employee = result.rows[0];
+
+    // Check if the password matches
+    const isMatch = await bcrypt.compare(password, employee.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
+
+    // Generate JWT token with employee information included
+    const token = jwt.sign(
+      { 
+        id: employee.employee_id, 
+        username: employee.username, 
+        firstname: employee.firstname, 
+        lastname: employee.lastname,
+        position: employee.position,
+        branch_id: employee.branch_id // Include employee position in the token payload
+      },
+      secretKey, // Use your JWT secret key here
+      { expiresIn: '1h' }
+    );
+
+    // Return success response with token and employee info
+    return res.json({ 
+      success: true, 
+      message: 'Login successful', 
+      token, 
+      employee_id: employee.employee_id, 
+      username: employee.username,
+      position: employee.position,
+      branch_id: employee.branch_id
+    });
+  } catch (error) {
+    // Log the error for debugging
+    console.error("Error during branch login:", error);
+
+    // Return a 500 Internal Server Error with error details
+    return res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+});
 
 
 
@@ -220,7 +306,7 @@ app.post('/register', async (req, res) => {
     }
   });
 
-  app.get('/admin-profile', authenticateadminToken, (req, res) => {
+app.get('/admin-profile', authenticateadminToken, (req, res) => {
     res.json({ success: true, user: req.user });
   })
 

@@ -1,17 +1,11 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import Header from '../assets/components/Header';
 import StocksTable from '../assets/components/StocksTable';
 import ExpiryTable from '../assets/components/ExpiryTable';
+import StockAlertTable from '../assets/components/StockAlertTable';
 
-function Inventory() {
+function Inventory({ branch }) { // Accept branch as a prop
   const [stocks, setStocks] = useState([]); // State for stocks
-
-  const expiringItems = stocks.filter((item) => {
-    const expirationDate = new Date(item.expirationDate);
-    const today = new Date();
-    const timeDiff = expirationDate - today;
-    return timeDiff > 0 && timeDiff <= 30 * 24 * 60 * 60 * 1000;
-  });
 
   return (
     <div className="h-screen overflow-hidden">
@@ -22,7 +16,8 @@ function Inventory() {
           <section className="mt-4">
             <h2 className="text-3xl font-bold">Stocks</h2>
             <div className="overflow-x-auto">
-              <StocksTable stockItems={stocks} />
+              {/* Pass branch_id to StocksTable */}
+              <StocksTable branch_id={branch} />
             </div>
           </section>
         </div>
@@ -30,10 +25,8 @@ function Inventory() {
         <div className="flex flex-col w-full lg:w-[40%] px-4 overflow-hidden">
           <section className="mt-0 flex justify-end">
             <div className="overflow-x-auto w-full max-w-lg"> 
-              <ExpiryTable 
-                expiringItems={expiringItems}
-                className="rounded-lg"
-              />
+              {/* Assuming you have ExpiryTable and StockAlertTable that can use expiringItems */}
+              
             </div>
           </section>
         </div>

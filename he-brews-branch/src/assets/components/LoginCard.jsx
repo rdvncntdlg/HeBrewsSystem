@@ -4,15 +4,43 @@ import { useNavigate } from "react-router-dom";
 function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-  };
-
   const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate("/dashboard");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      // Send a POST request to the backend for login
+      const response = await fetch('http://localhost:3000/branch-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      // Check if the response is okay (status in the range 200-299)
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+
+      // Parse the JSON response
+      const data = await response.json();
+
+      // Assuming the response contains the token and employee info
+      const { token, employee } = data;
+
+      // Store the token if necessary (e.g., in localStorage or context)
+      localStorage.setItem('token', token);
+
+      // Navigate to the dashboard after successful login
+      navigate("/dashboard");
+    } catch (error) {
+      // Handle error (e.g., display error message)
+      console.error('Login failed:', error.message);
+      alert(error.message); // Display the error message
+    }
   };
 
   return (
@@ -50,7 +78,6 @@ function LoginForm() {
       <button
         type="submit"
         className="px-16 py-2.5 mx-5 mt-10 text-sm text-center text-white whitespace-nowrap rounded-xl bg-neutral-950 max-md:px-5 max-md:mx-2.5"
-        onClick={handleClick}
       >
         Login
       </button>
