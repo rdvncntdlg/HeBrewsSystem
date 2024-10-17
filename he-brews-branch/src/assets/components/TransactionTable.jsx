@@ -19,11 +19,17 @@ const transactions = [
 
 function TransactionTable() {
   return (
-    <section className="mt-12 w-full text-black max-md:mt-10 max-md:max-w-full">
-      <TransactionTableHeader />
-      {transactions.map((transaction, index) => (
-        <TransactionTableRow key={transaction.id} transaction={transaction} isEven={index % 2 === 0} />
-      ))}
+    <section className="mt-12 w-full max-md:mt-10 max-md:max-w-full">
+      <div className="rounded-2xl overflow-hidden shadow-lg bg-white">
+        <table className="min-w-full border-collapse">
+          <TransactionTableHeader />
+          <tbody>
+            {transactions.map((transaction, index) => (
+              <TransactionTableRow key={transaction.id} transaction={transaction} isEven={index % 2 === 0} />
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }

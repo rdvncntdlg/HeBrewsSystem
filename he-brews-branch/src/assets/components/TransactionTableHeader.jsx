@@ -2,17 +2,17 @@ import React from 'react';
 
 function TransactionTableHeader() {
   return (
-    <div className="flex flex-col justify-center px-16 py-4 mt-12 w-full text-sm font-bold text-white rounded-3xl bg-neutral-950 max-md:px-5 max-md:mt-10 max-md:max-w-full">
-      <div className="flex flex-wrap gap-10 items-start max-md:max-w-full">
-        <div>INVOICE ID</div>
-        <div>CUSTOMER</div>
-        <div className="text-center">STAFF</div>
-        <div>AMOUNT</div>
-        <div>DATE</div>
-        <div>PAYMENT METHOD</div>
-        <div>BRANCH</div>
-      </div>
-    </div>
+    <thead>
+      <tr className="bg-neutral-950 text-white text-sm font-bold">
+        <th className="px-4 py-2">INVOICE ID</th>
+        <th className="px-4 py-2">CUSTOMER</th>
+        <th className="px-4 py-2">STAFF</th>
+        <th className="px-4 py-2">AMOUNT</th>
+        <th className="px-4 py-2">DATE</th>
+        <th className="px-4 py-2">PAYMENT METHOD</th>
+        <th className="px-4 py-2">BRANCH</th>
+      </tr>
+    </thead>
   );
 }
 
