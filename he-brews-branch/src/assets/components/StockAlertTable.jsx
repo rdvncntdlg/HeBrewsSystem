@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import RequestModal from './RequestModal'; // Import the RequestModal component
 
 function StockAlertPage() {
   const [stockItems, setStockItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
     const fetchStockAlerts = async () => {
@@ -12,7 +15,7 @@ function StockAlertPage() {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`, // Adjust this line based on your token storage method
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
         });
 
@@ -30,24 +33,18 @@ function StockAlertPage() {
     };
 
     fetchStockAlerts();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []); 
 
   const StockAlertTable = ({ stockItems }) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5; // Number of items to display per page
+    const itemsPerPage = 5;
 
-    // Sort the items by quantity in ascending order
     const sortedItems = [...stockItems].sort((a, b) => a.total_quantity - b.total_quantity);
-
-    // Calculate total pages
     const totalPages = Math.ceil(sortedItems.length / itemsPerPage);
-
-    // Get current items for the page
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = sortedItems.slice(indexOfFirstItem, indexOfLastItem);
 
-    // Pagination Handlers
     const nextPage = () => {
       if (currentPage < totalPages) {
         setCurrentPage(currentPage + 1);
@@ -60,17 +57,15 @@ function StockAlertPage() {
       }
     };
 
-    // Function to handle request action
     const handleRequest = (item) => {
-      console.log(`Requesting more stock for: ${item.itemname}`);
-      // Add logic to handle the request, like an API call
+      setSelectedItem(item);
+      setShowModal(true);
     };
 
     return (
       <div className="w-full mx-auto mt-1 p-4 bg-white shadow-md rounded-lg overflow-hidden"> 
         <h2 className="text-2xl text-black mb-4">Stock Alert</h2>
         
-        {/* Stock Alert Table */}
         <table className="w-full table-auto">
           <thead className="bg-gray-200">
             <tr>
@@ -103,7 +98,6 @@ function StockAlertPage() {
           </tbody>
         </table>
 
-        {/* Pagination Controls */}
         <div className="flex justify-between mt-4">
           <button onClick={prevPage} disabled={currentPage === 1} className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition duration-300">
             Previous
@@ -129,8 +123,10 @@ function StockAlertPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Stock Alerts</h1>
       <StockAlertTable stockItems={stockItems} />
+      {showModal && selectedItem && (
+        <RequestModal item={selectedItem} onClose={() => setShowModal(false)} />
+      )}
     </div>
   );
 }

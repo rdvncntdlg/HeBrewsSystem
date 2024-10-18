@@ -29,7 +29,7 @@ const pool = new Pool({
   host: 'localhost',
   database: 'hebrews',
   password: 'password',
-  port: 5433,
+  port: 5432,
 });
 
 const app = express();
@@ -44,44 +44,46 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-      return res.status(400).json({ success: false, message: 'Username and password are required' });
+    return res.status(400).json({ success: false, message: 'Username and password are required' });
   }
 
   try {
-      const result = await pool.query('SELECT customer_id, firstname, lastname, password, username FROM customertbl WHERE username = $1', [username]);
-      const user = result.rows[0];
+    const result = await pool.query('SELECT customer_id, firstname, lastname, password, username FROM customertbl WHERE username = $1', [username]);
+    const user = result.rows[0];
 
-      if (user) {
-          const passwordMatch = await bcrypt.compare(password, user.password); // Compare the password
-          
-          if (passwordMatch) {
-              // Generate a token (e.g., JWT)
-              const token = jwt.sign(
-                { username: user.username,
-                  firstname: user.firstname,  // include firstname in the token payload
-                  lastname: user.lastname }, 
-                secretKey, 
-                { expiresIn: '1h' } // Set token expiration time
-              );
+    if (user) {
+      const passwordMatch = await bcrypt.compare(password, user.password); // Compare the password
 
-              res.json({ 
-                  success: true, 
-                  message: 'Login successful', 
-                  token, 
-                  customer_id: user.customer_id, 
-                  firstname: user.firstname,
-                  lastname: user.lastname,
-                  username: user.username
-              });
-          } else {
-              res.status(401).json({ success: false, message: 'Invalid username or password' });
-          }
+      if (passwordMatch) {
+        // Generate a token (e.g., JWT)
+        const token = jwt.sign(
+          {
+            username: user.username,
+            firstname: user.firstname,  // include firstname in the token payload
+            lastname: user.lastname
+          },
+          secretKey,
+          { expiresIn: '1h' } // Set token expiration time
+        );
+
+        res.json({
+          success: true,
+          message: 'Login successful',
+          token,
+          customer_id: user.customer_id,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          username: user.username
+        });
       } else {
-          res.status(401).json({ success: false, message: 'Invalid username or password' });
+        res.status(401).json({ success: false, message: 'Invalid username or password' });
       }
+    } else {
+      res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
   } catch (error) {
-      console.error('Error during login:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
+    console.error('Error during login:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -194,10 +196,10 @@ app.post('/admin-login', async (req, res) => {
 
     // Generate JWT token with position included
     const token = jwt.sign(
-      { 
-        id: user.employee_id, 
-        username: user.username, 
-        firstname: user.firstname, 
+      {
+        id: user.employee_id,
+        username: user.username,
+        firstname: user.firstname,
         lastname: user.lastname,
         position: user.position // Include position in the token payload
       },
@@ -205,13 +207,13 @@ app.post('/admin-login', async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    return res.json({ 
-      success: true, 
-      message: 'Login successful', 
-      token, 
-      employee_id: user.employee_id, 
+    return res.json({
+      success: true,
+      message: 'Login successful',
+      token,
+      employee_id: user.employee_id,
       username: user.username,
-      position: user.position 
+      position: user.position
     });
   } catch (error) {
     // Log the error for debugging
@@ -247,10 +249,10 @@ app.post('/branch-login', async (req, res) => {
 
     // Generate JWT token with employee information included
     const token = jwt.sign(
-      { 
-        id: employee.employee_id, 
-        username: employee.username, 
-        firstname: employee.firstname, 
+      {
+        id: employee.employee_id,
+        username: employee.username,
+        firstname: employee.firstname,
         lastname: employee.lastname,
         position: employee.position,
         branch_id: employee.branch_id // Include employee position in the token payload
@@ -260,11 +262,11 @@ app.post('/branch-login', async (req, res) => {
     );
 
     // Return success response with token and employee info
-    return res.json({ 
-      success: true, 
-      message: 'Login successful', 
-      token, 
-      employee_id: employee.employee_id, 
+    return res.json({
+      success: true,
+      message: 'Login successful',
+      token,
+      employee_id: employee.employee_id,
       username: employee.username,
       position: employee.position,
       branch_id: employee.branch_id
@@ -281,34 +283,34 @@ app.post('/branch-login', async (req, res) => {
 
 
 app.post('/register', async (req, res) => {
-    const { firstName, lastName, email, username, password, address, phone } = req.body;
-  
-    if (!firstName || !lastName || !email || !username || !password || !address || !phone) {
-      return res.status(400).json({ success: false, message: 'All fields are required' });
-    }
-  
-    try {
-      const hashedPassword = bcrypt.hashSync(password, 10);
-  
-      // Insert the user and get the new customer_id
-      const result = await pool.query(
-        `INSERT INTO customertbl (firstname, lastname, email, username, password, address, phonenumber)
+  const { firstName, lastName, email, username, password, address, phone } = req.body;
+
+  if (!firstName || !lastName || !email || !username || !password || !address || !phone) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+
+  try {
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    // Insert the user and get the new customer_id
+    const result = await pool.query(
+      `INSERT INTO customertbl (firstname, lastname, email, username, password, address, phonenumber)
          VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING customer_id`,
-        [firstName, lastName, email, username, hashedPassword, address, phone]
-      );
-  
-      const customer_id = result.rows[0];
-  
-      res.status(200).json({ success: true, message: 'Registration successful', customer_id });
-    } catch (error) {
-      console.error('Error during registration:', error);
-      res.status(500).json({ success: false, message: 'Server error', details: error.message });
-    }
-  });
+      [firstName, lastName, email, username, hashedPassword, address, phone]
+    );
+
+    const customer_id = result.rows[0];
+
+    res.status(200).json({ success: true, message: 'Registration successful', customer_id });
+  } catch (error) {
+    console.error('Error during registration:', error);
+    res.status(500).json({ success: false, message: 'Server error', details: error.message });
+  }
+});
 
 app.get('/admin-profile', authenticateadminToken, (req, res) => {
-    res.json({ success: true, user: req.user });
-  })
+  res.json({ success: true, user: req.user });
+})
 
 // Protected route
 app.get('/profile', authenticateToken, (req, res) => {
@@ -319,16 +321,16 @@ app.post('/profile/update', async (req, res) => {
   const { customer_id, firstname, username } = req.body;
 
   try {
-      const result = await pool.query(
-          'UPDATE customertbl SET firstname = $1, username = $2 WHERE customer_id = $3 RETURNING *',
-          [firstname, username, customer_id]
-      );
-      
-      const updatedUser = result.rows[0];
-      res.json({ success: true, user: updatedUser });
+    const result = await pool.query(
+      'UPDATE customertbl SET firstname = $1, username = $2 WHERE customer_id = $3 RETURNING *',
+      [firstname, username, customer_id]
+    );
+
+    const updatedUser = result.rows[0];
+    res.json({ success: true, user: updatedUser });
   } catch (error) {
-      console.error('Error updating profile:', error);
-      res.status(500).json({ success: false, message: 'Server error' });
+    console.error('Error updating profile:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
@@ -710,7 +712,7 @@ app.post('/api/orderitems', async (req, res) => {
     );
 
     let order;
-    
+
     // If the orderId doesn't exist, insert it
     if (existingOrder.rows.length === 0) {
       order = await pool.query(
@@ -875,7 +877,7 @@ app.get('/expiring-items', authenticateEmployeeToken, async (req, res) => {
   try {
     // Query the database for stock items of the specific branch
     const result = await pool.query(
-      `SELECT i.inventory_id, s.itemname, i.expirationdate FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = $1 AND i.expirationdate <= NOW() + INTERVAL '30 days' ORDER BY i.expirationdate ASC`,[branch]
+      `SELECT i.inventory_id, s.itemname, i.expirationdate FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = $1 AND i.expirationdate <= NOW() + INTERVAL '30 days' ORDER BY i.expirationdate ASC`, [branch]
     );
     res.json(result.rows);
   } catch (error) {
@@ -890,7 +892,23 @@ app.get('/alert-stock', authenticateEmployeeToken, async (req, res) => {
   try {
     // Query the database for stock items of the specific branch
     const result = await pool.query(
-      `SELECT s.itemname, SUM(i.quantity) AS total_quantity FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = $1 GROUP BY s.itemname HAVING SUM(i.quantity) < 20 ORDER BY s.itemname ASC`,[branch]
+      `SELECT s.itemname, SUM(i.quantity) AS total_quantity, i.item_id, i.branch_id FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = $1 GROUP BY s.itemname, i.item_id, i.branch_id HAVING SUM(i.quantity) < 20 ORDER BY s.itemname ASC`, [branch]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching stock items:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.get('/requests', authenticateEmployeeToken, async (req, res) => {
+  const { branch } = req.user;
+
+  try {
+    // Query the database for stock items of the specific branch
+    const result = await pool.query(
+      `SELECT sr.request_id, sr.item_id, s.itemname, sr.quantity, sr.status FROM stockrequeststbl sr JOIN stockitemstbl s ON sr.item_id = s.item_id WHERE sr.branch_id = $1 AND sr.status IN ('Pending', 'Approved')`,
+      [branch]
     );
     res.json(result.rows);
   } catch (error) {
