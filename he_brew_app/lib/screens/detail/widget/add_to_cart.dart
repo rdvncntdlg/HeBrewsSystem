@@ -6,7 +6,9 @@ import 'package:he_brew_app/screens/detail/widget/custom_snackbar.dart';
 
 class AddToCart extends StatefulWidget {
   final Product product;
-  const AddToCart({super.key, required this.product});
+  final String token;  // Add token as a parameter
+
+  const AddToCart({super.key, required this.product, required this.token});
 
   @override
   State<AddToCart> createState() => _AddToCartState();
@@ -28,7 +30,8 @@ class _AddToCartState extends State<AddToCart> {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  provider.toggleFavorite(widget.product);
+                  // Pass both product and token to toggleFavorite
+                  provider.toggleFavorite(widget.product, widget.token);  
                   showCustomSnackbar(context, "Successfully Added");
                 },
                 child: Container(

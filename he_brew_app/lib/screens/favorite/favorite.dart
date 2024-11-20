@@ -59,7 +59,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      favoriteItems.title,
+                                      favoriteItems.name,
                                       style: const TextStyle(
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,

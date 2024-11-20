@@ -88,7 +88,7 @@ class _CartScreenState extends State<CartScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    cartItems.title,
+                                    cartItems.name,
                                     style: const TextStyle(
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.bold,

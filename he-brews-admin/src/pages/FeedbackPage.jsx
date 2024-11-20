@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '../assets/components/Header';
 import OverallRate from '../assets/components/OverallRate';
 import FeedbackGrid from '../assets/components/FeedbackGrid';
+import CustomerSatisfactionSurvey from '../assets/components/CustomerSatisfactionSurvey';
 
 function Feedback() {
     return (
@@ -16,4 +17,4 @@ function Feedback() {
     )
   };
   
-  export default Feedback;
+export default Feedback;

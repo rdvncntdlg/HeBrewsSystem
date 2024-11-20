@@ -1,5 +1,4 @@
 import React from 'react';
-import { CirclePlus } from 'lucide-react';
 
 // ProductCard.js
 
@@ -17,7 +16,6 @@ function ProductCard({ productId, image, name, price, orderId, onAddToOrder }) {
       if (response.ok) {
         const data = await response.json();
         console.log('Item added to order:', data);
-        // Call the onAddToOrder function and pass the new item data to update the state
         if (onAddToOrder) {
           onAddToOrder({ productId, name, price, image, orderId, quantity: 1 });
         }
@@ -30,18 +28,21 @@ function ProductCard({ productId, image, name, price, orderId, onAddToOrder }) {
   };
 
   return (
-    <div className="flex flex-col max-w-full font-bold rounded-none h-[178px] w-[140px] m-2">
-      <div className="flex flex-col pb-3.5 w-full bg-white rounded-3xl shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
-        <img loading="lazy" src={`http://localhost:3000/${image}`} alt={name} className="object-contain w-full rounded-3xl aspect-[1.13]" />
-        <div className="relative flex gap-1.5 mt-4 ml-2.5 max-md:mr-2.5">
-          <div className="flex flex-col">
-            <div className="text-base text-black">{name}</div>
-            <div className="self-start mt-1.5 text-sm text-red-700">₱{price}</div>
-          </div>
-          <CirclePlus
-            onClick={handleAddToOrder}
-            className="absolute bottom-0 right-0 object-contain shrink-0 w-6 aspect-square pr-2 cursor-pointer"
-          />
+    <div
+      className="flex flex-col max-w-[200px] w-full font-bold rounded-lg h-[200px] m-3 relative cursor-pointer"
+      onClick={handleAddToOrder} // Apply the click handler to the whole card
+    >
+      <div className="flex flex-col pb-4 w-full bg-white rounded-lg shadow-[0px_4px_4px_rgba(0,0,0,0.25)]">
+        {/* Image with top-left and top-right border */}
+        <img 
+          loading="lazy" 
+          src={image}
+          alt={name} 
+          className="object-cover w-full h-[150px] rounded-tl-lg rounded-tr-lg border-t-4 border-t-gray-300" // Apply rounded corners (lg) and border on top-left and top-right
+        />
+        <div className="flex flex-col gap-2 mt-4 ml-2.5">
+          <div className="text-base text-black">{name}</div>
+          <div className="self-start mt-1.5 text-sm text-red-700">₱{price}</div>
         </div>
       </div>
     </div>

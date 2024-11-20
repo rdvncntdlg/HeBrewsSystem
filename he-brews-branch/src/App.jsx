@@ -9,6 +9,7 @@ import Inventory from './pages/InventoryPage';
 import Feedback from './pages/FeedbackPage';
 import SidebarLayout from './pages/SidebarLayout'; // Adjust the path as needed
 import NonSidebarLayout from './pages/NonSidebarLayout'; // Adjust the path as needed
+import ManageOrdersPage from './pages/ManageOrders';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route element={<SidebarLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/manage-orders" element={<ManageOrdersPage />} />
           <Route path="/menu" element={<Menu />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/inventory" element={<Inventory />} />

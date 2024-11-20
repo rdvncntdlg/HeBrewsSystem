@@ -4,7 +4,9 @@ import 'package:he_brew_app/provider/favorite_provider.dart';
 
 class DetailAppBar extends StatelessWidget {
   final Product product;
-  const DetailAppBar({super.key, required this.product});
+  final String token;  // Add the token parameter
+
+  const DetailAppBar({super.key, required this.product, required this.token});
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +32,11 @@ class DetailAppBar extends StatelessWidget {
               padding: const EdgeInsets.all(15),
             ),
             onPressed: () {
-              provider.toggleFavorite(product);
+              // Use the token in your toggleFavorite method
+              provider.toggleFavorite(product, token);
             },
             icon: Icon(
-              provider.isExist(product)
-                  ? Icons.favorite
-                  : Icons.favorite_border,
+              provider.isFavorite(product) ? Icons.favorite : Icons.favorite_border,
               color: Colors.black,
               size: 25,
             ),

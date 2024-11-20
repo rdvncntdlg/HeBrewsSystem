@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import UsersPage from './pages/UsersPage';
@@ -11,6 +12,8 @@ import Branch from './pages/Branches';
 import Feedback from './pages/FeedbackPage';
 import SidebarLayout from './pages/SidebarLayout'; // Adjust the path as needed
 import NonSidebarLayout from './pages/NonSidebarLayout'; // Adjust the path as needed
+import CustomerSatisfactionSurvey from './assets/components/CustomerSatisfactionSurvey';
+import ThankYouPage from './assets/components/ThankyouPage';
 
 function App() {
   return (
@@ -18,7 +21,10 @@ function App() {
       <Routes>
         {/* Routes without sidebar */}
         <Route element={<NonSidebarLayout />}>
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/admin-login" element={<LoginPage />} />
+          <Route path="/customer-satisfaction-survey" element={<CustomerSatisfactionSurvey />} />
+          <Route path="/thank-you" element={<ThankYouPage />} />
         </Route>
 
         {/* Routes with sidebar */}

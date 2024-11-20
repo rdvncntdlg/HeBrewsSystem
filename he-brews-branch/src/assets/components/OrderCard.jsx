@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
 import OrderItem from './OrderItem';
-import { ChevronDown, ChevronUp, Download } from 'lucide-react'; // Adding lucide-react icons
+import { ChevronDown, ChevronUp, Download, ShoppingBag, Utensils } from 'lucide-react';
 
-const OrderCard = ({ name, orderId, itemCount, totalPrice, status: initialStatus, items }) => {
+const OrderCard = ({ name, orderId, itemCount, totalPrice, status: initialStatus, type, items, onAccept, onReject }) => {
   const [showItems, setShowItems] = useState(true); // State to toggle order items visibility
-  const [status, setStatus] = useState(initialStatus); // State for status dropdown
+  const [status, setStatus] = useState(initialStatus); // State for status
 
   const toggleItems = () => {
     setShowItems(!showItems);
   };
 
-  // Handle status change from the dropdown
-  const handleStatusChange = (e) => {
-    setStatus(e.target.value);
+  // Function to handle accept/reject actions
+  const handleAccept = () => {
+    setStatus('Accepted');
+    onAccept(orderId);
+  };
+
+  const handleReject = () => {
+    setStatus('Rejected');
+    onReject(orderId);
   };
 
   return (
@@ -25,20 +31,25 @@ const OrderCard = ({ name, orderId, itemCount, totalPrice, status: initialStatus
           </div>
           <div className="self-start mt-2 text-green-600">{totalPrice}</div>
         </div>
+
         <div className="flex flex-col self-start text-xs whitespace-nowrap">
           <div className="flex items-center gap-2 justify-between self-end max-w-full font-bold">
-            {/* Status Dropdown */}
-            <select 
-              value={status} 
-              onChange={handleStatusChange}
-              className={`px-2.5 py-1 rounded ${
-                status === 'Done' ? 'text-green-600 bg-emerald-100' : 'text-yellow-500 bg-orange-100'
-              }`}
-            >
-              <option value="Pending">Pending</option>
-              <option value="Done">Done</option>
-            </select>
-            
+            {/* Accept and Reject Buttons */}
+            <div className="flex space-x-2">
+              <button
+                onClick={handleReject}
+                className="px-3 py-1 text-white bg-red-500 rounded hover:bg-red-700"
+              >
+                X
+              </button>
+              <button
+                onClick={handleAccept}
+                className="px-3 py-1 text-white bg-green-500 rounded hover:bg-green-700"
+              >
+                ✓
+              </button>
+            </div>
+
             {/* Toggle Button */}
             <button onClick={toggleItems} className="text-gray-500 hover:text-gray-700">
               {showItems ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -46,21 +57,19 @@ const OrderCard = ({ name, orderId, itemCount, totalPrice, status: initialStatus
           </div>
 
           <div className="flex gap-5 justify-between mt-8 text-neutral-600">
-            <img
-              loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/288ad7b5c87ffd273cfeb1960519fc6803c4ef0535a1e51b9ee3f2c28d0c0bf5?placeholderIfAbsent=true&apiKey=f5640191d60f45f28ab9a480644a186e"
-              alt=""
-              className="object-contain shrink-0 my-auto aspect-[1.39] w-[18px]"
-            />
+            {type === 'Dine-in' ? (
+              <Utensils className="size-4" />
+            ) : (
+              <ShoppingBag className="size-4" />
+            )}
             <div className="flex shrink-0 w-px border border-solid bg-zinc-100 border-neutral-600 h-[18px]" />
-            <div className='flex gap-2 justify-center items-center'>Invoice <Download className='size-3'/></div>
+            <div className="flex gap-2 justify-center items-center">Invoice <Download className="size-3" /></div>
           </div>
         </div>
       </div>
 
       {/* Render Order Items only if showItems is true */}
-      {showItems &&
-        items.map((item, index) => <OrderItem key={index} {...item} />)}
+      {showItems && items.map((item, index) => <OrderItem key={index} {...item} />)}
     </div>
   );
 };

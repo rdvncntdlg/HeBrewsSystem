@@ -1,13 +1,16 @@
-import 'package:he_brew_app/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:he_brew_app/models/branch_model.dart'; // Import the Branch model
 import 'package:he_brew_app/screens/cart/carts_screen.dart';
 import 'package:he_brew_app/screens/favorite/favorite.dart';
 import 'package:he_brew_app/screens/home/home_screen.dart';
 import 'package:he_brew_app/screens/history/order_history.dart';
 import 'package:he_brew_app/screens/profile/profile.dart';
+import 'package:he_brew_app/theme.dart';
 
 class BottomNavBar extends StatefulWidget {
-  const BottomNavBar({super.key});
+  final Branch selectedBranch; // Required parameter
+
+  const BottomNavBar({super.key, required this.selectedBranch});
 
   @override
   State<BottomNavBar> createState() => _BottomNavBarState();
@@ -15,13 +18,23 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   int currentInd = 0;
-  List screens = const [
-    HomeScreen(),
-    FavoriteScreen(),
-    CartScreen(),
-    HistoryScreen(),
-    ProfileScreen(),
-  ];
+
+  // Remove const from this list
+  late List<Widget> screens;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize screens list with dynamic data
+    screens = [
+      HomeScreen(selectedBranch: widget.selectedBranch),  // Pass selectedBranch here
+      const FavoriteScreen(),
+      const CartScreen(),
+      const HistoryScreen(),
+      const ProfileScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +119,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           ],
         ),
       ),
-      body: screens[currentInd],
+      body: screens[currentInd],  // Display the selected screen
     );
   }
 }

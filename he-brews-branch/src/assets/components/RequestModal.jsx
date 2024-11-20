@@ -14,7 +14,7 @@ const RequestModal = ({ item, onClose }) => {
     };
   
     try {
-      const response = await fetch('http://localhost:3000/api/requests', {
+      const response = await fetch('http://localhost:3000/api/send-request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
