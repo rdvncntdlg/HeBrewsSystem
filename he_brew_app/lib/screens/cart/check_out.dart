@@ -1,14 +1,21 @@
-import 'package:he_brew_app/theme.dart';
-import 'package:he_brew_app/provider/add_to_cart_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:he_brew_app/provider/add_to_cart_provider.dart';
 import 'package:he_brew_app/screens/cart/order_success.dart';
+import 'package:he_brew_app/event_handler.dart';
+import 'package:he_brew_app/theme.dart';
+import 'package:provider/provider.dart';
 
-class CheckOutBox extends StatelessWidget {
+class CheckOutBox extends StatefulWidget {
   const CheckOutBox({super.key});
 
   @override
+  _CheckOutBoxState createState() => _CheckOutBoxState();
+}
+
+class _CheckOutBoxState extends State<CheckOutBox> with PaymongoEventHandler {
+  @override
   Widget build(BuildContext context) {
-    final provider = CartProvider.of(context);
+    final provider = Provider.of<CartProvider>(context, listen: true);
     final isCartEmpty = provider.cart.isEmpty;
 
     return Container(
@@ -29,9 +36,10 @@ class CheckOutBox extends StatelessWidget {
             child: Text(
               "Summary",
               style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24),
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
             ),
           ),
           const SizedBox(height: 30),
@@ -87,10 +95,11 @@ class CheckOutBox extends StatelessWidget {
               backgroundColor: primaryColor,
               minimumSize: const Size(double.infinity, 55),
             ),
-            onPressed: isCartEmpty // Disable the button if the cart is empty
+            onPressed: isCartEmpty
                 ? null
-                : () {
-                    showDialog(
+                : () async {
+                    bool proceedToPayment = false;
+                    await showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text('Confirm Order'),
@@ -99,31 +108,37 @@ class CheckOutBox extends StatelessWidget {
                         actions: [
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context); // Close the dialog
+                              Navigator.pop(context, false);
                             },
                             child: const Text('No'),
                           ),
                           TextButton(
                             onPressed: () {
-                              provider.emptyCart();
-                              // Generate a random order number for the example
-                              final orderNumber = DateTime.now()
-                                  .millisecondsSinceEpoch
-                                  .toString();
-                              Navigator.pop(context); // Close the dialog
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OrderSuccessScreen(
-                                      orderNumber: orderNumber),
-                                ),
-                              );
+                              proceedToPayment = true;
+                              Navigator.pop(context, true); // Close the dialog
                             },
                             child: const Text('Yes'),
                           ),
                         ],
                       ),
                     );
+
+                    if (proceedToPayment) {
+                      await gcashPayment(provider.cart); // Call gcashPayment with the cart items
+                      provider.emptyCart();
+
+                      // Generate a random order number for the example
+                      final orderNumber =
+                          DateTime.now().millisecondsSinceEpoch.toString();
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              OrderSuccessScreen(orderNumber: orderNumber),
+                        ),
+                      );
+                    }
                   },
             child: const Text(
               "Order Now",

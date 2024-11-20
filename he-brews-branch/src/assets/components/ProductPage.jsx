@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import CategoryList from './CategoryList';
-import ProductGrid from './ProductGrid';
+import ProductGrid from './AvailableProductGrid';
 
 function ProductPage() {
   const [selectedCategory, setSelectedCategory] = useState(null);

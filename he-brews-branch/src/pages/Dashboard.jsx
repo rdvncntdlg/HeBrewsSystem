@@ -2,7 +2,9 @@ import React from 'react';
 import Header from '../assets/components/Header';
 import StatCard from '../assets/components/StatCard';
 import { PhilippinePeso, ShoppingBag, Users } from 'lucide-react';
-import OrderList from '../assets/components/OrderList';
+import LineChartComponent from '../assets/components/LineChartComponent';
+import HorizontalBarChartComponent from '../assets/components/HorizontalBarChartComponent';
+import { sampleData } from '../assets/components/SampleData';
 
 function Dashboard() {
     const statCards = [
@@ -42,14 +44,23 @@ function Dashboard() {
   return (
     <div className="overflow-hidden max-md:pr-5">
         <Header text="Dashboard"/>
-        <section className="mt-16 max-md:mt-10 max-md:max-w-full">
+        <section className="mt-5 max-md:mt-10 max-md:max-w-full">
               <div className="flex gap-5 max-md:flex-col">
                 {statCards.map((card, index) => (
                   <StatCard key={index} {...card} />
                 ))}
               </div>
         </section>
-        <OrderList />
+        <div className="flex">
+      <div className="w-3/4 p-4">
+        <h1 className="text-xl font-bold mb-4">Sales</h1>
+        <LineChartComponent data={sampleData} />
+      </div>
+      <div className="w-1/4 p-4">
+        <h1 className="text-xl font-bold mb-4">Best Sellers</h1>
+        <HorizontalBarChartComponent data={sampleData} />
+      </div>
+    </div>
     </div>
   )
 };

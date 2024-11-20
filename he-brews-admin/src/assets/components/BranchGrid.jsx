@@ -37,12 +37,12 @@ function BranchGrid() {
     <section className="p-8">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-10">
         {branches.map((branch) => (
-          <div key={branch.id} className="h-full">
+          <div key={branch.branch_id} className="h-full">
             <BranchCard
-              id={branch.id}    
+              id={branch.branch_id}    
               image={branch.image}
-              name={branch.name}
-              address={branch.address}
+              name={branch.branch_name}
+              address={branch.branchlocation}
               icon={branch.icon}
               onDelete={handleDelete}
             />

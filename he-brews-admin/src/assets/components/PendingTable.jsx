@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Eye } from 'lucide-react'; // Import the Eye icon
+import { Check } from 'lucide-react';
+import ApprovalModal from './ApprovalModal'; // Import the ApprovalModal
 
 const PendingTable = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedRequest, setSelectedRequest] = useState(null); // For managing the selected request
+  const [isModalOpen, setIsModalOpen] = useState(false); // Manage modal state
 
   useEffect(() => {
     const fetchPendingRequests = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/stock-requests/pending'); // Ensure the correct URL is used
+        const response = await fetch('http://localhost:3000/api/stock-requests/pending');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -26,48 +29,69 @@ const PendingTable = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Or a loading spinner
+    return <div>Loading...</div>;
   }
 
   if (error) {
     return <div>Error: {error}</div>;
   }
 
-  const handleViewClick = (requestId) => {
-    // Logic for handling the view button click can be implemented here
-    console.log(`View request ID: ${requestId}`);
+  const handleViewClick = (request) => {
+    setSelectedRequest(request); // Set the selected request
+    setIsModalOpen(true); // Open the modal
+  };
+
+  const handleConfirmApproval = (requestId) => {
+    // Handle the approval confirmation (e.g., send a request to the server)
+    console.log(`Request ${requestId} approved.`);
+    setIsModalOpen(false); // Close the modal after confirmation
   };
 
   return (
-    <table className="min-w-full border border-gray-300">
-      <thead>
-        <tr>
-          <th className="border-b">Request ID</th>
-          <th className="border-b">Branch ID</th>
-          <th className="border-b">Request Date</th>
-          <th className="border-b">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {pendingRequests.map((request) => (
-          <tr key={request.request_id}>
-            <td className="border-b">{request.request_id}</td>
-            <td className="border-b">{request.branch_id}</td>
-            <td className="border-b">{request.request_date}</td>
-            <td className="border-b">
-              <button 
-                onClick={() => handleViewClick(request.request_id)} 
-                className="flex items-center px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-              >
-                <Eye className="w-4 h-4 mr-1" /> {/* Eye icon */}
-                {/* Optional: Text for accessibility */}
-                <span className="hidden md:inline">View</span>
-              </button>
-            </td>
+    <div>
+      {/* Render the table */}
+      <table className="min-w-full border border-gray-300">
+        <thead>
+          <tr>
+            <th className="border-b text-center py-2">Request ID</th>
+            <th className="border-b text-center py-2">Branch Name</th>
+            <th className="border-b text-center py-2">Item Name</th>
+            <th className="border-b text-center py-2">Quantity</th>
+            <th className="border-b text-center py-2">Request Date</th>
+            <th className="border-b text-center py-2">Action</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {pendingRequests.map((request) => (
+            <tr key={request.request_id}>
+              <td className="border-b text-center py-2">{request.request_id}</td>
+              <td className="border-b text-center py-2">{request.branchname}</td>
+              <td className="border-b text-center py-2">{request.itemname}</td>
+              <td className="border-b text-center py-2">{request.quantity}</td>
+              <td className="border-b text-center py-2">{request.request_date}</td>
+              <td className="border-b text-center py-2 flex justify-center">
+                <button 
+                  onClick={() => handleViewClick(request)} 
+                  className="flex items-center justify-center px-2 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  <Check className="w-4 h-4 mr-1" />
+                  <span className="hidden md:inline">Approve</span>
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Render the modal if a request is selected */}
+      {isModalOpen && selectedRequest && (
+        <ApprovalModal
+          onClose={() => setIsModalOpen(false)}
+          request={selectedRequest}
+          onConfirm={handleConfirmApproval}
+        />
+      )}
+    </div>
   );
 };
 

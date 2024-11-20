@@ -1,42 +1,113 @@
-import React from 'react';
+// StocksTable.js
+import React, { useState, useEffect } from 'react';
+import SendStockModal from './SendStockModal'; // Import the modal component
 
 function StocksTable() {
-  const stockItems = [
-    { id: "ITEM00001", name: "PLASTIC CUP", quantity: 100 },
-    { id: "ITEM00002", name: "NACHOS", quantity: 88 },
-    { id: "ITEM00003", name: "LEMON", quantity: 75 },
-    { id: "ITEM00004", name: "TISSUE", quantity: 89 },
-    { id: "ITEM00005", name: "ICE", quantity: 42 },
-    { id: "ITEM00006", name: "CUCUMBER", quantity: 18 },
-    { id: "ITEM00007", name: "TOMATO", quantity: 25 },
-    { id: "ITEM00008", name: "CHEESE", quantity: 85 },
-    { id: "ITEM00009", name: "ONION", quantity: 72 },
-    { id: "ITEM00010", name: "GROUNDED MEAT", quantity: 31 },
-    { id: "ITEM00011", name: "PASTA", quantity: 45 },
-    { id: "ITEM00012", name: "COFFEE BEANS", quantity: 56 },
-    { id: "ITEM00013", name: "CARBONARA SAUCE", quantity: 83 }
-  ];
+  const [stockItems, setStockItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  // Function to fetch stock items
+  const fetchStockItems = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/admin-stocks', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStockItems(data);
+      } else {
+        throw new Error('Failed to fetch stock items');
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStockItems(); // Fetch stock items on component mount
+  }, []);
+
+  const handleSend = async () => {
+    // Call the fetchStockItems function after sending stock
+    await fetchStockItems();
+  };
+
+  const openModal = (item) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="mt-5">
-      <table className="min-w-full bg-neutral-950 text-white text-sm font-bold rounded-3xl">
+      <table className="min-w-full bg-neutral-950 text-black text-sm rounded-3xl">
         <thead>
           <tr className="bg-gray-800">
-            <th className="px-4 py-2 text-left">ITEM ID</th>
-            <th className="px-4 py-2 text-left">NAME</th>
-            <th className="px-4 py-2 text-left">QUANTITY AVAILABLE</th>
+            <th className="px-4 py-2 text-center text-white">ITEM ID</th>
+            <th className="px-4 py-2 text-center text-white">NAME</th>
+            <th className="px-4 py-2 text-center text-white">QUANTITY AVAILABLE</th>
+            <th className="px-4 py-2 text-center text-white">EXPIRATION DATE</th>
+            <th className="px-4 py-2 text-center text-white">ACTION</th>
           </tr>
         </thead>
         <tbody>
-          {stockItems.map((item, index) => (
-            <tr key={item.id} className={index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'}>
-              <td className="px-4 py-2">{item.id}</td>
-              <td className="px-4 py-2 text-center">{item.name}</td>
-              <td className="px-4 py-2 text-center">{item.quantity}</td>
+          {stockItems.length > 0 ? (
+            stockItems.map((item, index) => (
+              <tr key={item.inventory_id} className={index % 2 === 0 ? 'bg-zinc-300' : 'bg-white'}>
+                <td className="px-4 py-2 text-center text-black">{item.inventory_id}</td>
+                <td className="px-4 py-2 text-center text-black">{item.itemname}</td>
+                <td className="px-4 py-2 text-center text-black">{item.quantity}</td>
+                <td className="px-4 py-2 text-center text-black">{item.expirationdate}</td>
+                <td className="px-4 py-2 text-center">
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
+                    onClick={() => openModal(item)} // Open modal with selected item
+                  >
+                    Send
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="px-4 py-2 text-center text-black">No stock items available</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
+
+      {/* Render the SendStockModal */}
+      {selectedItem && (
+        <SendStockModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onSend={handleSend} // Pass the handleSend function
+          fetchStockItems={fetchStockItems} // Pass the fetchStockItems function
+          item={selectedItem}
+        />
+      )}
     </div>
   );
 }

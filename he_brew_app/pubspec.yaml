@@ -10,11 +10,15 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.6
-  google_fonts: ^6.2.1
+  google_fonts: ^4.0.4
   provider: ^6.1.2
   font_awesome_flutter: '>= 9.2.0'
-  http: ^1.2.2
+  http: ^0.13.6
   shared_preferences: ^2.0.13
+  paymongo_sdk: ^1.7.0
+  webview_flutter: ^4.8.0
+  webview_flutter_wkwebview: ^3.14.0
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:

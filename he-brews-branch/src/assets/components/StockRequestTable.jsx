@@ -6,8 +6,8 @@ const StockRequestTable = () => {
 
   useEffect(() => {
     const fetchStockRequests = async () => {
-      try { // Get the token from localStorage or state
-        const response = await fetch('http://localhost:3000/requests', {
+      try {
+        const response = await fetch('http://localhost:3000/api/requests', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -31,14 +31,33 @@ const StockRequestTable = () => {
     fetchStockRequests();
   }, []);
 
-  const handleReceived = (id) => {
-    setStockRequests(
-      stockRequests.map((request) =>
-        request.inventory_id === id
-          ? { ...request, status: 'Received' }
-          : request
-      )
-    );
+  // Handle receiving stock
+  const handleReceived = async (request_id) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/receive-items', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ request_id }), // Send the request_id to backend
+      });
+
+      if (response.ok) {
+        // Update the status to "Received" in the UI after success
+        setStockRequests(
+          stockRequests.map((request) =>
+            request.request_id === request_id
+              ? { ...request, status: 'Received' }
+              : request
+          )
+        );
+      } else {
+        console.error('Failed to update status');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   if (loading) {
@@ -78,7 +97,7 @@ const StockRequestTable = () => {
                 </td>
                 <td className="px-4 py-2">
                   <button
-                    onClick={() => handleReceived(request.inventory_id)}
+                    onClick={() => handleReceived(request.request_id)}
                     disabled={request.status !== 'Approved'}
                     className={`px-4 py-2 text-white rounded ${
                       request.status === 'Approved'

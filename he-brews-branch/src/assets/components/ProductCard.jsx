@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Check, X } from 'lucide-react'; // Import the icons
 
-function ProductCard({ id, name, price, image, category, onDelete }) {
+function ProductCard({ id, name, price, image, category, available, onStatusChange }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => {
@@ -16,65 +17,89 @@ function ProductCard({ id, name, price, image, category, onDelete }) {
     console.log('Updated product:', updatedProduct);
   };
 
-  const handleDelete = async () => {
-    const confirmed = window.confirm(`Are you sure you want to delete the product "${name}"?`);
+  const handleAvailable = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/products/${id}/available`, {
+        method: 'PUT',
+      });
 
-    if (confirmed) {
-      try {
-        const response = await fetch(`http://localhost:3000/api/products/${id}`, {
-          method: 'DELETE',
-        });
-
-        if (response.ok) {
-          console.log(`Product with ID ${id} deleted successfully`);
-          onDelete(id); // Call the parent component's delete function to update the UI
-        } else {
-          console.error('Failed to delete the product');
-        }
-      } catch (error) {
-        console.error('Error deleting the product:', error);
+      if (response.ok) {
+        console.log(`Product with ID ${id} is now available`);
+        onStatusChange(id, true); // Call the parent component's status change function
+      } else {
+        console.error('Failed to set the product as available');
       }
+    } catch (error) {
+      console.error('Error making the product available:', error);
+    }
+  };
+
+  const handleUnavailable = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/products/${id}/unavailable`, {
+        method: 'PUT',
+      });
+
+      if (response.ok) {
+        console.log(`Product with ID ${id} is now unavailable`);
+        onStatusChange(id, false); // Call the parent component's status change function
+      } else {
+        console.error('Failed to set the product as unavailable');
+      }
+    } catch (error) {
+      console.error('Error making the product unavailable:', error);
     }
   };
 
   return (
-    <div className="flex flex-col w-[188px] pb-3.5 mx-auto font-bold bg-white rounded-3xl shadow-[0px_4px_4px_rgba(0,0,0,0.25)] max-md:mt-10 relative">
-      {/* Delete Button */}
-      <button
-        onClick={handleDelete}
-        aria-label="Delete product"
-        className="absolute top-2 right-2 text-gray-500 hover:text-red-600 z-20"
-      >
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/458/458594.png" // X icon
-          alt="Delete"
-          className="w-4 h-4"
-        />
-      </button>
+    <div className="flex flex-col w-full h-full mx-auto font-bold bg-white rounded-lg shadow-[0px_4px_4px_rgba(0,0,0,0.25)] max-md:mt-10 relative">
+      {/* Icons container: Available (Check) and Unavailable (X) */}
+      <div className="absolute top-0 right-0 flex gap-2 z-20">
+        {available ? (
+          // Only show the set as unavailable button (X) when available is true
+          <button
+            onClick={handleUnavailable}
+            aria-label="Set product as unavailable"
+            className="w-8 h-8 bg-red-500 text-white flex items-center justify-center rounded-full border-4 border-white hover:bg-red-600 transform translate-x-1/2 -translate-y-1/2"
+          >
+            <X className="w-4 h-4" /> {/* X icon for unavailable */}
+          </button>
+        ) : (
+          // Only show the set as available button (Check) when available is false
+          <button
+            onClick={handleAvailable}
+            aria-label="Set product as available"
+            className="w-8 h-8 bg-green-500 text-white flex items-center justify-center rounded-full border-4 border-white hover:bg-green-600 transform translate-x-1/2 -translate-y-1/2"
+          >
+            <Check className="w-4 h-4" /> {/* Check icon for available */}
+          </button>
+        )}
+      </div>
 
-      <img
-        loading="lazy"
-        src={image}
-        alt={name}
-        className="object-contain z-10 rounded-3xl aspect-[1.2] w-[188px]"
-      />
-      <div className="flex gap-5 justify-between self-center mt-3.5 max-w-full w-[155px]">
-        <div className="flex flex-col">
-          <div className="text-base text-black">{name}</div>
-          <div className="z-10 self-start text-sm text-red-700">₱ {price}</div>
-        </div>
-        <button
-          onClick={handleOpenModal}
-          aria-label="Edit product"
-          className="text-gray-500 hover:text-gray-700"
-        >
+      {/* Flex container for image and content */}
+      <div className="flex flex-col h-full">
+        {/* Image takes 70% of the card's height with rounded top-left and top-right corners */}
+        <div className="h-[70%]">
           <img
             loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/8f2d4d489b32bece0970f68b2a0867dfbb0d020a8e56bae572e5ada61bf53574?placeholderIfAbsent=true&apiKey=f5640191d60f45f28ab9a480644a186e"
-            alt="Edit"
-            className="object-contain shrink-0 my-auto w-5 aspect-square"
+            src={image}
+            alt={name}
+            className="object-cover w-full h-full border-t border-t-gray-300 rounded-tl-lg rounded-tr-lg"  // Added rounded top-left and top-right corners
           />
-        </button>
+        </div>
+
+        {/* Content section takes 30% of the card's height */}
+        <div className="h-[30%] flex flex-col justify-center px-5 pt-2">
+          {/* Name takes 50% and adjusts based on space */}
+          <div className="h-[50%] w-full flex justify-center items-center">
+            <div className="text-base md:text-sm lg:text-smx text-black text-center flex-1">{name}</div>
+          </div>
+
+          {/* Price takes 50% */}
+          <div className="h-[50%] w-full flex justify-center items-center">
+            <div className="text-base md:text-lg lg:text-sm text-red-700 text-center pb-2">{`₱ ${price}`}</div>
+          </div>
+        </div>
       </div>
     </div>
   );

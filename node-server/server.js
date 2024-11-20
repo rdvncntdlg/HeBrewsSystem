@@ -1,10 +1,13 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+require('dotenv').config();
 const { Pool } = require('pg');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const axios = require('axios');
+const { PAYMONGO_SECRET_KEY } = process.env;
 
 
 const secretKey = 'your-secret-key'; // Use a strong secret key
@@ -25,11 +28,11 @@ const upload = multer({
 
 // PostgreSQL connection setup
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'hebrews',
-  password: 'password',
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
 const app = express();
@@ -104,6 +107,7 @@ const authenticateToken = (req, res, next) => {
 
     // Assuming user contains firstname and lastname
     req.user = {
+      customer_id:user.customer_id,
       username: user.username,  // assuming username is part of the token payload
       firstname: user.firstname,  // include firstname
       lastname: user.lastname    // include lastname
@@ -154,6 +158,7 @@ const authenticateEmployeeToken = (req, res, next) => {
 
     // Assuming user contains firstname, lastname, and position
     req.user = {
+      id: user.id,  // Assuming username is part of the token payload
       username: user.username,  // Assuming username is part of the token payload
       firstname: user.firstname, // Include firstname
       lastname: user.lastname,   // Include lastname
@@ -539,6 +544,98 @@ app.get('/api/list-products', async (req, res) => {
   }
 });
 
+app.get('/api/list-products-branch/available/', authenticateEmployeeToken, async (req, res) => {
+  try {
+    // Extract the branch_id from the decoded token in the request object
+    const branch_id = req.user.branch
+
+    if (!branch_id) {
+      return res.status(400).json({ error: 'Branch ID not found' });
+    }
+
+    // Query the database using branch_id
+    const result = await pool.query(`
+      SELECT a.availablemenu_id, m.menu_id, m.itemname, m.price, m.imageurl, m.category_id, a.available
+      FROM availablemenutbl a
+      JOIN menutbl m ON a.menu_id = m.menu_id
+      WHERE a.branch_id = $1 AND a.available = true
+      ORDER BY m.menu_id
+    `, [branch_id]); // Use branch_id as a parameter in the query
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/list-products-branch/unavailable/', authenticateEmployeeToken, async (req, res) => {
+  try {
+    // Extract the branch_id from the decoded token in the request object
+    const branch_id = req.user.branch
+
+    if (!branch_id) {
+      return res.status(400).json({ error: 'Branch ID not found' });
+    }
+
+    // Query the database using branch_id
+    const result = await pool.query(`
+      SELECT a.availablemenu_id, m.menu_id, m.itemname, m.price, m.imageurl, m.category_id, a.available
+      FROM availablemenutbl a
+      JOIN menutbl m ON a.menu_id = m.menu_id
+      WHERE a.branch_id = $1 AND a.available = false
+      ORDER BY m.menu_id
+    `, [branch_id]); // Use branch_id as a parameter in the query
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.put('/api/products/:id/available', async (req, res) => {
+  const productId = parseInt(req.params.id, 10);
+
+  try {
+    const result = await pool.query(
+      'UPDATE availablemenutbl SET available = TRUE WHERE availablemenu_id = $1 RETURNING *',
+      [productId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.status(200).json({ message: 'Product is now available', product: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating product availability:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to mark a product as unavailable
+app.put('/api/products/:id/unavailable', async (req, res) => {
+  const productId = parseInt(req.params.id, 10);
+
+  try {
+    const result = await pool.query(
+      'UPDATE availablemenutbl SET available = FALSE WHERE availablemenu_id = $1 RETURNING *',
+      [productId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.status(200).json({ message: 'Product is now unavailable', product: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating product availability:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // Update product route
 app.put('/api/products/:id', upload.single('image'), async (req, res) => {
   const { id } = req.params;
@@ -628,6 +725,22 @@ app.post('/api/add-categories', upload.single('image'), async (req, res) => {
   }
 });
 
+app.get('/branches-app', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM public.branchtbl
+      WHERE branch_id != 0
+      ORDER BY branch_id ASC
+    `);
+
+    // Send the result back as JSON
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 app.get('/api/branches', async (req, res) => {
   try {
@@ -638,6 +751,23 @@ app.get('/api/branches', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
+app.get('/api/branchname', authenticateEmployeeToken, async (req, res) => {
+  const branchId = req.user.branch; // Get branch_id from the authenticated user
+
+  try {
+    const result = await pool.query('SELECT * FROM branchtbl WHERE branch_id = $1', [branchId]);
+    if (result.rows.length > 0) {
+      res.json(result.rows); // Send back the branch name(s) and location
+    } else {
+      res.status(404).send('No branch found');
+    }
+  } catch (error) {
+    console.error('Error fetching branch data:', error);
+    res.status(500).send('Server error');
+  }
+});
+
 
 app.put('/api/branches/:id', async (req, res) => {
   const branchId = req.params.id;
@@ -782,6 +912,63 @@ app.post('/api/order/increase/:orderitem_id', async (req, res) => {
   }
 });
 
+app.get('/api/order-items/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    // Query the orderitemtbl for the specific order_id
+    const query = `
+      SELECT o.menu_id, o.quantity, m.itemname, m.price
+FROM orderitemtbl o
+JOIN menutbl m ON o.menu_id = m.menu_id
+WHERE o.order_id = $1;
+
+    `;
+    const result = await pool.query(query, [orderId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'No items found for this order ID' });
+    }
+
+    res.json(result.rows); // Send the retrieved items as a response
+  } catch (error) {
+    console.error('Error fetching order items:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+app.get('/api/stock-items', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM stockitemstbl');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error retrieving stock items', error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+app.post('/api/add-stock', async (req, res) => {
+  const { item_id, quantity, expirationdate } = req.body;
+
+  // Validate incoming data
+  if (!item_id || !quantity || !expirationdate) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  try {
+    // Insert stock data into inventorytbl
+    const query = 'INSERT INTO inventorytbl (branch_id, quantity, expirationdate, item_id) VALUES ($1, $2, $3, $4) RETURNING *';
+    const values = ["0", quantity, expirationdate, item_id];
+    const result = await pool.query(query, values);
+
+    // Send response with the inserted stock data
+    return res.status(201).json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error('Error adding stock to inventory:', error);
+    return res.status(500).json({ error: 'Database error' });
+  }
+});
+
 // Decrease item quantity
 app.post('/api/order/decrease/:orderitem_id', async (req, res) => {
   const { orderitem_id } = req.params;
@@ -805,6 +992,117 @@ app.get('/api/inventory', async (req, res) => {
   }
 });
 
+
+app.post('/api/approve-request', async (req, res) => {
+  const { item_id, requested_quantity: reqQuantity } = req.body;
+  let requested_quantity = reqQuantity;
+
+  try {
+    const itemsToFulfill = [];
+
+    // Query to get all items of the requested item_id
+    const result = await pool.query(
+      `
+          SELECT i.*, si.itemname 
+          FROM inventorytbl i 
+          JOIN stockitemstbl si ON i.item_id = si.item_id 
+          WHERE i.item_id = $1 AND i.branch_id = 0 
+          ORDER BY i.expirationdate ASC
+          `,
+      [item_id]
+    );
+
+    // Check if there are any items returned
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'No items found for the requested item_id.' });
+    }
+
+    // Iterate over the retrieved items
+    for (let row of result.rows) {
+      let availableQuantity = row.quantity;
+
+      // Use a while loop to decrement requested_quantity
+      while (requested_quantity > 0 && availableQuantity > 0) {
+        const quantityToTake = Math.min(requested_quantity, availableQuantity);
+
+        // Add a copy of the item to the fulfillment array, including inventory_id
+        itemsToFulfill.push({
+          inventory_id: row.inventory_id, // Added inventory_id
+          item_id: row.item_id,
+          itemname: row.itemname,
+          expirationdate: row.expirationdate,
+          quantity: quantityToTake
+        });
+
+        requested_quantity -= quantityToTake;
+        availableQuantity -= quantityToTake;
+
+        if (requested_quantity <= 0) {
+          break;
+        }
+      }
+
+      if (requested_quantity <= 0) {
+        break;
+      }
+    }
+
+    if (itemsToFulfill.length > 0) {
+      res.status(200).json(itemsToFulfill);
+    } else {
+      res.status(404).json({ message: 'Not enough items available to fulfill the request.' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
+// Route to confirm approval, insert data into sentitemstbl, update stockrequeststbl, and update inventory
+app.post('/api/confirm-approval', async (req, res) => {
+  const { request_id, itemDetails, branch_id } = req.body;
+
+  try {
+    // Start a transaction
+    await pool.query('BEGIN');
+
+    // Insert each item into the sentitemstbl and update inventory
+    for (const item of itemDetails) {
+      const { inventory_id, item_id, quantity, expirationdate } = item;
+
+      // 1. Insert the approved items into sentitemstbl
+      await pool.query(
+        'INSERT INTO sentitemstbl (request_id, item_id, quantity, expirationdate, branch_id) VALUES ($1, $2, $3, $4, $5)',
+        [request_id, item_id, quantity, expirationdate, branch_id]
+      );
+
+      // 2. Update the inventorytbl by decreasing the quantity based on inventory_id
+      await pool.query(
+        'UPDATE inventorytbl SET quantity = quantity - $1 WHERE inventory_id = $2',
+        [quantity, inventory_id]
+      );
+    }
+
+    // 3. Update the stockrequeststbl to set the status to 'Approved'
+    await pool.query(
+      'UPDATE stockrequeststbl SET status = $1 WHERE request_id = $2',
+      ['Approved', request_id]
+    );
+
+    // Commit the transaction if all queries succeed
+    await pool.query('COMMIT');
+    res.status(200).json({ message: 'Items confirmed, inventory updated, and request status set to approved.' });
+  } catch (error) {
+    // Rollback the transaction in case of an error
+    await pool.query('ROLLBACK');
+    console.error('Error during confirmation:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+
 // Add a new inventory item
 app.post('/api/inventory', async (req, res) => {
   const { branch_id, itemname, quantity, expirationdate } = req.body;
@@ -822,10 +1120,10 @@ app.post('/api/inventory', async (req, res) => {
   }
 });
 
-app.get('/api/stock-requests/Pending', async (req, res) => {
+app.get('/api/stock-requests/pending', async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT request_id, branch_id, request_date, status, processed_date FROM stockrequeststbl WHERE status = $1',
+      'SELECT sr.request_id, sr.branch_id, b.branchname, sr.request_date, sr.status, sr.completion_date, sr.item_id, si.itemname, sr.quantity FROM stockrequeststbl sr JOIN branchtbl b ON sr.branch_id = b.branch_id JOIN stockitemstbl si ON sr.item_id = si.item_id WHERE sr.status = $1',
       ['Pending']
     );
     res.json(result.rows);
@@ -837,7 +1135,7 @@ app.get('/api/stock-requests/Pending', async (req, res) => {
 
 app.get('/api/stock-requests/Approved', async (req, res) => {
   try {
-    const result = await pool.query('SELECT request_id, branch_id, request_date, status, processed_date FROM stockrequeststbl WHERE status = $1', ['Approved']);
+    const result = await pool.query('SELECT request_id, branch_id, request_date, status, completion_date FROM stockrequeststbl WHERE status = $1', ['Approved']);
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -847,11 +1145,57 @@ app.get('/api/stock-requests/Approved', async (req, res) => {
 
 app.get('/api/stock-requests/Completed', async (req, res) => {
   try {
-    const result = await pool.query('SELECT request_id, branch_id, request_date, status, processed_date FROM stockrequeststbl WHERE status = $1', ['Completed']);
+    const result = await pool.query('SELECT request_id, branch_id, request_date, status, completion_date FROM stockrequeststbl WHERE status = $1', ['Completed']);
     res.json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/api/approve-request', async (req, res) => {
+  const { requestId, itemId, quantity, branchId } = req.body; // Include branchId
+
+  try {
+    // Check if the item is available
+    const itemResult = await pool.query(
+      'SELECT * FROM inventorytbl WHERE item_id = $1 AND branch_id = 0',
+      [itemId]
+    );
+
+    if (itemResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    const item = itemResult.rows[0];
+
+    // Check if enough quantity is available
+    if (item.quantity < quantity) {
+      return res.status(400).json({ message: 'Insufficient quantity available' });
+    }
+
+    // Approve the request
+    await pool.query(
+      'UPDATE stock_requests SET status = $1 WHERE request_id = $2',
+      ['approved', requestId]
+    );
+
+    // Insert into sentitemstbl
+    await pool.query(
+      'INSERT INTO sentitemstbl (request_id, item_id, branch_id, quantity) VALUES ($1, $2, $3, $4)',
+      [requestId, itemId, branchId, quantity]
+    );
+
+    // Reduce the quantity in inventory
+    await pool.query(
+      'UPDATE inventorytbl SET quantity = quantity - $1 WHERE item_id = $2 AND branch_id = 0',
+      [quantity, itemId]
+    );
+
+    res.json({ message: 'Request approved successfully' });
+  } catch (error) {
+    console.error('Error approving request:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
@@ -901,7 +1245,7 @@ app.get('/alert-stock', authenticateEmployeeToken, async (req, res) => {
   }
 });
 
-app.get('/requests', authenticateEmployeeToken, async (req, res) => {
+app.get('/api/requests', authenticateEmployeeToken, async (req, res) => {
   const { branch } = req.user;
 
   try {
@@ -916,6 +1260,497 @@ app.get('/requests', authenticateEmployeeToken, async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+app.post('/api/send-request', async (req, res) => {
+  const { branch_id, item_id, quantity } = req.body;
+
+  // Validate that all required fields are present
+  if (!branch_id || !item_id || !quantity) {
+    return res.status(400).json({ message: 'Branch ID, item ID, and quantity are required.' });
+  }
+
+  try {
+    // Insert into stockrequeststbl
+    const insertQuery = `
+      INSERT INTO stockrequeststbl (branch_id, item_id, quantity, status, request_date)
+      VALUES ($1, $2, $3, 'Pending', NOW())
+      RETURNING request_id
+    `;
+
+    const result = await pool.query(insertQuery, [branch_id, item_id, quantity]);
+
+    // Return the newly created request ID
+    const newRequestId = result.rows[0].request_id;
+    return res.status(201).json({ message: 'Stock request submitted successfully', request_id: newRequestId });
+
+  } catch (error) {
+    console.error('Error inserting stock request:', error);
+    return res.status(500).json({ message: 'Failed to submit stock request' });
+  }
+});
+
+app.post('/api/receive-items', async (req, res) => {
+  const { request_id } = req.body;
+
+  try {
+    // Fetch the items from sentitemstbl where request_id matches
+    const selectQuery = `
+      SELECT item_id, quantity, expirationdate, branch_id
+      FROM sentitemstbl
+      WHERE request_id = $1
+    `;
+    const { rows: sentItems } = await pool.query(selectQuery, [request_id]);
+
+    if (sentItems.length === 0) {
+      return res.status(404).json({ message: 'No items found for this request' });
+    }
+
+    // Insert each item into the inventory table
+    const insertQuery = `
+      INSERT INTO inventorytbl (item_id, quantity, expirationdate, branch_id)
+      VALUES ($1, $2, $3, $4)
+    `;
+    for (const item of sentItems) {
+      await pool.query(insertQuery, [
+        item.item_id,
+        item.quantity,
+        item.expirationdate,
+        item.branch_id,
+      ]);
+    }
+
+    // Update the status in sentitemstbl to 'Received'
+    const updateQuery = `
+      UPDATE stockrequeststbl
+      SET status = 'Completed', completion_date = NOW()
+      WHERE request_id = $1
+    `;
+    await pool.query(updateQuery, [request_id]);
+
+    res.status(200).json({ message: 'Items transferred to inventory and status updated to Received' });
+  } catch (error) {
+    console.error('Error processing stock transfer:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.get('/admin-stocks', authenticateEmployeeToken, async (req, res) => {
+  const { branch } = req.user;
+
+  try {
+    // Query the database for stock items of the specific branch
+    const result = await pool.query(
+      `SELECT i.inventory_id, i.quantity, i.expirationdate, s.itemname FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = 0`,
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching stock items:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+app.post('/api/send-stock', async (req, res) => {
+  const { branchName, quantity, itemId, expirationdate } = req.body;
+
+  try {
+    // Insert into inventorytbl
+    await pool.query(
+      'INSERT INTO inventorytbl (branch_id, item_id, quantity, expirationdate) VALUES ($1, $2, $3, $4)',
+      [branchName, itemId, quantity, expirationdate]
+    );
+
+    // Update the current stock in the inventory
+    await pool.query(
+      'UPDATE inventorytbl SET quantity = quantity - $1 WHERE inventory_id = $2',
+      [quantity, itemId]
+    );
+
+    res.status(200).json({ message: 'Stock transferred successfully.' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to transfer stock.' });
+  }
+});
+
+app.post('/api/submit-payment', async (req, res) => {
+  const { orderId, branchId, totalAmount, paymentMethod, invoiceDate, type, employeeId } = req.body;
+  
+  console.log('Incoming request data:', req.body); // Add this to log the request data
+
+  try {
+    const updateOrderQuery = 'UPDATE ordertbl SET status = $1, branch_id = $2, type = $3, employee_id = $4 WHERE order_id = $5';
+    await pool.query(updateOrderQuery, ['Preparing',branchId, type, employeeId, orderId]);
+
+    const insertInvoiceQuery = `
+      INSERT INTO invoicetbl (order_id, invoicedate, totalamount, paymentmethod)
+      VALUES ($1, $2, $3, $4)`;
+
+    await pool.query(insertInvoiceQuery, [orderId, invoiceDate, totalAmount, paymentMethod]);
+
+    res.status(200).json({ success: true, message: 'Payment submitted successfully!' });
+  } catch (error) {
+    console.error('Error submitting payment:', error); // This should give more details
+    res.status(500).json({ success: false, message: 'Error submitting payment' });
+  }
+});
+
+app.get('/api/preparing-orders', authenticateEmployeeToken, async (req, res) => {
+  try {
+    const { branch } = req.user; // Extract branchId from the decoded token (req.user)
+    
+    // Query to fetch orders based on branchId
+    const result = await pool.query('SELECT * FROM ordertbl WHERE branch_id = $1 AND status = $2', [branch, 'Preparing']);
+
+    res.json(result.rows); // Send orders as response
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+app.get('/api/ready-orders', authenticateEmployeeToken, async (req, res) => {
+  try {
+    const { branch } = req.user; // Extract branchId from the decoded token (req.user)
+    
+    // Query to fetch orders based on branchId
+    const result = await pool.query('SELECT * FROM ordertbl WHERE branch_id = $1 AND status = $2', [branch, 'Ready']);
+
+    res.json(result.rows); // Send orders as response
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+app.get('/api/orders/:order_id/items', async (req, res) => {
+  const { order_id } = req.params;
+  try {
+    console.log('Fetching items for order_id:', order_id); // Log the order_id for debugging
+
+    // SQL query to fetch items for a specific order
+    const result = await pool.query(`
+      SELECT 
+        oi.orderitem_id,
+        oi.order_id,
+        oi.quantity,
+        m.itemname,
+        m.price,
+        m.description,
+        m.imageurl
+      FROM 
+        orderitemtbl oi
+      JOIN 
+        menutbl m
+      ON 
+        oi.menu_id = m.menu_id
+      WHERE 
+        oi.order_id = $1;
+    `, [order_id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: `No items found for order ID: ${order_id}` });
+    }
+
+    // Send back the order items with menu details
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching items for order', order_id, ':', err.message);
+    res.status(500).json({ message: 'Server error fetching order items' });
+  }
+});
+
+// Accept order and update status to "Ready"
+app.put('/api/orders/:orderId/ready', authenticateToken, async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    await pool.query('UPDATE ordertbl SET status = $1 WHERE order_id = $2', ['Ready', orderId]);
+    res.status(200).send({ message: 'Order status updated to Ready' });
+  } catch (err) {
+    console.error('Error in updating order status:', err);  // Log the error
+    res.status(500).send({ error: 'Failed to update order status', details: err.message });
+  }
+});
+
+
+app.put('/api/orders/:orderId/complete', authenticateToken, async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    await pool.query('UPDATE ordertbl SET status = $1 WHERE order_id = $2', ['Completed', orderId]);
+    res.status(200).send({ message: 'Order status updated to Ready' });
+  } catch (err) {
+    res.status(500).send({ error: 'Failed to update order status' });
+  }
+});
+
+// Reject order and update status to "Cancelled"
+app.put('/api/orders/:orderId/reject', authenticateToken, async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    await pool.query('UPDATE ordertbl SET status = $1 WHERE order_id = $2', ['Cancelled', orderId]);
+    res.status(200).send({ message: 'Order status updated to Cancelled' });
+  } catch (err) {
+    res.status(500).send({ error: 'Failed to update order status' });
+  }
+});
+ // Make sure the secret key is in your environment variables
+
+// Function to generate random ID (assuming this function exists)
+const generateRandomId = (length) => {
+  return Math.random().toString(36).substr(2, length);
+};
+
+app.post('/api/create-gcash-checkout-session', async (req, res) => {
+  const { customer_id, lineItems } = req.body;
+
+  const formattedLineItems = lineItems.map((product) => {
+    return {
+      currency: 'PHP',
+      amount: Math.round(product.unit_price * 100), // Convert to cents
+      name: product.item_description,
+      quantity: product.quantity,
+    };
+  });
+
+  const randomId = generateRandomId(28);
+
+  try {
+    const response = await axios.post(
+      'https://api.paymongo.com/v1/checkout_sessions',
+      {
+        data: {
+          attributes: {
+            send_email_receipt: false,
+            show_line_items: true,
+            line_items: formattedLineItems,
+            payment_method_types: ['gcash'],
+            success_url: `https://website.sigbuilders.app/success?session_id=${randomId}`,
+            cancel_url: 'https://website.sigbuilders.app/cancel',
+          },
+        },
+      },
+      {
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${Buffer.from(PAYMONGO_SECRET_KEY).toString('base64')}`, // Corrected Authorization header
+        },
+      }
+    );
+
+    const checkoutUrl = response.data.data.attributes.checkout_url;
+
+    if (!checkoutUrl) {
+      return res.status(500).json({ error: 'Checkout URL not found in response' });
+    }
+
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+
+      // UPSERT query to insert or update payment
+      const query = `
+        INSERT INTO payment (customer_id, session_id, payment_status)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (customer_id)
+        DO UPDATE SET 
+          session_id = EXCLUDED.session_id,
+          payment_status = EXCLUDED.payment_status;
+      `;
+      const values = [customer_id, randomId, 'pending'];
+
+      await client.query(query, values);
+      await client.query('COMMIT'); // Commit the transaction
+    } catch (error) {
+      await client.query('ROLLBACK'); // Rollback in case of error
+      console.error('Error inserting/updating payment:', error.message);
+      return res.status(500).json({ error: 'Failed to insert/update payment', details: error.message });
+    } finally {
+      client.release(); // Release the connection back to the pool
+    }
+
+    res.status(200).json({ url: checkoutUrl });
+  } catch (error) {
+    console.error('Error creating checkout session:', error.response ? error.response.data : error.message);
+    res.status(500).json({ error: 'Failed to create checkout session', details: error.response ? error.response.data : error.message });
+  }
+});
+
+app.get('/transactions', authenticateEmployeeToken, async (req, res) => {
+  try {
+    const branch_id = req.user.branch; // Extract branch_id from the decoded token (req.user)
+
+    // Query to get transactions, filtered by branch_id
+    const result = await pool.query(`
+      SELECT 
+        i.invoice_id, 
+        o.customer_id, 
+        o.employee_id, 
+        e.firstname, 
+        e.lastname, 
+        i.totalamount, 
+        i.invoicedate, 
+        i.paymentmethod, 
+        b.branchname 
+      FROM ordertbl o
+      JOIN invoicetbl i ON o.order_id = i.order_id
+      JOIN branchtbl b ON o.branch_id = b.branch_id
+      JOIN employeetbl e ON o.employee_id = e.employee_id
+      WHERE o.branch_id = $1
+      ORDER BY i.invoicedate DESC
+    `, [branch_id]); // Pass the branch_id dynamically into the query
+
+    const transactions = result.rows;
+    res.json(transactions); // Send the results back as JSON
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch transactions' }); // Handle any errors
+  }
+});
+
+// POST endpoint to handle form submission
+app.post('/submit-survey', async (req, res) => {
+  const {
+    name,
+    age,
+    visitFrequency,
+    branch,
+    reasonForChoice,
+    otherReason,
+    serviceSatisfaction,
+    badExperience,
+    recommend,
+    foodRating,
+    drinksRating,
+    menuRating,
+    servingRating,
+    foodQualityRating,
+    customerServiceRating,
+    ambianceRating,
+    priceRating,
+    comments,
+  } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO feedbacktbl (
+        name, age, visit_frequency, branch, reason_for_choice, other_reason,
+        service_satisfaction, bad_experience, recommend, food_rating, drinks_rating, 
+        menu_rating, serving_rating, food_quality_rating, customer_service_rating, 
+        ambiance_rating, price_rating, comments
+      ) 
+      VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18
+      ) RETURNING *;
+    `;
+    const values = [
+      name, age, visitFrequency, branch, reasonForChoice, otherReason, serviceSatisfaction,
+      badExperience, recommend, foodRating, drinksRating, menuRating, servingRating,
+      foodQualityRating, customerServiceRating, ambianceRating, priceRating, comments,
+    ];
+    
+    const result = await pool.query(query, values);
+    res.status(201).json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error('Error submitting survey:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+app.get('/products', async (req, res) => {
+  const branchId = req.query.branch_id; // Get the branch_id from query params
+
+  try {
+    // Use the SQL query provided to get available products for branch_id = 2
+    const result = await pool.query(`
+      SELECT m.menu_id, m.itemname, m.price, m.description, m.imageurl, c.categoryname
+      FROM menutbl m
+      JOIN availablemenutbl a ON m.menu_id = a.menu_id
+      JOIN categorytbl c ON m.category_id = c.category_id
+      WHERE a.available = true AND a.branch_id = $1
+    `,[branchId]);
+
+    const products = result.rows;
+
+    // Map the result to match your Flutter Product model
+    const mappedProducts = products.map(product => ({
+      menu_id: product.menu_id,
+      name: product.itemname,
+      description: product.description,
+      image: product.imageurl,
+      price: product.price,
+      category: product.categoryname,
+      quantity: 1, // Default quantity
+    }));
+
+    res.json(mappedProducts);  // Send the data to the frontend
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
+app.post('/favorites', authenticateToken, async (req, res) => {
+  const { product_id } = req.body;
+  const customer_id = req.user.customer_id;
+
+  try {
+    const checkExistenceQuery = `
+      SELECT * FROM favoritestbl WHERE customer_id = $1 AND product_id = $2
+    `;
+    const result = await pool.query(checkExistenceQuery, [customer_id, product_id]);
+
+    if (result.rows.length > 0) {
+      return res.status(400).json({ message: 'Product already in favorites' });
+    }
+
+    const query = `
+      INSERT INTO favoritestbl (customer_id, product_id)
+      VALUES ($1, $2) RETURNING *;
+    `;
+    const newFavorite = await pool.query(query, [customer_id, product_id]);
+    res.status(201).json(newFavorite.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Remove a product from favorites
+app.delete('/favorites', authenticateToken, async (req, res) => {
+  const { product_id } = req.body;
+  const customer_id = req.user.customer_id;
+
+  try {
+    const query = `
+      DELETE FROM favoritestbl WHERE customer_id = $1 AND product_id = $2 RETURNING *;
+    `;
+    const deletedFavorite = await pool.query(query, [customer_id, product_id]);
+
+    if (deletedFavorite.rowCount === 0) {
+      return res.status(404).json({ message: 'Favorite not found' });
+    }
+
+    res.status(200).json({ message: 'Product removed from favorites' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all favorite products for a customer
+app.get('/favorites/:customer_id', authenticateToken, async (req, res) => {
+  const customer_id = req.params.customer_id;
+
+  try {
+    const query = `
+      SELECT product_id FROM favoritestbl WHERE customer_id = $1;
+    `;
+    const favorites = await pool.query(query, [customer_id]);
+    res.status(200).json(favorites.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
