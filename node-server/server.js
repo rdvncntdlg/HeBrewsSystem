@@ -25,14 +25,12 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // Limit file size to 5MB
 });
 
+const connectionString = `${process.env.POSTGRES_URL}?sslmode=require&other_param=value`;
 
 // PostgreSQL connection setup
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  connectionString: process.env.POSTGRES_URL,
+  ssl: { rejectUnauthorized: false }, // Only disable for development purposes
 });
 
 const app = express();
