@@ -25,7 +25,6 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // Limit file size to 5MB
 });
 
-const connectionString = `${process.env.POSTGRES_URL}?sslmode=require&other_param=value`;
 
 // PostgreSQL connection setup
 const pool = new Pool({
@@ -33,18 +32,6 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }, // Use true if the certificate is trusted
 });
 
-async function testConnection() {
-  try {
-    const res = await pool.query('SELECT NOW()');
-    console.log('Database connection successful:', res.rows[0]);
-  } catch (err) {
-    console.error('Database connection error:', err.message);
-  } finally {
-    await pool.end();
-  }
-}
-
-testConnection();
 
 const app = express();
 const port = 3000;
