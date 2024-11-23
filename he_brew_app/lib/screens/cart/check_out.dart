@@ -141,7 +141,7 @@ class _CheckOutBoxState extends State<CheckOutBox> with PaymongoEventHandler {
                     }
                   },
             child: const Text(
-              "Order Now",
+              "Proceed to Order",
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold,
