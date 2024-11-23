@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/provider/add_to_cart_provider.dart';
-import 'package:he_brew_app/screens/cart/order_success.dart';
-import 'package:he_brew_app/event_handler.dart';
+import 'package:he_brew_app/screens/selection/selection_screen.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +11,7 @@ class CheckOutBox extends StatefulWidget {
   _CheckOutBoxState createState() => _CheckOutBoxState();
 }
 
-class _CheckOutBoxState extends State<CheckOutBox> with PaymongoEventHandler {
+class _CheckOutBoxState extends State<CheckOutBox> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<CartProvider>(context, listen: true);
@@ -97,48 +96,13 @@ class _CheckOutBoxState extends State<CheckOutBox> with PaymongoEventHandler {
             ),
             onPressed: isCartEmpty
                 ? null
-                : () async {
-                    bool proceedToPayment = false;
-                    await showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Confirm Order'),
-                        content: const Text(
-                            'Are you sure you want to place this order?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, false);
-                            },
-                            child: const Text('No'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              proceedToPayment = true;
-                              Navigator.pop(context, true); // Close the dialog
-                            },
-                            child: const Text('Yes'),
-                          ),
-                        ],
+                : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SelectionScreen(),
                       ),
                     );
-
-                    if (proceedToPayment) {
-                      await gcashPayment(provider.cart); // Call gcashPayment with the cart items
-                      provider.emptyCart();
-
-                      // Generate a random order number for the example
-                      final orderNumber =
-                          DateTime.now().millisecondsSinceEpoch.toString();
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              OrderSuccessScreen(orderNumber: orderNumber),
-                        ),
-                      );
-                    }
                   },
             child: const Text(
               "Proceed to Order",
