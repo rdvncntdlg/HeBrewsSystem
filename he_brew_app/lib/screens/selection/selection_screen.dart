@@ -25,69 +25,65 @@ class _SelectionScreenState extends State<SelectionScreen> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
           children: [
-            const Text(
-              "Choose your order type:",
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
+            // First row with Dine-In and Take-Out boxes centered
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedOption = "Dine-In";
+                    });
+                  },
+                  child: OptionBox(
+                    icon: Icons.restaurant,
+                    label: "Dine-In",
+                    isSelected: selectedOption == "Dine-In",
+                  ),
+                ),
+                const SizedBox(width: 30), // Increased space between the boxes
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedOption = "Take-Out";
+                    });
+                  },
+                  child: OptionBox(
+                    icon: Icons.takeout_dining,
+                    label: "Take-Out",
+                    isSelected: selectedOption == "Take-Out",
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            // Options displayed as boxes with icons and labels
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 3,
-                crossAxisSpacing: 20,
-                mainAxisSpacing: 20,
-                childAspectRatio: 1.0,
-                children: [
-                  // Dine-In option box
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedOption = "Dine-In";
-                      });
-                    },
-                    child: OptionBox(
-                      icon: Icons.restaurant,
-                      label: "Dine-In",
-                      isSelected: selectedOption == "Dine-In",
-                    ),
+            const SizedBox(height: 40), // Increased space between rows
+
+            // Second row with Delivery box centered
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedOption = "Delivery";
+                    });
+                  },
+                  child: OptionBox(
+                    icon: Icons.delivery_dining,
+                    label: "Delivery",
+                    isSelected: selectedOption == "Delivery",
                   ),
-                  // Take-Out option box
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedOption = "Take-Out";
-                      });
-                    },
-                    child: OptionBox(
-                      icon: Icons.takeout_dining,
-                      label: "Take-Out",
-                      isSelected: selectedOption == "Take-Out",
-                    ),
-                  ),
-                  // Delivery option box
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedOption = "Delivery";
-                      });
-                    },
-                    child: OptionBox(
-                      icon: Icons.delivery_dining,
-                      label: "Delivery",
-                      isSelected: selectedOption == "Delivery",
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            // Complete Order Button
+            const SizedBox(height: 50), // Space between the options and the button
+
+            // Spacer to push the button to the bottom
+            const Spacer(),
+
+            // Complete Order Button pinned to the bottom
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
@@ -105,7 +101,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
                         MaterialPageRoute(
                           builder: (context) => OrderSuccessScreen(
                             orderNumber: orderNumber,
-                            orderType: selectedOption!,
+                            orderType: selectedOption ?? "Unknown", // Default value if null
                           ),
                         ),
                       );
@@ -141,6 +137,8 @@ class OptionBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 150, // Increased width for larger boxes
+      height: 150, // Increased height for larger boxes
       decoration: BoxDecoration(
         color: isSelected ? primaryColor : Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -154,15 +152,15 @@ class OptionBox extends StatelessWidget {
         children: [
           Icon(
             icon,
-            size: 40,
+            size: 60, // Increased icon size to match box size
             color: isSelected ? Colors.white : primaryColor,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             label,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 16,
+              fontSize: 18, // Adjusted font size for better alignment
               fontWeight: FontWeight.bold,
               color: isSelected ? Colors.white : Colors.black,
             ),
