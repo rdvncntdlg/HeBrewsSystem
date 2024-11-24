@@ -8,7 +8,7 @@ function StockAlertPage() {
   useEffect(() => {
     const fetchStockAlerts = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/alert-stock`, {
+        const response = await fetch(`https://hebrewssystem.onrender.com/alert-stock`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

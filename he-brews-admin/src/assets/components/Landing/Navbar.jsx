@@ -28,7 +28,7 @@ const Navbar = () => {
             <div className="container mx-auto flex justify-between items-center py-4 px-6">
                 <a href="#" className="text-custom-brown flex items-center">
                     <img
-                        src="http://localhost:3000/uploads/logo-cream.png"
+                        src="https://hebrewssystem.onrender.com/uploads/logo-cream.png"
                         alt="logo"
                         className="w-48 h-14 mr-2 object-cover"
                     />

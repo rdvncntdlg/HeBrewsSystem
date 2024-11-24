@@ -13,7 +13,7 @@ const ReadyOrderList = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/api/ready-orders', {
+      const response = await fetch('https://hebrewssystem.onrender.com/api/ready-orders', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -28,7 +28,7 @@ const ReadyOrderList = () => {
 
       const ordersWithItems = await Promise.all(
         data.map(async (order) => {
-          const itemsResponse = await fetch(`http://localhost:3000/api/orders/${order.order_id}/items`, {
+          const itemsResponse = await fetch(`https://hebrewssystem.onrender.com/api/orders/${order.order_id}/items`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -58,7 +58,7 @@ const ReadyOrderList = () => {
   const handleAcceptOrder = async (orderId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/orders/${orderId}/complete`, {
+      const response = await fetch(`https://hebrewssystem.onrender.com/api/orders/${orderId}/complete`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -82,7 +82,7 @@ const ReadyOrderList = () => {
   const handleRejectOrder = async (orderId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/orders/${orderId}/reject`, {
+      const response = await fetch(`https://hebrewssystem.onrender.com/api/orders/${orderId}/reject`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,

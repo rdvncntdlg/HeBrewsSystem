@@ -12,7 +12,7 @@ function EmployeeTable() {
     useEffect(() => {
         const fetchEmployees = async () => {
             try {
-                const response = await fetch("http://localhost:3000/api/employees");
+                const response = await fetch("https://hebrewssystem.onrender.com/api/employees");
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -32,7 +32,7 @@ function EmployeeTable() {
     const handleDelete = async (employee_id) => {
         if (window.confirm("Are you sure you want to delete this employee?")) {
             try {
-                const response = await fetch(`http://localhost:3000/api/employees/${employee_id}`, {
+                const response = await fetch(`https://hebrewssystem.onrender.com/api/employees/${employee_id}`, {
                     method: 'DELETE',
                 });
 

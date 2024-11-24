@@ -9,7 +9,7 @@ const ApprovedTable = () => {
   useEffect(() => {
     const fetchApprovedRequests = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/stock-requests/Approved'); // Ensure the correct URL is used
+        const response = await fetch('https://hebrewssystem.onrender.com/api/stock-requests/Approved'); // Ensure the correct URL is used
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

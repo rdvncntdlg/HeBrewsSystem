@@ -50,7 +50,7 @@ function EditCustomerModal({ isOpen, onClose, onUpdate, customerData }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/customers/${customer.customer_id}`, {
+      const response = await fetch(`https://hebrewssystem.onrender.com/api/customers/${customer.customer_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

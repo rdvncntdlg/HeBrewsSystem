@@ -8,7 +8,7 @@ function AddStockModal({ onClose }) {
 
   // Fetch stock items from the backend when the component mounts
   useEffect(() => {
-    fetch('http://localhost:3000/api/stock-items')
+    fetch('https://hebrewssystem.onrender.com/api/stock-items')
       .then((response) => response.json())
       .then((data) => setStockItems(data))
       .catch((error) => console.error('Error fetching stock items:', error));
@@ -25,7 +25,7 @@ function AddStockModal({ onClose }) {
     };
 
     // Send the stock data to the backend
-    fetch('http://localhost:3000/api/add-stock', {
+    fetch('https://hebrewssystem.onrender.com/api/add-stock', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

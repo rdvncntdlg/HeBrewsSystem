@@ -36,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> login(String username, String password) async {
-    final url = Uri.parse('http://localhost:3000/profile');
+    final url = Uri.parse('https://hebrewssystem.onrender.com/profile');
 
     final response = await http.post(url,
         body: json.encode({
@@ -64,7 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _fetchUserData() async {
-    final url = Uri.parse('http://localhost:3000/profile');
+    final url = Uri.parse('https://hebrewssystem.onrender.com/profile');
 
     // Get stored token
     final prefs = await SharedPreferences.getInstance();

@@ -15,7 +15,7 @@ const Home = () => {
     <section
       id="home"
       className="bg-cover bg-center h-screen relative"
-      style={{ backgroundImage: "url('http://localhost:3000/uploads/hebrews-bg.jpg')" }}
+      style={{ backgroundImage: "url('https://hebrewssystem.onrender.com/uploads/hebrews-bg.jpg')" }}
     >
       {/* Gradient with three stops: 100% opacity, 50% opacity, and transparent */}
       <div className="absolute inset-0 bg-gradient-to-b from-custom-black/100 via-custom-black/80 to-transparent"></div>

@@ -52,7 +52,7 @@ function EditEmployeeModal({ isOpen, onClose, onUpdate, employeeData }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/employees/${employee.employee_id}`, {
+      const response = await fetch(`https://hebrewssystem.onrender.com/api/employees/${employee.employee_id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

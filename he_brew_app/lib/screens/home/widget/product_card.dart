@@ -46,7 +46,7 @@ class ProductCard extends StatelessWidget {
                   child: Hero(
                     tag: product.image,
                     child: Image.network(
-                      'http://localhost:3000/${product.image}', // Concatenate the base URL and image path
+                      'https://hebrewssystem.onrender.com/${product.image}', // Concatenate the base URL and image path
                       width: 200,
                       height: 200,
                       fit: BoxFit.cover,

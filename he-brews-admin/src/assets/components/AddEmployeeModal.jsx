@@ -24,7 +24,7 @@ function AddEmployeeModal({ isOpen, onClose, onAdd }) {
         e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:3000/api/employees', {
+            const response = await fetch('https://hebrewssystem.onrender.com/api/employees', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -15,7 +15,7 @@ function BranchCard({ id, image, name, address, icon, onUpdate, onDelete }) {
 
   const fetchBranches = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/branches');
+      const response = await fetch('https://hebrewssystem.onrender.com/api/branches');
       const data = await response.json();
       setBranches(data);
     } catch (error) {
@@ -26,7 +26,7 @@ function BranchCard({ id, image, name, address, icon, onUpdate, onDelete }) {
   const handleDelete = async (id) => {
     console.log('Deleting branch with ID:', id); // Log the ID
     try {
-      const response = await fetch(`http://localhost:3000/api/branches/${id}`, {
+      const response = await fetch(`https://hebrewssystem.onrender.com/api/branches/${id}`, {
         method: 'DELETE',
       });
   

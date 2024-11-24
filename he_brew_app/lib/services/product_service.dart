@@ -4,7 +4,7 @@ import '../models/product_model.dart'; // Adjust import to your model location
 
 class ProductService {
   final String baseUrl =
-      'http://localhost:3000'; // Replace with your backend URL
+      'https://hebrewssystem.onrender.com'; // Replace with your backend URL
 
   Future<List<Product>> fetchProduct(int branchId) async {
     try {

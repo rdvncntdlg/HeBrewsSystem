@@ -10,7 +10,7 @@ const CompletedTable = () => {
   useEffect(() => {
     const fetchCompletedRequests = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/stock-requests/Completed'); // Update the URL if necessary
+        const response = await fetch('https://hebrewssystem.onrender.com/api/stock-requests/Completed'); // Update the URL if necessary
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

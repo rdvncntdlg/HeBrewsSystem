@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:he_brew_app/models/product_model.dart';
 
 class FavoriteService {
-  final String _baseUrl = 'http://localhost:3000';
+  final String _baseUrl = 'https://hebrewssystem.onrender.com';
 
   // Fetch user profile to get customer_id
   Future<Map<String, dynamic>> fetchProfile(String token) async {

@@ -11,7 +11,7 @@ function LoginForm() {
     event.preventDefault();
     
     try {
-      const response = await fetch("http://localhost:3000/admin-login", {
+      const response = await fetch("https://hebrewssystem.onrender.com/admin-login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

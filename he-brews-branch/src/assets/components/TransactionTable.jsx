@@ -13,7 +13,7 @@ function TransactionTable() {
     const token = localStorage.getItem('token');
 
     // Fetch data from the backend with the Bearer token
-    fetch('http://localhost:3000/transactions', {
+    fetch('https://hebrewssystem.onrender.com/transactions', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

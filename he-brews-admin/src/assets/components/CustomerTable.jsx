@@ -12,7 +12,7 @@ function CustomerTable() {
     useEffect(() => {
         const fetchCustomers = async () => {
             try {
-                const response = await fetch("http://localhost:3000/api/customers");
+                const response = await fetch("https://hebrewssystem.onrender.com/api/customers");
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -32,7 +32,7 @@ function CustomerTable() {
     const handleDelete = async (customer_id) => {
         if (window.confirm("Are you sure you want to delete this customer?")) {
             try {
-                const response = await fetch(`http://localhost:3000/api/customers/${customer_id}`, {
+                const response = await fetch(`https://hebrewssystem.onrender.com/api/customers/${customer_id}`, {
                     method: 'DELETE',
                 });
 

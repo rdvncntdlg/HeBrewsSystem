@@ -11,7 +11,7 @@ const MenuModal = ({ isOpen, onClose }) => {
     if (isOpen) {
       const fetchCategories = async () => {
         try {
-          const response = await fetch('http://localhost:3000/api/categories');
+          const response = await fetch('https://hebrewssystem.onrender.com/api/categories');
           if (response.ok) {
             const data = await response.json();
             console.log(data); // Debug the categories in frontend
@@ -46,7 +46,7 @@ const MenuModal = ({ isOpen, onClose }) => {
     }
   
     try {
-      const response = await fetch('http://localhost:3000/api/products', {
+      const response = await fetch('https://hebrewssystem.onrender.com/api/products', {
         method: 'POST',
         body: formData,
       });

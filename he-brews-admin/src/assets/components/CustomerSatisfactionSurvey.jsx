@@ -63,7 +63,7 @@ const CustomerSatisfactionSurvey = () => {
         };
     
         try {
-            const response = await fetch('http://localhost:3000/submit-survey', {
+            const response = await fetch('https://hebrewssystem.onrender.com/submit-survey', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

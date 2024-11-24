@@ -26,7 +26,7 @@ const CategoryModal = ({ isOpen, onClose }) => {
       }
 
       // Make API request to the server
-      const response = await fetch("http://localhost:3000/api/add-categories", {
+      const response = await fetch("https://hebrewssystem.onrender.com/api/add-categories", {
         method: "POST",
         body: formData,
       });

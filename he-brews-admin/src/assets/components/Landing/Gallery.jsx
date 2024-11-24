@@ -5,22 +5,22 @@ import 'aos/dist/aos.css'; // Make sure to import the AOS CSS
 const Gallery = () => {
   const item = [
     {
-      image: 'http://localhost:3000/uploads/new-products.jpg',
+      image: 'https://hebrewssystem.onrender.com/uploads/new-products.jpg',
       title: 'New Drinks',
       description: 'Explore our new range of refreshing drinks designed to energize and refresh your day.',
     },
     {
-      image: 'http://localhost:3000/uploads/products.jpg',
+      image: 'https://hebrewssystem.onrender.com/uploads/products.jpg',
       title: 'Meals',
       description: 'Savor our delicious and nutritious meals, prepared with the finest ingredients.',
     },
     {
-      image: 'http://localhost:3000/uploads/cup-of-coffee.jpg',
+      image: 'https://hebrewssystem.onrender.com/uploads/cup-of-coffee.jpg',
       title: 'Cup of Coffee to Enjoy',
       description: 'Enjoy a hot cup of freshly brewed coffee, perfect for any time of the day.',
     },
     {
-      image: 'http://localhost:3000/uploads/enjoy.jpg',
+      image: 'https://hebrewssystem.onrender.com/uploads/enjoy.jpg',
       title: 'Seize the Moment',
       description: 'Take a moment to enjoy the little things in life with our curated selection of products.',
     },
