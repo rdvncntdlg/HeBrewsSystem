@@ -57,7 +57,7 @@ class _DetailScreenState extends State<DetailScreen>
   }
 
   // Function to fetch the token from SharedPreferences
-  Future<void> _getToken() async {
+ Future<void> _getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _token = prefs.getString('auth_token');
