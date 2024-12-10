@@ -1,20 +1,8 @@
-import 'order_history_model.dart';
+import 'history_item.dart';
 
-final List<OrderHistory> sampleHistory = [
-  OrderHistory(
-    restaurantName: 'Karam Beirut',
-    logoUrl: 'https://example.com/logo1.png',
-    date: '22 May 2020',
-    time: '10:00 PM',
-    orderId: '20654834',
-    status: 'Successful',
-  ),
-  OrderHistory(
-    restaurantName: 'Karam Beirut',
-    logoUrl: 'https://example.com/logo2.png',
-    date: '22 May 2020',
-    time: '9:30 PM',
-    orderId: '20654835',
-    status: 'Canceled',
-  ),
+final List<HistoryItem> sampleHistory = [
+  HistoryItem(date: '2024-07-21', orderDetails: 'Latte', amount: 85.00),
+  HistoryItem(date: '2024-07-20', orderDetails: 'Cappuccino', amount: 85.00),
+  HistoryItem(date: '2024-07-19', orderDetails: 'Espresso', amount: 93.00),
+  HistoryItem(date: '2024-07-22', orderDetails: 'White Choco', amount: 83.00),
 ];
