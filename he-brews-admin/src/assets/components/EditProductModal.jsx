@@ -35,7 +35,7 @@ function EditProductModal({ isOpen, onClose, product, onUpdate }) {
     if (image) formData.append('image', image);
 
     try {
-      const response = await fetch(`https://hebrewssystem.onrender.com/api/products/${id}`, { // Correct API URL
+      const response = await fetch(`https://hebrewscafeserver.onrender.com/api/products/${id}`, { // Correct API URL
         method: 'PUT',
         body: formData,
       });

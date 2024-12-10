@@ -23,7 +23,7 @@ function AddCustomerModal({ isOpen, onClose, onAdd }) {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://hebrewssystem.onrender.com/api/customers', {
+      const response = await fetch('https://hebrewscafeserver.onrender.com/api/customers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

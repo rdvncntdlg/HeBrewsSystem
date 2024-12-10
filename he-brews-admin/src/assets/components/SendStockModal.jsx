@@ -10,7 +10,7 @@ const SendStockModal = ({ isOpen, onClose, item, fetchStockItems }) => { // Add 
   useEffect(() => {
     const fetchBranches = async () => {
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/api/branches', {
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/branches', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`, // Adjust if necessary
@@ -42,7 +42,7 @@ const SendStockModal = ({ isOpen, onClose, item, fetchStockItems }) => { // Add 
     e.preventDefault();
     if (branchName && quantity) {
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/api/send-stock', {
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/send-stock', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`, // Adjust if necessary

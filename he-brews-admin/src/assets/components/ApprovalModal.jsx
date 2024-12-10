@@ -11,7 +11,7 @@ const ApprovalModal = ({ onClose, request }) => {
       if (request && request.item_id) { // Ensure request and item_id are available
         setLoading(true);
         try {
-          const response = await fetch('https://hebrewssystem.onrender.com/api/approve-request', {
+          const response = await fetch('https://hebrewscafeserver.onrender.com/api/approve-request', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ const ApprovalModal = ({ onClose, request }) => {
           <button
             onClick={async () => {
               try {
-                const response = await fetch('https://hebrewssystem.onrender.com/api/confirm-approval', {
+                const response = await fetch('https://hebrewscafeserver.onrender.com/api/confirm-approval', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',

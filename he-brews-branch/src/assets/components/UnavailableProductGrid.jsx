@@ -15,7 +15,7 @@ function UnavailableProductGrid({ selectedCategory }) {
           return;
         }
 
-        const response = await fetch('https://hebrewssystem.onrender.com/api/list-products-branch/unavailable/', {
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/list-products-branch/unavailable/', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
@@ -65,8 +65,8 @@ function UnavailableProductGrid({ selectedCategory }) {
             name={product.itemname} // Use `itemname` as the product name
             price={product.price} // Use `price` as the product price
             image={product.imageurl 
-              ? `https://hebrewssystem.onrender.com/${product.imageurl}` 
-              : 'https://hebrewssystem.onrender.com/uploads/product/logo-product-default.jpg'} // Corrected default image URL
+              ? `https://hebrewscafeserver.onrender.com/${product.imageurl}` 
+              : 'https://hebrewscafeserver.onrender.com/uploads/product/logo-product-default.jpg'} // Corrected default image URL
             category={product.category_id}  // Pass category_id if needed for filtering
             available={product.available}
             onStatusChange={handleStatusChange} // Pass the status change handler to the product card

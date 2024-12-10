@@ -8,7 +8,7 @@ function ProductGrid({ selectedCategoryId }) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/api/list-products');
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/list-products');
         if (!response.ok) {
           const text = await response.text(); // Read response as text if not OK
           console.error('Error response:', text);
@@ -47,7 +47,7 @@ function ProductGrid({ selectedCategoryId }) {
               id={product.menu_id}
               name={product.itemname}
               price={product.price}
-              image={`https://hebrewssystem.onrender.com/${product.imageurl}`}
+              image={`https://hebrewscafeserver.onrender.com/${product.imageurl}`}
               category={product.category_id}
               onDelete={handleDeleteProduct}
             />

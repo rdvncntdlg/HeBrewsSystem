@@ -7,7 +7,7 @@ const StockRequestTable = () => {
   useEffect(() => {
     const fetchStockRequests = async () => {
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/api/requests', {
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/requests', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -34,7 +34,7 @@ const StockRequestTable = () => {
   // Handle receiving stock
   const handleReceived = async (request_id) => {
     try {
-      const response = await fetch('https://hebrewssystem.onrender.com/api/receive-items', {
+      const response = await fetch('https://hebrewscafeserver.onrender.com/api/receive-items', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

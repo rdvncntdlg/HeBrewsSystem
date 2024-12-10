@@ -13,32 +13,40 @@ class FavoriteProvider extends ChangeNotifier {
   int? get customerId => _customerId;
 
   // Initialize by fetching profile and favorites
-  Future<void> initialize(String token) async {
-    try {
-      // Fetch profile to get customer_id
-      final profile = await _favoriteService.fetchProfile(token);
-      if (profile.containsKey('user')) {
-        _customerId = profile['user']['customer_id'];  // Access the customer_id from profile
-      } else {
-        throw Exception('Invalid profile structure');
-      }
-
-      // Fetch favorites for the user
-      if (_customerId != null) {
-        final fetchedFavorites = await _favoriteService.fetchFavorites(_customerId!, token);
-        _favorites.clear();
-        _favorites.addAll(fetchedFavorites);
-      }
-
-      notifyListeners();
-    } catch (e) {
-      throw Exception('Error initializing favorites: $e');
-    }
+Future<void> initialize(String token) async {
+  if (token.isEmpty) {
+    throw Exception('Token is empty');
   }
+
+  try {
+    final profile = await _favoriteService.fetchProfile(token);
+
+    if (profile.containsKey('user')) {
+      final user = profile['user'];
+      if (user is Map<String, dynamic> && user.containsKey('customer_id')) {
+        _customerId = user['customer_id'];
+      } else {
+        throw Exception('Invalid profile structure: Missing "customer_id"');
+      }
+    } else {
+      throw Exception('Profile does not contain "user" key');
+    }
+
+    if (_customerId != null) {
+      final fetchedFavorites = await _favoriteService.fetchFavorites(_customerId!, token);
+      _favorites.clear();
+      _favorites.addAll(fetchedFavorites);
+    }
+
+    notifyListeners();
+  } catch (e) {
+    throw Exception('Error initializing favorites: $e');
+  }
+}
 
   // Toggle favorite
   Future<void> toggleFavorite(Product product, String token) async {
-    if (_customerId == null) throw Exception('User not authenticated');
+    if (customerId == null) throw Exception('User not authenticated');
 
     try {
       if (isFavorite(product)) {

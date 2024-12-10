@@ -19,7 +19,7 @@ function EditBranchModal({ isOpen, onClose, branch, onSave }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://hebrewssystem.onrender.com/api/branches/${branch.id}`, {
+      const response = await fetch(`https://hebrewscafeserver.onrender.com/api/branches/${branch.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

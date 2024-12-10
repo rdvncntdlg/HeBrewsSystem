@@ -14,7 +14,7 @@ function BranchGrid() {
   useEffect(() => {
     async function fetchBranches() {
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/api/branches');
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/branches');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

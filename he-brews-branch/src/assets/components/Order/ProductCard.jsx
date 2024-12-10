@@ -5,7 +5,7 @@ import React from 'react';
 function ProductCard({ productId, image, name, price, orderId, onAddToOrder }) {
   const handleAddToOrder = async () => {
     try {
-      const response = await fetch('https://hebrewssystem.onrender.com/api/orderitems', {
+      const response = await fetch('https://hebrewscafeserver.onrender.com/api/orderitems', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -34,7 +34,7 @@ function Header({ text }) {
       }
 
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/admin-profile', {
+        const response = await fetch('https://hebrewscafeserver.onrender.com/admin-profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

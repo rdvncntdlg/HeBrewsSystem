@@ -14,7 +14,7 @@ function ProductGrid({ orderId }) {
           return;
         }
 
-        const response = await fetch('https://hebrewssystem.onrender.com/api/list-products-branch/available/', {
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/list-products-branch/available/', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`, // Pass the token in the Authorization header
@@ -44,8 +44,8 @@ function ProductGrid({ orderId }) {
             key={product.menu_id} // Assuming 'id' is a unique identifier
             productId={product.menu_id}
             image={product.imageurl 
-              ? `https://hebrewssystem.onrender.com/${product.imageurl}` 
-              : 'https://hebrewssystem.onrender.com/uploads/product/logo-product-default.jpg'} // Corrected default image URL
+              ? `https://hebrewscafeserver.onrender.com/${product.imageurl}` 
+              : 'https://hebrewscafeserver.onrender.com/uploads/product/logo-product-default.jpg'} // Corrected default image URL
             name={product.itemname}
             price={product.price}
             addIcon={product.add_icon_url}

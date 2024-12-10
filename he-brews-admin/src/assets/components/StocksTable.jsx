@@ -12,7 +12,7 @@ function StocksTable() {
   // Function to fetch stock items
   const fetchStockItems = async () => {
     try {
-      const response = await fetch('https://hebrewssystem.onrender.com/admin-stocks', {
+      const response = await fetch('https://hebrewscafeserver.onrender.com/admin-stocks', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

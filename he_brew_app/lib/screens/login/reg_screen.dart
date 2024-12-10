@@ -64,7 +64,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       final response = await http.post(
-        Uri.parse('https://hebrewssystem.onrender.com/register'),
+        Uri.parse('https://hebrewscafeserver.onrender.com/api/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'firstName': _firstNameController.text,

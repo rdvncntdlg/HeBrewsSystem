@@ -20,7 +20,7 @@ function StocksTable() {
       setError(null); // Reset error state before fetching
 
       try {
-        const response = await fetch(`https://hebrewssystem.onrender.com/stocks`, {
+        const response = await fetch(`https://hebrewscafeserver.onrender.com/stocks`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

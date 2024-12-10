@@ -12,7 +12,7 @@ const PendingTable = () => {
   useEffect(() => {
     const fetchPendingRequests = async () => {
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/api/stock-requests/pending');
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/stock-requests/pending');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

@@ -22,7 +22,7 @@ function ProductCard({ id, name, price, image, category, onDelete }) {
 
     if (confirmed) {
       try {
-        const response = await fetch(`https://hebrewssystem.onrender.com/api/products/${id}`, {
+        const response = await fetch(`https://hebrewscafeserver.onrender.com/api/products/${id}`, {
           method: 'DELETE',
         });
 

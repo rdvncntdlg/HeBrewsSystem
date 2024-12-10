@@ -14,7 +14,7 @@ function ExpiryTable() {
       }
 
       try {
-        const response = await fetch(`https://hebrewssystem.onrender.com/expiring-items`, {
+        const response = await fetch(`https://hebrewscafeserver.onrender.com/expiring-items`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

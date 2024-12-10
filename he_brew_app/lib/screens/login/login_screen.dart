@@ -21,7 +21,7 @@ class LoginScreen extends StatelessWidget {
     Future<void> signIn() async {
       if (isValid()) {
         final response = await http.post(
-          Uri.parse('https://hebrewssystem.onrender.com/login'),
+          Uri.parse('https://hebrewscafeserver.onrender.com/api/login'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             'username': usernameController.text,

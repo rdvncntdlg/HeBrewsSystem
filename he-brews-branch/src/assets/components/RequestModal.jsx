@@ -14,7 +14,7 @@ const RequestModal = ({ item, onClose }) => {
     };
   
     try {
-      const response = await fetch('https://hebrewssystem.onrender.com/api/send-request', {
+      const response = await fetch('https://hebrewscafeserver.onrender.com/api/send-request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

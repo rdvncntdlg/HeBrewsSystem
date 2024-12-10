@@ -42,7 +42,7 @@ function AddBranchModal({ onClose }) {
     formData.append('longitude', latLng.lng);
 
     try {
-      const response = await fetch('https://hebrewssystem.onrender.com/api/add-branches', {
+      const response = await fetch('https://hebrewscafeserver.onrender.com/api/add-branches', {
         method: 'POST',
         body: formData,
       });

@@ -4,11 +4,11 @@ import '../models/product_model.dart'; // Adjust import to your model location
 
 class ProductService {
   final String baseUrl =
-      'https://hebrewssystem.onrender.com'; // Replace with your backend URL
+      'https://hebrewscafeserver.onrender.com'; // Replace with your backend URL
 
   Future<List<Product>> fetchProduct(int branchId) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/products?branch_id=$branchId'));
+      final response = await http.get(Uri.parse('$baseUrl/api/products?branch_id=$branchId'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);

@@ -34,7 +34,7 @@ function Header({ text }) {
       }
 
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/employee-profile', { // Changed to employee profile endpoint
+        const response = await fetch('https://hebrewscafeserver.onrender.com/employee-profile', { // Changed to employee profile endpoint
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

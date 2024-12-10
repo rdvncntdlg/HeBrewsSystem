@@ -3,33 +3,35 @@ import 'package:http/http.dart' as http;
 import 'package:he_brew_app/models/product_model.dart';
 
 class FavoriteService {
-  final String _baseUrl = 'https://hebrewssystem.onrender.com';
+  final String _baseUrl = 'https://hebrewscafeserver.onrender.com';
 
   // Fetch user profile to get customer_id
   Future<Map<String, dynamic>> fetchProfile(String token) async {
-    final response = await http.get(
-      Uri.parse('$_baseUrl/profile'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
+  final response = await http.get(
+    Uri.parse('$_baseUrl/api/profile'),
+    headers: {
+      'Authorization': 'Bearer $token',
+    },
+  );
 
-    if (response.statusCode == 200) {
-      final decodedResponse = jsonDecode(response.body);
-      if (decodedResponse is Map<String, dynamic>) {
-        return decodedResponse;
-      } else {
-        throw Exception('Unexpected response format');
-      }
+  if (response.statusCode == 200) {
+    final decodedResponse = jsonDecode(response.body);
+    print('Fetched profile: $decodedResponse'); // Add this log
+    if (decodedResponse is Map<String, dynamic>) {
+      return decodedResponse;
     } else {
-      throw Exception('Failed to fetch profile');
+      throw Exception('Unexpected response format');
     }
+  } else {
+    throw Exception('Failed to fetch profile');
   }
+}
+
 
   // Add a product to the favorites
   Future<void> addFavorite(int customerId, Product product, String token) async {
     final response = await http.post(
-      Uri.parse('$_baseUrl/favorites'),
+      Uri.parse('$_baseUrl/api/favorites'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -48,7 +50,7 @@ class FavoriteService {
   // Remove a product from the favorites
   Future<void> removeFavorite(int customerId, Product product, String token) async {
     final response = await http.delete(
-      Uri.parse('$_baseUrl/favorites'),
+      Uri.parse('$_baseUrl/api/favorites'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -67,7 +69,7 @@ class FavoriteService {
   // Fetch all favorite products for a customer
   Future<List<Product>> fetchFavorites(int customerId, String token) async {
     final response = await http.get(
-      Uri.parse('$_baseUrl/favorites/$customerId'),
+      Uri.parse('$_baseUrl/api/favorites/$customerId'),
       headers: {
         'Authorization': 'Bearer $token',
       },

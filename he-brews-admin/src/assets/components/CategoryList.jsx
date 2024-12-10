@@ -8,7 +8,7 @@ function CategoryList({ onFilter }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/api/categories');
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/categories');
         const data = await response.json();
         setCategories(data);
       } catch (error) {
@@ -38,7 +38,7 @@ function CategoryList({ onFilter }) {
               {category.image_path && (
                 <img
                   loading="lazy"
-                  src={`https://hebrewssystem.onrender.com/${category.image_path}`}
+                  src={`https://hebrewscafeserver.onrender.com/${category.image_path}`}
                   alt={category.categoryname}
                   className="object-contain inline-block z-0 shrink-0 w-3 h-3 aspect-square"
                 />

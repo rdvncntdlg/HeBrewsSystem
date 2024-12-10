@@ -14,7 +14,7 @@ function OrderSummary({ orderId }) {
     const fetchOrderItems = async () => {
       if (!orderId) return;
       try {
-        const response = await fetch(`https://hebrewssystem.onrender.com/api/order/${orderId}`);
+        const response = await fetch(`https://hebrewscafeserver.onrender.com/api/order/${orderId}`);
         const data = await response.json();
         setOrderItems(data);
       } catch (error) {
@@ -28,7 +28,7 @@ function OrderSummary({ orderId }) {
   // Function to update the item quantity in the database
   const updateQuantityInDb = async (orderitem_id, action) => {
     try {
-      await fetch(`https://hebrewssystem.onrender.com/api/order/${action}/${orderitem_id}`, {
+      await fetch(`https://hebrewscafeserver.onrender.com/api/order/${action}/${orderitem_id}`, {
         method: 'POST',
       });
     } catch (error) {

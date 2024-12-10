@@ -15,7 +15,7 @@ const CashModal = ({ orderId, subtotal, total, tax, dineOption, onClose }) => {
   useEffect(() => {
     const fetchOrderItems = async () => {
       try {
-        const response = await fetch(`https://hebrewssystem.onrender.com/api/order-items/${orderId}`);
+        const response = await fetch(`https://hebrewscafeserver.onrender.com/api/order-items/${orderId}`);
         const data = await response.json();
         setOrderItems(data);
       } catch (error) {
@@ -25,7 +25,7 @@ const CashModal = ({ orderId, subtotal, total, tax, dineOption, onClose }) => {
 
     const fetchBranch = async () => {
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/api/branchname', {
+        const response = await fetch('https://hebrewscafeserver.onrender.com/api/branchname', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -46,7 +46,7 @@ const CashModal = ({ orderId, subtotal, total, tax, dineOption, onClose }) => {
 
     const fetchEmployeeProfile = async () => {
       try {
-        const response = await fetch('https://hebrewssystem.onrender.com/employee-profile', {
+        const response = await fetch('https://hebrewscafeserver.onrender.com/employee-profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -163,7 +163,7 @@ const CashModal = ({ orderId, subtotal, total, tax, dineOption, onClose }) => {
         invoiceDate: new Date().toISOString(),
       };
 
-      const response = await fetch('https://hebrewssystem.onrender.com/api/submit-payment', {
+      const response = await fetch('https://hebrewscafeserver.onrender.com/api/submit-payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -196,7 +196,7 @@ const CashModal = ({ orderId, subtotal, total, tax, dineOption, onClose }) => {
       <div className="bg-white rounded-lg w-96 p-6 space-y-6">
         <div className="py-4" id="receipt-content">
           <img
-            src={`https://hebrewssystem.onrender.com/uploads/logo-black.png`}
+            src={`https://hebrewscafeserver.onrender.com/uploads/logo-black.png`}
             alt="Logo"
             className="mx-auto w-28 h-28 object-contain"
           />

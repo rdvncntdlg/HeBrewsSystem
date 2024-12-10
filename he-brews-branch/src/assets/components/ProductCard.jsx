@@ -19,7 +19,7 @@ function ProductCard({ id, name, price, image, category, available, onStatusChan
 
   const handleAvailable = async () => {
     try {
-      const response = await fetch(`https://hebrewssystem.onrender.com/api/products/${id}/available`, {
+      const response = await fetch(`https://hebrewscafeserver.onrender.com/api/products/${id}/available`, {
         method: 'PUT',
       });
 
@@ -36,7 +36,7 @@ function ProductCard({ id, name, price, image, category, available, onStatusChan
 
   const handleUnavailable = async () => {
     try {
-      const response = await fetch(`https://hebrewssystem.onrender.com/api/products/${id}/unavailable`, {
+      const response = await fetch(`https://hebrewscafeserver.onrender.com/api/products/${id}/unavailable`, {
         method: 'PUT',
       });
 
