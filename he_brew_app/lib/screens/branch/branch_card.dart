@@ -28,7 +28,10 @@ class BranchCard extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Cancel', style: GoogleFonts.poppins()),
+                  style: TextButton.styleFrom(
+                    textStyle: GoogleFonts.poppins(color: Colors.black), // Set text color to black
+                  ),
+                  child: Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
@@ -41,7 +44,10 @@ class BranchCard extends StatelessWidget {
                       ),
                     );
                   },
-                  child: Text('Select', style: GoogleFonts.poppins()),
+                  style: TextButton.styleFrom(
+                    textStyle: GoogleFonts.poppins(color: Colors.black), // Set text color to black
+                  ),
+                  child: Text('Select'),
                 ),
               ],
             );
