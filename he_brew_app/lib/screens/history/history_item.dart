@@ -1,11 +1,17 @@
-class HistoryItem {
+class OrderHistory {
+  final String restaurantName;
+  final String logoUrl;
   final String date;
-  final String orderDetails;
-  final double amount;
+  final String time;
+  final String orderId;
+  final String status;
 
-  HistoryItem({
+  OrderHistory({
+    required this.restaurantName,
+    required this.logoUrl,
     required this.date,
-    required this.orderDetails,
-    required this.amount,
+    required this.time,
+    required this.orderId,
+    required this.status,
   });
 }
