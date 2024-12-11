@@ -2,9 +2,12 @@ import 'package:he_brew_app/provider/add_to_cart_provider.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:he_brew_app/screens/cart/check_out.dart';
 import 'package:flutter/material.dart';
+import 'package:he_brew_app/models/branch_model.dart';
 
 class CartScreen extends StatefulWidget {
-  const CartScreen({super.key});
+  final Branch selectedBranch; // Add selectedBranch as a parameter
+
+  const CartScreen({super.key, required this.selectedBranch});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -34,7 +37,7 @@ class _CartScreenState extends State<CartScreen> {
 
     return Scaffold(
       backgroundColor: contentColor,
-      bottomSheet: const CheckOutBox(),
+      bottomSheet: CheckOutBox(selectedBranch: widget.selectedBranch), // Pass the branch to CheckOutBox
       body: SafeArea(
         child: Column(
           children: [
@@ -194,4 +197,4 @@ class _CartScreenState extends State<CartScreen> {
       ),
     );
   }
-} 
+}
