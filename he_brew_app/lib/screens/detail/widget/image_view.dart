@@ -20,8 +20,7 @@ class ImageView extends StatelessWidget {
         child: SizedBox(
           height: 250,
           child: SizedBox(
-            child: Image.network(
-                'https://hebrewscafeserver.onrender.com/${image}'),
+            child: Image.asset(image),
           ),
         ),
       ),

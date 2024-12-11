@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/models/branch_model.dart';
-import 'package:he_brew_app/models/category.dart';
 import 'package:he_brew_app/screens/home/widget/product_card.dart';
-import 'package:he_brew_app/screens/home/widget/home_app_bar.dart';
+import 'package:he_brew_app/screens/home/widget/home_app_bar.dart'; // Import the new file
 import 'package:he_brew_app/screens/home/widget/search_bar.dart';
 import 'package:he_brew_app/models/product_model.dart';
 import 'package:he_brew_app/theme.dart';
-import 'package:he_brew_app/services/category_service.dart';
-import 'package:he_brew_app/services/product_service.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';// Import the service to fetch products
+import 'package:he_brew_app/services/product_service.dart'; // Import the service to fetch products
 
 class HomeScreen extends StatefulWidget {
   final Branch selectedBranch;
@@ -21,16 +20,39 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   late Future<List<Product>> products;
-  late Future<List<Category>> categories;
 
-  // Fetching the products and categories when the screen is loaded
+  // Category data moved outside of build() method
+  final List<String> categoryTitles = [
+    "Best Sellers",
+    "Iced Drinks",
+    "Blended Coffee",
+    "Milkshakes",
+    "Fruit Slush",
+    "Iced Tea",
+    "Big Plates",
+    "Snacks",
+    "Pasta",
+    "Sandwiches",
+  ];
+
+  final List<IconData> categoryIcons = [
+    FontAwesomeIcons.fireFlameCurved,
+    FontAwesomeIcons.diceD6,
+    FontAwesomeIcons.mugHot,
+    FontAwesomeIcons.blender,
+    FontAwesomeIcons.appleWhole,
+    FontAwesomeIcons.martiniGlassCitrus,
+    FontAwesomeIcons.utensils,
+    Icons.fastfood,
+    FontAwesomeIcons.bowlFood,
+    FontAwesomeIcons.breadSlice,
+  ];
+
+  // Fetching the products when the screen is loaded
   @override
   void initState() {
     super.initState();
-    products = ProductService().fetchProduct(
-        widget.selectedBranch.branch_id); // Fetch products from API
-    categories =
-        CategoryService().fetchCategories(); // Fetch categories from API
+    products = ProductService().fetchProduct(widget.selectedBranch.branch_id); // Fetch products from API
   }
 
   @override
@@ -47,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 35),
-              HomeAppBar(branchName: widget.selectedBranch.name),
+              HomeAppBar(branchName: widget.selectedBranch.name), // Corrected usage
               const SizedBox(height: 20),
               const MySearchBar(),
               const SizedBox(height: 20),
@@ -56,27 +78,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  FutureBuilder<List<Category>>(
-                    future: categories,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Text('No categories available');
-                      } else {
-                        List<Category> categoryList = snapshot.data!;
-                        return Text(
-                          categoryList[selectedIndex].title,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 25,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        );
-                      }
-                    },
+                  Icon(categoryIcons[selectedIndex]),
+                  Text(
+                    categoryTitles[selectedIndex],
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 25,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ],
               ),
@@ -91,14 +100,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return Center(child: Text('No products available'));
                   } else {
+                    // Get products based on selected category
                     List<Product> categoryProducts = snapshot.data!;
-                    // Filter the products based on selected category id
-                    List<Product> filteredProducts = categoryProducts
-                        .where((product) =>
-                            product.category ==
-                            snapshot.data![selectedIndex].category)
-                        .toList();
-
                     return GridView.builder(
                       padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
@@ -110,11 +113,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisSpacing: 20,
                         mainAxisExtent: 300,
                       ),
-                      itemCount: filteredProducts.length,
+                      itemCount: categoryProducts.length,
                       itemBuilder: (context, index) {
                         return ProductCard(
-                          product: filteredProducts[index],
-                          selectedBranch: widget.selectedBranch,
+                          product: categoryProducts[index],
+                          selectedBranch: widget.selectedBranch, // Pass selectedBranch here
                         );
                       },
                     );
@@ -128,64 +131,61 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Updated categoryItems method to use categoryTitles and categoryIcons properly
+  // Corrected categoryItems method to use categoryTitles and categoryIcons properly
   SizedBox categoryItems() {
     return SizedBox(
       height: 150,
-      child: FutureBuilder<List<Category>>(
-        future: categories,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No categories available'));
-          } else {
-            List<Category> categoryList = snapshot.data!;
-            return ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: categoryList.length,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedIndex = index;
-                    });
-                  },
-                  child: Container(
-                    width: 125,
-                    padding: const EdgeInsets.all(5),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: categoryTitles.length, // Use categoryTitles length
+        physics: const BouncingScrollPhysics(),
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedIndex = index;
+              });
+            },
+            child: Container(
+              width: 125,
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: selectedIndex == index
+                    ? primaryColor
+                    : Colors.transparent,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 80,
+                    width: 80,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: selectedIndex == index
-                          ? primaryColor
-                          : Colors.transparent,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 5),
-                        Text(
-                          categoryList[index].title,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: selectedIndex == index
-                                ? contentColor
-                                : Colors.black,
-                          ),
-                        ),
-                      ],
+                      borderRadius: BorderRadius.circular(10),
+                      image: DecorationImage(
+                        image: AssetImage('assets/icons/${categoryIcons[index]}.png'), // Add proper icon path
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                );
-              },
-            );
-          }
+                  const SizedBox(height: 5),
+                  Text(
+                    categoryTitles[index],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: selectedIndex == index
+                          ? contentColor
+                          : Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         },
       ),
     );
