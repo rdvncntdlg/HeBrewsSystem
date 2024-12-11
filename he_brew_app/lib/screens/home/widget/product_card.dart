@@ -8,7 +8,8 @@ class ProductCard extends StatelessWidget {
   final Product product;
   final Branch selectedBranch; // Add this line to accept selectedBranch
 
-  const ProductCard({super.key, required this.product, required this.selectedBranch});
+  const ProductCard(
+      {super.key, required this.product, required this.selectedBranch});
 
   @override
   Widget build(BuildContext context) {

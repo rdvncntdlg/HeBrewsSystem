@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
-import 'package:he_brew_app/screens/home/home_screen.dart'; // Import HomeScreen
+import 'package:he_brew_app/screens/nav_bar.dart';
+import 'package:lottie/lottie.dart'; // Import HomeScreen
 import 'package:he_brew_app/models/branch_model.dart'; // Import Branch model
 
 class OrderSuccessScreen extends StatelessWidget {
@@ -9,11 +9,11 @@ class OrderSuccessScreen extends StatelessWidget {
   final Branch selectedBranch; // Pass the selected branch
 
   const OrderSuccessScreen({
-    Key? key,
+    super.key,
     required this.orderNumber,
     required this.orderType,
     required this.selectedBranch,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,8 @@ class OrderSuccessScreen extends StatelessWidget {
               SizedBox(
                 height: 150,
                 width: 150,
-                child: Lottie.asset('animations/Animation_success.lottie'), // Ensure the file exists
+                child: Lottie.asset(
+                    'animations/Animation_success.lottie'), // Ensure the file exists
               ),
               const SizedBox(height: 20),
 
@@ -47,9 +48,9 @@ class OrderSuccessScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
-              Text(
+              const Text(
                 "Your order has been placed successfully.",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
                   fontFamily: 'Poppins',
@@ -87,7 +88,8 @@ class OrderSuccessScreen extends StatelessWidget {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color.fromARGB(255, 67, 69, 49),
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -96,7 +98,8 @@ class OrderSuccessScreen extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomeScreen(selectedBranch: selectedBranch),
+                      builder: (context) =>
+                          BottomNavBar(selectedBranch: selectedBranch),
                     ),
                   );
                 },

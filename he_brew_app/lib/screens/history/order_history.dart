@@ -21,9 +21,10 @@ class HistoryScreen extends StatelessWidget {
         itemCount: sampleHistory.length,
         itemBuilder: (context, index) {
           final item = sampleHistory[index];
-          
+
           // Dynamic status label mapping
-          Color statusColor = Colors.black;  // All statuses will have black color
+          Color statusColor =
+              Colors.black; // All statuses will have black color
           String displayStatus;
 
           switch (item.status) {
@@ -44,7 +45,8 @@ class HistoryScreen extends StatelessWidget {
           }
 
           return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+            margin:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -102,10 +104,14 @@ class HistoryScreen extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 255, 255, 255), // Button background color
-                        side: const BorderSide(color: Color.fromARGB(255, 32, 32, 32)), // Button border color
+                        backgroundColor: const Color.fromARGB(
+                            255, 255, 255, 255), // Button background color
+                        side: const BorderSide(
+                            color: Color.fromARGB(
+                                255, 32, 32, 32)), // Button border color
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0), // Rounded corners
+                          borderRadius:
+                              BorderRadius.circular(10.0), // Rounded corners
                         ),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16.0,
@@ -115,7 +121,8 @@ class HistoryScreen extends StatelessWidget {
                       child: const Text(
                         'Track Order',
                         style: TextStyle(
-                          color: Color.fromARGB(255, 32, 32, 32), // Button text color
+                          color: Color.fromARGB(
+                              255, 32, 32, 32), // Button text color
                           fontWeight: FontWeight.bold,
                         ),
                       ),

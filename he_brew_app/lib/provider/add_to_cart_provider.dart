@@ -11,7 +11,8 @@ class CartProvider extends ChangeNotifier {
     if (_cart.contains(product)) {
       // If the product is already in the cart, increment its quantity
       for (Product element in _cart) {
-        if (element.menu_id == product.menu_id) {  // Ensure we find the correct product by id
+        if (element.menu_id == product.menu_id) {
+          // Ensure we find the correct product by id
           element.quantity++;
         }
       }
@@ -23,7 +24,7 @@ class CartProvider extends ChangeNotifier {
     // Example usage of the token (if required in your case):
     // SomeApiService.addToCart(product, token);
 
-    notifyListeners();  // Notify listeners that the cart has changed
+    notifyListeners(); // Notify listeners that the cart has changed
   }
 
   // Method to increment product quantity at a specific index
@@ -37,7 +38,7 @@ class CartProvider extends ChangeNotifier {
     if (_cart[index].quantity > 1) {
       _cart[index].quantity--;
     } else {
-      removeItem(index);  // If quantity is 1, remove the item
+      removeItem(index); // If quantity is 1, remove the item
     }
     notifyListeners();
   }
