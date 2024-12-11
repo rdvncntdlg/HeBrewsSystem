@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/provider/add_to_cart_provider.dart';
-import 'package:he_brew_app/screens/selection/selection_screen.dart';
+import 'package:he_brew_app/screens/cart/selection_screen.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:provider/provider.dart';
+import 'package:he_brew_app/models/branch_model.dart';
 
 class CheckOutBox extends StatefulWidget {
-  const CheckOutBox({super.key});
+  final Branch selectedBranch; // Add selectedBranch as a parameter
+
+  const CheckOutBox({super.key, required this.selectedBranch});
 
   @override
   _CheckOutBoxState createState() => _CheckOutBoxState();
@@ -90,7 +93,9 @@ class _CheckOutBoxState extends State<CheckOutBox> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const SelectionScreen(),
+                        builder: (context) => SelectionScreen(
+                          selectedBranch: widget.selectedBranch, // Pass the branch to SelectionScreen
+                        ),
                       ),
                     );
                   },
