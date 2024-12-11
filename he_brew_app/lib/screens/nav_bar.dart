@@ -30,7 +30,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     screens = [
       HomeScreen(selectedBranch: widget.selectedBranch),  // Pass selectedBranch here
       const FavoriteScreen(),
-      const CartScreen(),
+      CartScreen(selectedBranch: widget.selectedBranch), // Pass selectedBranch here
       const HistoryScreen(),
       const ProfileScreen(),
     ];
