@@ -19,6 +19,7 @@ dependencies:
   webview_flutter: ^4.8.0
   webview_flutter_wkwebview: ^3.14.0
   jwt_decoder: ^2.0.1
+  lottie: ^2.3.2
 
 dev_dependencies:
   flutter_test:
@@ -40,3 +41,4 @@ flutter:
     - images/sandwiches/
     - images/profile/
     - images/branches/
+    - assets/animations/Animation_success.lottie/

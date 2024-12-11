@@ -24,23 +24,13 @@ class _CheckOutBoxState extends State<CheckOutBox> {
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
-          topRight: Radius.circular(30),
-          bottomLeft: Radius.circular(30),
+          topRight: Radius.circular(12),
+          bottomLeft: Radius.circular(12),
         ),
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          const Center(
-            child: Text(
-              "Summary",
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
-            ),
-          ),
           const SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -105,7 +95,7 @@ class _CheckOutBoxState extends State<CheckOutBox> {
                     );
                   },
             child: const Text(
-              "Proceed to Order",
+              "Proceed to Checkout",
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold,

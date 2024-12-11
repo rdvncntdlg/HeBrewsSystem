@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'sample_data.dart';
-import 'order_tracking.dart'; // Import the new screen
+import 'order_tracking.dart'; // Import the OrderTrackingScreen
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -21,6 +21,28 @@ class HistoryScreen extends StatelessWidget {
         itemCount: sampleHistory.length,
         itemBuilder: (context, index) {
           final item = sampleHistory[index];
+          
+          // Dynamic status label mapping
+          Color statusColor = Colors.black;  // All statuses will have black color
+          String displayStatus;
+
+          switch (item.status) {
+            case 'Successful':
+              displayStatus = 'Completed';
+              break;
+            case 'Cancelled':
+              displayStatus = 'Cancelled';
+              break;
+            case 'Preparing':
+              displayStatus = 'Preparing';
+              break;
+            case 'Pending':
+              displayStatus = 'Pending';
+              break;
+            default:
+              displayStatus = item.status;
+          }
+
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
             child: Padding(
@@ -40,11 +62,9 @@ class HistoryScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        item.status,
+                        displayStatus,
                         style: TextStyle(
-                          color: item.status == 'Successful'
-                              ? Colors.green
-                              : Colors.red,
+                          color: statusColor,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
