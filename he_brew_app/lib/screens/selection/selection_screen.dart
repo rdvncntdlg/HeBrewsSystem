@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:he_brew_app/screens/cart/order_success.dart';
-import 'package:he_brew_app/models/branch_model.dart';
 
 class SelectionScreen extends StatefulWidget {
-  final Branch selectedBranch; // Pass the selected branch to this screen
-
-  const SelectionScreen({super.key, required this.selectedBranch});
+  const SelectionScreen({super.key});
 
   @override
   _SelectionScreenState createState() => _SelectionScreenState();
@@ -52,7 +49,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
         ),
         backgroundColor: primaryColor,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -133,9 +130,9 @@ class _SelectionScreenState extends State<SelectionScreen> {
               keyboardType: TextInputType.phone,
               enabled: selectedOption == "Delivery",
               inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(11),
-                FilteringTextInputFormatter.allow(RegExp(r'^\d{0,11}\$')),
+                FilteringTextInputFormatter.digitsOnly, // Allow only digits
+                LengthLimitingTextInputFormatter(11),   // Limit to 11 digits
+                FilteringTextInputFormatter.allow(RegExp(r'^\d{0,11}$')), // Allow any digits up to 11 characters
               ],
             ),
             const SizedBox(height: 20),
@@ -178,7 +175,6 @@ class _SelectionScreenState extends State<SelectionScreen> {
                       builder: (context) => OrderSuccessScreen(
                         orderNumber: orderNumber,
                         orderType: selectedOption ?? "Unknown",
-                        selectedBranch: widget.selectedBranch, // Pass the selected branch
                       ),
                     ),
                   );
