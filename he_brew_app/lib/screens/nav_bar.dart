@@ -7,16 +7,16 @@ import 'package:he_brew_app/screens/history/order_history.dart';
 import 'package:he_brew_app/screens/profile/profile.dart';
 import 'package:he_brew_app/theme.dart';
 
-class BottomNavBar extends StatefulWidget {
+class BottomHomeNavBar extends StatefulWidget {
   final Branch selectedBranch; // Required parameter
 
-  const BottomNavBar({super.key, required this.selectedBranch});
+  const BottomHomeNavBar({super.key, required this.selectedBranch});
 
   @override
-  State<BottomNavBar> createState() => _BottomNavBarState();
+  State<BottomHomeNavBar> createState() => _BottomHomeNavBarState();
 }
 
-class _BottomNavBarState extends State<BottomNavBar> {
+class _BottomHomeNavBarState extends State<BottomHomeNavBar> {
   int currentInd = 0;
 
   // Remove const from this list

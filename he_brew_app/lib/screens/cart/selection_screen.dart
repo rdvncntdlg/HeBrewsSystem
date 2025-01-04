@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:he_brew_app/screens/cart/payment_screen.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:he_brew_app/screens/cart/order_success.dart';
 import 'package:he_brew_app/models/branch_model.dart';
 
 class SelectionScreen extends StatefulWidget {
   final Branch selectedBranch; // Pass the selected branch to this screen
+  final double totalPrice;
 
-  const SelectionScreen({super.key, required this.selectedBranch});
+  const SelectionScreen({super.key, required this.selectedBranch, required this.totalPrice});
 
   @override
   _SelectionScreenState createState() => _SelectionScreenState();
@@ -130,12 +132,11 @@ class _SelectionScreenState extends State<SelectionScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              keyboardType: TextInputType.phone,
               enabled: selectedOption == "Delivery",
+              keyboardType: TextInputType.phone,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(11),
-                FilteringTextInputFormatter.allow(RegExp(r'^\d{0,11}\$')),
               ],
             ),
             const SizedBox(height: 20),
@@ -175,10 +176,12 @@ class _SelectionScreenState extends State<SelectionScreen> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => OrderSuccessScreen(
+                      builder: (context) => PaymentScreen(
                         orderNumber: orderNumber,
                         orderType: selectedOption ?? "Unknown",
                         selectedBranch: widget.selectedBranch, // Pass the selected branch
+                        paymentMethod: "GCash",
+                        totalPrice: widget.totalPrice,
                       ),
                     ),
                   );

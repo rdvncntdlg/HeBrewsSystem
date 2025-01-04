@@ -37,7 +37,7 @@ class _CartScreenState extends State<CartScreen> {
 
     return Scaffold(
       backgroundColor: contentColor,
-      bottomSheet: CheckOutBox(selectedBranch: widget.selectedBranch), // Pass the branch to CheckOutBox
+      bottomSheet: CheckOutBox(selectedBranch: widget.selectedBranch), 
       body: SafeArea(
         child: Column(
           children: [

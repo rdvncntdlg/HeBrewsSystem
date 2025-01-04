@@ -102,7 +102,7 @@ class HistoryScreen extends StatelessWidget {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 255, 255, 255), // Button background color
+                        backgroundColor: const Color.fromARGB(255, 255, 255, 255), // Button background color
                         side: const BorderSide(color: Color.fromARGB(255, 32, 32, 32)), // Button border color
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0), // Rounded corners

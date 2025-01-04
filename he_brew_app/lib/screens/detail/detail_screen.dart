@@ -67,7 +67,7 @@ class _DetailScreenState extends State<DetailScreen>
   @override
   Widget build(BuildContext context) {
     if (_token == null) {
-      return Scaffold(
+      return const Scaffold(
         body: Center(
             child:
                 CircularProgressIndicator()), // Show loading indicator while token is being fetched

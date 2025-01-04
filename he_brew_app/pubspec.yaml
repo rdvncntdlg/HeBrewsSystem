@@ -20,6 +20,8 @@ dependencies:
   webview_flutter_wkwebview: ^3.14.0
   jwt_decoder: ^2.0.1
   lottie: ^2.3.2
+  webview_flutter_android: ^3.16.8
+  webview_flutter_platform_interface: ^2.10.0
 
 dev_dependencies:
   flutter_test:

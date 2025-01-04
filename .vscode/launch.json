@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "he_brew_app",
+            "cwd": "he_brew_app",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "he_brew_app (profile mode)",
+            "cwd": "he_brew_app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "he_brew_app (release mode)",
+            "cwd": "he_brew_app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

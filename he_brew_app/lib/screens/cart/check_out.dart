@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/provider/add_to_cart_provider.dart';
+import 'package:he_brew_app/screens/cart/carts_screen.dart';
+import 'package:he_brew_app/screens/cart/payment_screen.dart';
 import 'package:he_brew_app/screens/cart/selection_screen.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +21,7 @@ class _CheckOutBoxState extends State<CheckOutBox> {
   Widget build(BuildContext context) {
     final provider = Provider.of<CartProvider>(context, listen: true);
     final isCartEmpty = provider.cart.isEmpty;
+    final totalPrice = provider.totalPrice; // Extract the total price
 
     return Container(
       height: 300,
@@ -48,7 +51,7 @@ class _CheckOutBoxState extends State<CheckOutBox> {
                 ),
               ),
               Text(
-                "₱${provider.totalPrice.toStringAsFixed(2)}",
+                "₱${totalPrice.toStringAsFixed(2)}",
                 style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.bold,
@@ -72,7 +75,7 @@ class _CheckOutBoxState extends State<CheckOutBox> {
                 ),
               ),
               Text(
-                "₱${provider.totalPrice.toStringAsFixed(2)}",
+                "₱${totalPrice.toStringAsFixed(2)}",
                 style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.bold,
@@ -94,7 +97,8 @@ class _CheckOutBoxState extends State<CheckOutBox> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => SelectionScreen(
-                          selectedBranch: widget.selectedBranch, // Pass the branch to SelectionScreen
+                          totalPrice: totalPrice,
+                          selectedBranch: widget.selectedBranch,
                         ),
                       ),
                     );

@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:he_brew_app/screens/home/home_screen.dart'; // Import HomeScreen
+import 'package:he_brew_app/screens/nav_bar.dart';
 import 'package:he_brew_app/models/branch_model.dart'; // Import Branch model
+import 'dart:math'; // For generating random order numbers
 
 class OrderSuccessScreen extends StatelessWidget {
-  final String orderNumber; // Pass the order number or ID
+  final String orderNumber;
   final String orderType; // Add this parameter to display the order type
   final Branch selectedBranch; // Pass the selected branch
 
   const OrderSuccessScreen({
-    Key? key,
+    super.key,
     required this.orderNumber,
     required this.orderType,
     required this.selectedBranch,
-  }) : super(key: key);
+  });
+
+  // Generate a random 5-digit order number
+  String get randomOrderNumber => (Random().nextInt(90000) + 10000).toString();
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +51,9 @@ class OrderSuccessScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
-              Text(
+              const Text(
                 "Your order has been placed successfully.",
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.normal,
                   fontFamily: 'Poppins',
@@ -96,7 +100,7 @@ class OrderSuccessScreen extends StatelessWidget {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => HomeScreen(selectedBranch: selectedBranch),
+                      builder: (context) => BottomHomeNavBar(selectedBranch: selectedBranch),
                     ),
                   );
                 },

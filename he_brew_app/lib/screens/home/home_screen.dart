@@ -11,7 +11,7 @@ import 'package:he_brew_app/services/product_service.dart'; // Import the servic
 class HomeScreen extends StatefulWidget {
   final Branch selectedBranch;
 
-  const HomeScreen({Key? key, required this.selectedBranch}) : super(key: key);
+  const HomeScreen({super.key, required this.selectedBranch});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -94,11 +94,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 future: products,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No products available'));
+                    return const Center(child: Text('No products available'));
                   } else {
                     // Get products based on selected category
                     List<Product> categoryProducts = snapshot.data!;

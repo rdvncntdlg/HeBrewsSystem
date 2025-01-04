@@ -22,11 +22,11 @@ class BranchSelection extends StatelessWidget {
         future: branchService.fetchBranches(), // Fetch the branch data
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No branches found.'));
+            return const Center(child: Text('No branches found.'));
           } else {
             final branches = snapshot.data!;
 
@@ -58,8 +58,8 @@ class BranchSelection extends StatelessWidget {
                     // Display branches in a grid or list
                     GridView.builder(
                       shrinkWrap: true, // To make the grid view fit within the single child scroll view
-                      physics: NeverScrollableScrollPhysics(), // Prevent scrolling within the grid
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      physics: const NeverScrollableScrollPhysics(), // Prevent scrolling within the grid
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2, // Two cards per row
                         crossAxisSpacing: 20.0,
                         mainAxisSpacing: 20.0,

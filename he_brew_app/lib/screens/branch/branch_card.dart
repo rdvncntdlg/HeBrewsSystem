@@ -6,12 +6,12 @@ import 'package:he_brew_app/screens/nav_bar.dart'; // Import the BottomNavBar sc
 class BranchCard extends StatelessWidget {
   final Branch branch;
 
-  const BranchCard({Key? key, required this.branch}) : super(key: key);
+  const BranchCard({super.key, required this.branch});
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = 200.0;
-    final double cardHeight = 250.0;
+    const double cardWidth = 200.0;
+    const double cardHeight = 250.0;
     final double imageHeight = cardHeight * 0.6;
 
     return GestureDetector(
@@ -31,14 +31,14 @@ class BranchCard extends StatelessWidget {
                   style: TextButton.styleFrom(
                     textStyle: GoogleFonts.poppins(color: Colors.black), // Set text color to black
                   ),
-                  child: Text('Cancel'),
+                  child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => BottomNavBar(
+                        builder: (context) => BottomHomeNavBar(
                           selectedBranch: branch, // Passing the selected branch
                         ),
                       ),
@@ -47,7 +47,7 @@ class BranchCard extends StatelessWidget {
                   style: TextButton.styleFrom(
                     textStyle: GoogleFonts.poppins(color: Colors.black), // Set text color to black
                   ),
-                  child: Text('Select'),
+                  child: const Text('Select'),
                 ),
               ],
             );
@@ -87,7 +87,7 @@ class BranchCard extends StatelessWidget {
                 },
               ),
             ),
-            Spacer(),
+            const Spacer(),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(
