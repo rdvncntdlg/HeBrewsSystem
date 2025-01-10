@@ -8,20 +8,25 @@ class CartProvider extends ChangeNotifier {
 
   // Modified toggleFavorite method to accept both product and token
   void toggleFavorite(Product product, String token) {
-    if (_cart.contains(product)) {
-      // If the product is already in the cart, increment its quantity
-      for (Product element in _cart) {
-        if (element.menu_id == product.menu_id) {  // Ensure we find the correct product by id
-          element.quantity++;
-        }
+    bool productFound = false;
+
+    // Check if the product is already in the cart
+    for (Product element in _cart) {
+      if (element.menu_id == product.menu_id) {
+        // If the product is already in the cart, increment its quantity
+        element.quantity++;
+        productFound = true;
+        break;
       }
-    } else {
-      // If the product is not in the cart, add it
+    }
+
+    // If the product wasn't found, add it to the cart
+    if (!productFound) {
       _cart.add(product);
     }
+
+    // Optionally handle token logic here if needed (for API calls, etc.)
     // Token could be used for authentication or API calls here if needed
-    // Example usage of the token (if required in your case):
-    // SomeApiService.addToCart(product, token);
 
     notifyListeners();  // Notify listeners that the cart has changed
   }

@@ -1,6 +1,6 @@
 // branch.dart
 class Branch {
-  final int branch_id;
+  final String branch_id;
   final String imageUrl;
   final String name;
   final String location;

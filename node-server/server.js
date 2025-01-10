@@ -7,6 +7,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const axios = require('axios');
+const { getRandomValues } = require('crypto');
 const { PAYMONGO_SECRET_KEY } = process.env;
 
 
@@ -724,8 +725,8 @@ app.post('/api/add-categories', upload.single('image'), async (req, res) => {
 app.get('/branches-app', async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT * FROM public.branchtbl
-      WHERE branch_id != 0
+      SELECT * FROM branchtbl
+      WHERE branch_id != 'BR00000'
       ORDER BY branch_id ASC
     `);
 
@@ -1747,6 +1748,205 @@ app.get('/favorites/:customer_id', authenticateToken, async (req, res) => {
   }
 });
 
+const generateOrderNumber = () => {
+  // Get the current date in YYYYMMDD format
+  const date = new Date().toISOString().split('T')[0].replace(/-/g, ''); 
+
+  // Generate a random 3-digit number
+  const randomNumber = Math.floor(Math.random() * 900) + 100;  // Random number between 100 and 999
+
+  // Combine them into the order number
+  return `OI${date}${randomNumber}`;
+};
+
+const checkIfOrderItemIdExists = async (orderitem_id) => {
+  const query = 'SELECT 1 FROM orderitemtbl WHERE orderitem_id = $1 LIMIT 1';
+  const result = await pool.query(query, [orderitem_id]);
+
+  // If the result is not empty, that means the ID exists
+  return result.rows.length > 0;
+};
+
+app.post('/customer/orders', async (req, res) => {
+  const { orderNumber, orderType, selectedBranch, cartItems, customerId, totalPrice } = req.body;
+
+  try {
+    // Insert order into the ordertbl
+    const orderQuery = `
+      INSERT INTO ordertbl (order_id, customer_id, branch_id, status, type)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
+    `;
+    const orderValues = [orderNumber, customerId, selectedBranch, 'Preparing', orderType];
+
+    const orderResult = await pool.query(orderQuery, orderValues);
+
+    const invoiceQuery = `
+      INSERT INTO invoicetbl (invoice_id, order_id, invoicedate, totalamount, paymentmethod)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
+    `;
+    const invoiceNumber = orderNumber.replace("ORD", "INV");
+    const today = new Date().toISOString().split('T')[0];
+    const invoiceValues = [invoiceNumber, orderNumber, today, totalPrice, 'Gcash'];
+
+    const invoiceResult = await pool.query(invoiceQuery, invoiceValues);
+
+    // Loop through cartItems and insert each item into the orderitemtbl
+    for (const item of cartItems) {
+      const { menu_id, quantity, price } = item;
+
+      let orderitem_id;
+      let idExists = true;
+
+      // Loop until we generate a unique orderitem_id
+      while (idExists) {
+        orderitem_id = generateOrderNumber();
+        idExists = await checkIfOrderItemIdExists(orderitem_id);
+      }
+
+      // Insert the order item into orderitemtbl
+      const itemQuery = `
+        INSERT INTO orderitemtbl (orderitem_id, order_id, menu_id, quantity, price_total, total_amount)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *;
+      `;
+      const cartValues = [orderitem_id, orderNumber, menu_id, quantity, price, price * quantity];
+      
+      const cartResult = await pool.query(itemQuery, cartValues);
+    }
+
+    // Send success response with the inserted order details
+    res.status(201).json({ message: 'Order placed successfully!', order: orderResult.rows[0] });
+  } catch (error) {
+    console.error('Error inserting order:', error);
+    res.status(500).json({ message: 'Failed to place order.' });
+  }
+});
+
+app.get('/customer/order-history/:customerId', async (req, res) => {
+  const { customerId } = req.params;
+
+  try {
+    // Query to fetch order history from the database
+    const query = `
+      SELECT 
+        o.order_id,         -- Order ID from ordertbl
+        o.status,           -- Status of the order from ordertbl
+        o.branch_id,        -- Branch ID from ordertbl
+        o.type,             -- Order type from ordertbl
+        inv.invoicedate,    -- Invoice date from invoicetbl
+        inv.totalamount,    -- Total amount from invoicetbl
+        oi.menu_id,         -- Menu ID from orderitemtbl
+        oi.quantity,        -- Quantity from orderitemtbl
+        oi.price_total,     -- Price total from orderitemtbl
+        m.itemname,          -- Item name from menutbl
+        b.branchname
+      FROM ordertbl o
+      JOIN invoicetbl inv ON o.order_id = inv.order_id  -- Join with invoicetbl based on order_id
+      JOIN orderitemtbl oi ON o.order_id = oi.order_id  -- Join with orderitemtbl based on order_id
+      JOIN menutbl m ON oi.menu_id = m.menu_id
+      JOIN branchtbl b ON o.branch_id = b.branch_id
+      WHERE o.customer_id = $1  -- Filter for customer ID
+      ORDER BY inv.invoicedate DESC;
+    `;
+
+    const result = await pool.query(query, [customerId]);
+
+    // Group the items by order ID and prepare the response data
+    const orders = {};
+
+    result.rows.forEach(row => {
+      if (!orders[row.order_id]) {
+        orders[row.order_id] = {
+          orderID: row.order_id,
+          date: row.invoicedate,  // Use invoicedate from the query
+          orderDetails: [],
+          amount: row.totalamount, // Assuming price_total is the total for that row (adjust if needed)
+          status: row.status,
+          branchname: row.branchname,
+        };
+      }
+      // Group the items for each order
+      orders[row.order_id].orderDetails.push({
+        itemName: row.itemname,
+        quantity: row.quantity,
+        priceTotal: row.price_total,
+      });
+    });
+
+    const ordersArray = Object.values(orders);
+
+    res.status(200).json(ordersArray);
+  } catch (error) {
+    console.error('Error fetching order history:', error);
+    res.status(500).json({ message: 'Failed to fetch order history' });
+  }
+});
+
+// Fetch user's favorite items
+app.get('/customers/:customerId/favorites', authenticateToken, async (req, res) => {
+  const { customerId } = req.params;
+
+  try {
+    const result = await pool.query(
+      'SELECT f.menu_id, m.itemname, m.price, m.imageurl, c.categoryname FROM favoritetbl f JOIN menutbl m ON f.menu_id = m.menu_id JOIN categorytbl c ON m.category_id = c.category_id WHERE customer_id = $1',
+      [customerId]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
+    res.status(500).json({ message: 'Failed to fetch favorites' });
+  }
+});
+
+const generateFavoriteId = () => {
+  const randomNumbers = Math.floor(10000 + Math.random() * 90000); // Generate a 5-digit random number
+  return `FAV${randomNumbers}`;
+}
+
+// Add a product to favorites
+app.post('/customers/:customerId/favorites', authenticateToken, async (req, res) => {
+  const { customerId } = req.params;
+  const { menu_id } = req.body;
+
+  if (!menu_id) {
+    return res.status(400).json({ message: 'menu_id is required' });
+  }
+
+  try {
+    favorite_id = generateFavoriteId();
+    const result = await pool.query(
+      'INSERT INTO favoritetbl (favorite_id, customer_id, menu_id) VALUES ($1, $2, $3) RETURNING *',
+      [favorite_id, customerId, menu_id]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error adding favorite:', error);
+    res.status(500).json({ message: 'Failed to add favorite' });
+  }
+});
+
+// Remove a product from favorites
+app.delete('/customers/:customerId/favorites/:menuId', authenticateToken, async (req, res) => {
+  const { customerId, menuId } = req.params;
+
+  try {
+    const result = await pool.query(
+      'DELETE FROM favoritetbl WHERE customer_id = $1 AND menu_id = $2 RETURNING *',
+      [customerId, menuId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Favorite not found' });
+    }
+
+    res.json({ message: 'Favorite removed successfully' });
+  } catch (error) {
+    console.error('Error removing favorite:', error);
+    res.status(500).json({ message: 'Failed to remove favorite' });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

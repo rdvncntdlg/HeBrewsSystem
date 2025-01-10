@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:he_brew_app/provider/customer_provider.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:he_brew_app/screens/branch/branches.dart';
@@ -19,6 +21,7 @@ class LoginScreen extends StatelessWidget {
     }
 
     Future<void> signIn() async {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
       if (isValid()) {
         final response = await http.post(
           Uri.parse('https://hebrewscafeserver.onrender.com/api/login'),
@@ -33,6 +36,7 @@ class LoginScreen extends StatelessWidget {
         if (response.statusCode == 200 && data['success']) {
           // Extract the token from the response
           String token = data['token'];
+          userProvider.setCustomerId(data['customer_id']);
 
           // Save the token using SharedPreferences
           final prefs = await SharedPreferences.getInstance();

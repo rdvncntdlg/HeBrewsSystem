@@ -25,8 +25,8 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  final publicClient = const PaymongoClient<PaymongoPublic>('pk_test_1uLTkmCKXReqc2Jk9siZRTuc');
-  final secretClient = const PaymongoClient<PaymongoSecret>('sk_test_sEx9zBemN6cU4uY4RudHyvtG' );
+  final publicClient = const PaymongoClient<PaymongoPublic>('pk_test_vphudEoxiYsEy1RNcQWtjvaD');
+  final secretClient = const PaymongoClient<PaymongoSecret>('sk_test_cvmaoNjHD9CsbQen5RJvTtvU' );
 
   bool isLoading = false;
 

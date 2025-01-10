@@ -1,5 +1,5 @@
 class Product {
-  final int menu_id;
+  final String menu_id;
   final String name;
   final String description;
   final String image;

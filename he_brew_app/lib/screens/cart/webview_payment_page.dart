@@ -67,7 +67,8 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                   builder: (context) => OrderSuccessScreen(
                     orderNumber: widget.orderNumber,
                     orderType: widget.orderType ?? "Unknown",
-                    selectedBranch: widget.selectedBranch, // Pass the selected branch
+                    selectedBranch: widget.selectedBranch,
+                    totalPrice: widget.totalPrice,
                   ),
                 ),
               );

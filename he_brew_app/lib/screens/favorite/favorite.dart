@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:he_brew_app/provider/favorite_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
@@ -10,27 +12,48 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
+  late FavoriteProvider provider;
+
+  @override
+  Future<void> didChangeDependencies() async {
+    super.didChangeDependencies();
+    provider = FavoriteProvider.of(context);
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    // Ensure token is not null and not empty
+    if (token != null && token.isNotEmpty) {
+      await provider.initialize(token); // Make sure the initialization is awaited
+    } else {
+      // Handle the case where token is null or empty (optional)
+      print('Token is not available');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = FavoriteProvider.of(context);
-    final finalList = provider.favorites;
-    return Scaffold(
-      backgroundColor: contentColor,
-      appBar: AppBar(
-        backgroundColor: contentColor,
-        title: const Text(
-          "Favorites",
-          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-              child: ListView.builder(
+    return Consumer<FavoriteProvider>(
+      builder: (context, provider, child) {
+        final finalList = provider.favorites;
+
+        return Scaffold(
+          backgroundColor: contentColor,
+          appBar: AppBar(
+            backgroundColor: contentColor,
+            title: const Text(
+              "Favorites",
+              style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold),
+            ),
+            centerTitle: true,
+          ),
+          body: finalList.isEmpty
+              ? Center(child: Text("No favorites yet"))
+              : ListView.builder(
                   itemCount: finalList.length,
                   itemBuilder: (context, index) {
-                    final favoriteItems = finalList[index];
+                    final favoriteItem = finalList[index];
+
                     return Stack(
                       children: [
                         Padding(
@@ -52,14 +75,14 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                     color: contentColor,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: Image.asset(favoriteItems.image),
+                                  child: Image.network('https://hebrewscafeserver.onrender.com/${favoriteItem.image}'),
                                 ),
                                 const SizedBox(width: 10),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      favoriteItems.name,
+                                      favoriteItem.name,
                                       style: const TextStyle(
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
@@ -68,7 +91,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      favoriteItems.category,
+                                      favoriteItem.category,
                                       style: TextStyle(
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
@@ -78,7 +101,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                                     ),
                                     const SizedBox(height: 10),
                                     Text(
-                                      "₱${favoriteItems.price}.00",
+                                      "₱${favoriteItem.price}0",
                                       style: const TextStyle(
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
@@ -95,9 +118,17 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                           top: 50,
                           right: 35,
                           child: GestureDetector(
-                            onTap: () {
-                              finalList.removeAt(index);
-                              setState(() {});
+                            onTap: () async {
+                              final prefs = await SharedPreferences.getInstance();
+                              final token = prefs.getString('auth_token'); // Fetch the token from SharedPreferences
+
+                              if (token != null && token.isNotEmpty) {
+                                // Proceed to remove the favorite with the valid token
+                                await provider.removeFavorite(favoriteItem, token);
+                              } else {
+                                // Handle the case where token is null or empty
+                                print('Token is not available');
+                              }
                             },
                             child: const Icon(
                               Icons.delete,
@@ -108,9 +139,10 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                         ),
                       ],
                     );
-                  }))
-        ],
-      ),
+                  },
+                ),
+        );
+      },
     );
   }
 }

@@ -3,11 +3,11 @@ import 'package:http/http.dart' as http;
 import '../models/branch_model.dart';  // Adjust import to your model location
 
 class BranchService {
-  final String baseUrl = 'https://hebrewscafeserver.onrender.com'; // Replace with your backend URL
+  final String baseUrl = 'http://10.0.2.2:3000'; // Replace with your backend URL https://hebrewscafeserver.onrender.com
 
   Future<List<Branch>> fetchBranches() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/api/branches-app'));
+      final response = await http.get(Uri.parse('$baseUrl/branches-app'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);

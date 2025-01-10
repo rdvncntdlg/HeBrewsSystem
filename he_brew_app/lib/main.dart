@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/models/branch_model.dart';
 import 'package:he_brew_app/provider/add_to_cart_provider.dart';
+import 'package:he_brew_app/provider/customer_provider.dart';
 import 'package:he_brew_app/provider/favorite_provider.dart';
-import 'package:he_brew_app/screens/cart/order_success.dart';
 import 'package:he_brew_app/screens/login/login_screen.dart';
 import 'package:he_brew_app/screens/login/reg_screen.dart';
 import 'package:he_brew_app/screens/nav_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:he_brew_app/screens/login/welcome_screen.dart';
 import 'package:he_brew_app/theme.dart';
-import 'dart:io';
-import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +23,7 @@ class MainApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(create: (_) => CartProvider()),
           ChangeNotifierProvider(create: (_) => FavoriteProvider()),
+          ChangeNotifierProvider(create: (_) => UserProvider()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

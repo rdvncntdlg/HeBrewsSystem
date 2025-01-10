@@ -68,7 +68,7 @@ class ProductCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: Text(
-                    "₱${product.price}.00",
+                    "₱${product.price}0",
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 12,

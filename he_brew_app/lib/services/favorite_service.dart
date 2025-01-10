@@ -1,85 +1,64 @@
-import 'dart:convert';
+import 'package:he_brew_app/models/favorite_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:he_brew_app/models/product_model.dart';
+import 'dart:convert';
 
 class FavoriteService {
-  final String _baseUrl = 'https://hebrewscafeserver.onrender.com';
+  final String baseUrl = 'http://10.0.2.2:3000'; // Replace with your API base URL
 
   // Fetch user profile to get customer_id
   Future<Map<String, dynamic>> fetchProfile(String token) async {
-  final response = await http.get(
-    Uri.parse('$_baseUrl/api/profile'),
-    headers: {
-      'Authorization': 'Bearer $token',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final decodedResponse = jsonDecode(response.body);
-    print('Fetched profile: $decodedResponse'); // Add this log
-    if (decodedResponse is Map<String, dynamic>) {
-      return decodedResponse;
-    } else {
-      throw Exception('Unexpected response format');
-    }
-  } else {
-    throw Exception('Failed to fetch profile');
-  }
-}
-
-
-  // Add a product to the favorites
-  Future<void> addFavorite(int customerId, Product product, String token) async {
-    final response = await http.post(
-      Uri.parse('$_baseUrl/api/favorites'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'customer_id': customerId,
-        'product_id': product.menu_id, // Ensure you pass the correct product ID here
-      }),
-    );
-
-    if (response.statusCode != 201) {
-      throw Exception('Failed to add favorite');
-    }
-  }
-
-  // Remove a product from the favorites
-  Future<void> removeFavorite(int customerId, Product product, String token) async {
-    final response = await http.delete(
-      Uri.parse('$_baseUrl/api/favorites'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'customer_id': customerId,
-        'product_id': product.menu_id, // Use product's menu_id or ID as appropriate
-      }),
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to remove favorite');
-    }
-  }
-
-  // Fetch all favorite products for a customer
-  Future<List<Product>> fetchFavorites(int customerId, String token) async {
     final response = await http.get(
-      Uri.parse('$_baseUrl/api/favorites/$customerId'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
+      Uri.parse('$baseUrl/profile'),
+      headers: {'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> favoriteList = jsonDecode(response.body);
-      return favoriteList.map((item) => Product.fromJson(item)).toList();
+      return json.decode(response.body);
     } else {
-      throw Exception('Failed to fetch favorites');
+      throw Exception('Failed to fetch profile: ${response.reasonPhrase}');
+    }
+  }
+
+  // Fetch user's favorite products
+  Future<List<Favorite>> fetchFavorites(String customerId, String token) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/customers/$customerId/favorites'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      return data.map((json) => Favorite.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to fetch favorites: ${response.reasonPhrase}');
+    }
+  }
+
+  // Add a product to favorites
+  Future<void> addFavorite(String customerId, Favorite favorite, String token) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/customers/$customerId/favorites'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'menu_id': favorite.menu_id}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to add favorite: ${response.reasonPhrase}');
+    }
+  }
+
+  // Remove a product from favorites
+  Future<void> removeFavorite(String customerId, Favorite favorite, String token) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/customers/$customerId/favorites/${favorite.menu_id}'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to remove favorite: ${response.reasonPhrase}');
     }
   }
 }

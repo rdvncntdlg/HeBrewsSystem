@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:he_brew_app/screens/history/order_history.dart';
+import 'package:intl/intl.dart';
 
 class OrderTrackingScreen extends StatelessWidget {
   final String orderId;
   final String orderStatus;
+  final String branchName;
+  final double amount;
 
   const OrderTrackingScreen({
     required this.orderId,
     required this.orderStatus,
+    required this.branchName,
+    required this.amount,
     super.key,
   });
 
@@ -74,14 +78,15 @@ class OrderTrackingScreen extends StatelessWidget {
   }
 
   Widget _buildOrderDetails() {
+    final formatter = NumberFormat('###,###.00');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildDetailRow(Icons.access_time, 'Estimated pickup at', '01:10 PM'),
         const SizedBox(height: 16),
-        _buildDetailRow(Icons.location_pin, 'Pick Up Location', 'He Brews Cafe'),
+        _buildDetailRow(Icons.location_pin, 'Pick Up Location', branchName),
         const SizedBox(height: 16),
-        _buildDetailRow(Icons.attach_money, 'Total cost', '220 SAR'),
+        _buildDetailRow(Icons.attach_money, 'Total cost', formatter.format(amount)),
       ],
     );
   }
@@ -165,10 +170,7 @@ class OrderTrackingScreen extends StatelessWidget {
   Widget _buildReceiveOrderButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HistoryScreen()),
-        );
+        Navigator.pop(context);
       },
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 20),

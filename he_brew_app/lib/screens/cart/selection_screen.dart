@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:math';
 import 'package:he_brew_app/screens/cart/payment_screen.dart';
 import 'package:he_brew_app/theme.dart';
-import 'package:he_brew_app/screens/cart/order_success.dart';
 import 'package:he_brew_app/models/branch_model.dart';
 
 class SelectionScreen extends StatefulWidget {
@@ -29,6 +29,17 @@ class _SelectionScreenState extends State<SelectionScreen> {
     });
   }
 
+  String generateOrderNumber() {
+    // Get the current date in YYYY/MM/DD format
+    String date = DateTime.now().toString().substring(0, 10).replaceAll('-', '');
+
+    // Generate a random 3-digit number
+    int randomNumber = Random().nextInt(900) + 100;  // Random number between 100 and 999
+
+    // Combine them into the order number
+    return "ORD$date$randomNumber";
+  }
+
   @override
   void initState() {
     super.initState();
@@ -50,7 +61,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
       appBar: AppBar(
         title: const Text(
           "Shipping",
-          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: primaryColor,
       ),
@@ -171,8 +182,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
           ),
           onPressed: isCompleteOrderEnabled
               ? () {
-                  final orderNumber =
-                      DateTime.now().millisecondsSinceEpoch.toString();
+                  final orderNumber = generateOrderNumber();
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(

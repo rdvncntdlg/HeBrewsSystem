@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/models/product_model.dart';
+import 'package:he_brew_app/models/favorite_model.dart';
 import 'package:he_brew_app/provider/favorite_provider.dart';
 
 class DetailAppBar extends StatelessWidget {
@@ -11,6 +12,18 @@ class DetailAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = FavoriteProvider.of(context);  // Access the FavoriteProvider
+    final favorite = Favorite(
+      menu_id: product.menu_id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+    );  // Convert product to Favorite
+
+    if (token.isNotEmpty) {
+      provider.initialize(token);
+    }
+
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Row(
@@ -32,18 +45,19 @@ class DetailAppBar extends StatelessWidget {
               padding: const EdgeInsets.all(15),
             ),
             onPressed: () {
-              // Print the token value for debugging
-              print('Token value: $token');  // Debug print
-
               // Ensure the token is not null before calling toggleFavorite
               if (token.isNotEmpty) {
-                provider.toggleFavorite(product, token);  // Toggle favorite with the token
+                if (provider.isFavorite(favorite)) {
+                  provider.removeFavorite(favorite, token);  // Remove from favorites
+                } else {
+                  provider.addFavorite(favorite, token);  // Add to favorites
+                }
               } else {
                 print('Token is null or empty');  // Handle the case where token is invalid
               }
             },
             icon: Icon(
-              provider.isFavorite(product) ? Icons.favorite : Icons.favorite_border,
+              provider.isFavorite(favorite) ? Icons.favorite : Icons.favorite_border,
               color: Colors.black,
               size: 25,
             ),
