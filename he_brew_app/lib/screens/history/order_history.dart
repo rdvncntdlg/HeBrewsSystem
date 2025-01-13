@@ -6,8 +6,21 @@ import 'package:he_brew_app/services/history_service.dart';
 import 'package:provider/provider.dart';
 import 'order_tracking.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
+
+  @override
+  _HistoryScreenState createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  late Future<List<HistoryItem>> _history;
+
+  @override
+  void initState() {
+    super.initState();
+    _history = fetchHistory(context);
+  }
 
   Future<List<HistoryItem>> fetchHistory(BuildContext context) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -26,7 +39,7 @@ class HistoryScreen extends StatelessWidget {
       ),
       backgroundColor: Colors.white,
       body: FutureBuilder<List<HistoryItem>>(
-        future: fetchHistory(context),
+        future: _history,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -45,7 +58,7 @@ class HistoryScreen extends StatelessWidget {
                 String displayStatus;
 
                 switch (item.status ?? '') {
-                  case 'Successful':
+                  case 'Completed':
                     statusColor = Colors.green;
                     displayStatus = 'Completed';
                     break;
@@ -57,9 +70,9 @@ class HistoryScreen extends StatelessWidget {
                     statusColor = Colors.orange;
                     displayStatus = 'Preparing';
                     break;
-                  case 'Pending':
+                  case 'Ready':
                     statusColor = Colors.blue;
-                    displayStatus = 'Pending';
+                    displayStatus = 'Ready';
                     break;
                   default:
                     statusColor = Colors.black;
@@ -109,7 +122,7 @@ class HistoryScreen extends StatelessWidget {
                                   '${detail.quantity} x ${detail.item} - \$${detail.price.toStringAsFixed(2)}',
                                   style: const TextStyle(fontSize: 14),
                                 );
-                              }).toList() ??
+                              }).toList() ?? 
                               [const Text('No order details available')],
                         ),
                         const SizedBox(height: 12.0),
@@ -117,8 +130,8 @@ class HistoryScreen extends StatelessWidget {
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
+                            onPressed: () async {
+                              final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => OrderTrackingScreen(
@@ -129,6 +142,11 @@ class HistoryScreen extends StatelessWidget {
                                   ),
                                 ),
                               );
+                              if (result == true) {
+                                setState(() {
+                                  _history = fetchHistory(context); // Refresh data
+                                });
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,

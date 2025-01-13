@@ -1950,65 +1950,6 @@ app.delete('/customers/:customerId/favorites/:menuId', authenticateToken, async 
   }
 });
 
-// app.post('/api/recommend', async (req, res) => {
-//   const { customer_id, branch_id } = req.body;
-
-//   if (!customer_id) {
-//       return res.status(400).json({ error: 'Customer ID is required.' });
-//   }
-
-//   try {
-//       // Query orders and favorites
-//       const ordersQuery = "SELECT o.customer_id, oi.menu_id FROM orderitemtbl oi JOIN ordertbl o ON oi.order_id = o.order_id;";
-//       const favoritesQuery = "SELECT customer_id, menu_id FROM favoritetbl;";
-
-//       const ordersResult = await pool.query(ordersQuery);
-//       const favoritesResult = await pool.query(favoritesQuery);
-
-//       // Combine query results
-//       const ordersData = ordersResult.rows;
-//       const favoritesData = favoritesResult.rows;
-
-//       // Prepare data for Python
-//       const dataForPython = JSON.stringify({ customer_id, orders: ordersData, favorites: favoritesData });
-
-//       // Call the Python script
-//       const pythonProcess = spawn('python', ['recommend.py']);
-//       let result = '';
-
-//       // Send data to Python script
-//       pythonProcess.stdin.write(dataForPython);
-//       pythonProcess.stdin.end();
-
-//       // Capture Python script output
-//       pythonProcess.stdout.on('data', (data) => {
-//           result += data.toString();
-//       });
-
-//       pythonProcess.stderr.on('data', (data) => {
-//           console.error(`Python error: ${data}`);
-//           res.status(500).json({ error: 'Error processing recommendations.' });
-//       });
-
-//       pythonProcess.on('close', (code) => {
-//           if (code !== 0) {
-//               return res.status(500).json({ error: 'Python script failed.' });
-//           }
-
-//           try {
-//               const recommendations = JSON.parse(result);
-//               res.json({ customer_id, recommendations });
-//           } catch (err) {
-//               console.error('Error parsing Python result:', err);
-//               res.status(500).json({ error: 'Invalid Python output.' });
-//           }
-//       });
-//   } catch (error) {
-//       console.error('Database error:', error);
-//       res.status(500).json({ error: 'Failed to fetch data.' });
-//   }
-// });
-
 app.post('/api/recommend', async (req, res) => {
   const { customer_id, branch_id } = req.body;
 
@@ -2074,7 +2015,6 @@ app.post('/api/recommend', async (req, res) => {
               // Wait for all menu detail queries to finish
               const menuDetails = await Promise.all(menuDetailsPromises);
               const filteredMenuDetails = menuDetails.filter(item => item !== undefined);
-              console.log(filteredMenuDetails);
 
               // Step 3: Send back the detailed menu information to the frontend
               res.json({ customer_id, recommendations: filteredMenuDetails });
@@ -2086,6 +2026,31 @@ app.post('/api/recommend', async (req, res) => {
   } catch (error) {
       console.error('Database error:', error);
       res.status(500).json({ error: 'Failed to fetch data.' });
+  }
+});
+
+app.put('/api/order-received/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  if (!orderId) {
+    return res.status(400).json({ message: 'order_id is required' });
+  }
+
+  try {
+    const result = await pool.query(
+      'UPDATE ordertbl SET status = $1 WHERE order_id = $2',
+      [status, orderId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    
+    res.status(200).json({message: 'Order received successfully'});
+  } catch (error) {
+    console.error('Error adding favorite:', error);
+    res.status(500).json({ message: 'Failed to change order details' });
   }
 });
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class OrderTrackingScreen extends StatelessWidget {
   final String orderId;
@@ -82,8 +83,6 @@ class OrderTrackingScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDetailRow(Icons.access_time, 'Estimated pickup at', '01:10 PM'),
-        const SizedBox(height: 16),
         _buildDetailRow(Icons.location_pin, 'Pick Up Location', branchName),
         const SizedBox(height: 16),
         _buildDetailRow(Icons.attach_money, 'Total cost', formatter.format(amount)),
@@ -168,10 +167,18 @@ class OrderTrackingScreen extends StatelessWidget {
   }
 
   Widget _buildReceiveOrderButton(BuildContext context) {
+    bool isReady = orderStatus == 'Ready';
+    bool isCompleted = orderStatus == 'Completed';
+
     return ElevatedButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
+      onPressed: isReady && !isCompleted ? () async {
+        await _updateOrderStatusToCompleted(orderId);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Order Received')),
+        );
+        Navigator.pop(context, true);
+      }
+      : null,
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 20),
         shape: RoundedRectangleBorder(
@@ -179,12 +186,32 @@ class OrderTrackingScreen extends StatelessWidget {
         ),
         backgroundColor: const Color.fromARGB(255, 67, 69, 49),
       ),
-      child: const Center(
+      child: Center(
         child: Text(
-          'Receive Order',
-          style: TextStyle(fontSize: 18, color: Colors.white),
+          isCompleted ? 'Order Received' : 'Receive Order',
+          style: const TextStyle(fontSize: 18, color: Colors.white),
         ),
       ),
     );
+  }
+}
+
+Future<void> _updateOrderStatusToCompleted(String orderId) async {
+  final url = Uri.parse('http://10.0.2.2:3000/api/order-received/$orderId');
+
+  try {
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: '{"status": "Completed"}', // Adjust body based on your backend API
+    );
+
+    if (response.statusCode == 200) {
+      print('Order $orderId status updated to Completed.');
+    } else {
+      print('Failed to update order status. Error: ${response.body}');
+    }
+  } catch (e) {
+    print('Error updating order status: $e');
   }
 }
