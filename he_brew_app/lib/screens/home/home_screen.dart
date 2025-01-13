@@ -25,29 +25,34 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   late Future<List<Product>> products;
   late Future<List<Product>> recommend;
+  late Future<List<Product>> filteredProducts;
 
   final List<String> categoryTitles = [
     "Best Sellers",
-    "Iced Drinks",
-    "Blended Coffee",
-    "Milkshakes",
+    "Coffee Creations",
+    "Cold Brew",
+    "Blended Drinks",
     "Fruit Slush",
-    "Iced Tea",
+    "Fizzy Pop",
+    "Non-Coffee Delights",
     "Big Plates",
     "Snacks",
     "Pasta",
+    "Platter",
     "Sandwiches",
   ];
 
   final List<IconData> categoryIcons = [
     FontAwesomeIcons.fireFlameCurved,
     FontAwesomeIcons.diceD6,
-    FontAwesomeIcons.mugHot,
+    FontAwesomeIcons.snowflake,
     FontAwesomeIcons.blender,
-    FontAwesomeIcons.appleWhole,
+    FontAwesomeIcons.lemon,
+    FontAwesomeIcons.mugHot,
     FontAwesomeIcons.martiniGlassCitrus,
-    FontAwesomeIcons.utensils,
     Icons.fastfood,
+    FontAwesomeIcons.cookieBite,
+    FontAwesomeIcons.utensils,
     FontAwesomeIcons.bowlFood,
     FontAwesomeIcons.breadSlice,
   ];
@@ -56,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     products = ProductService().fetchProduct(widget.selectedBranch.branch_id);
+    filteredProducts = products;
     String? customerId = Provider.of<UserProvider>(context, listen: false).customerId;
     recommend = RecommendService().fetchRecommend(customerId ?? '', widget.selectedBranch.branch_id);
   }
@@ -91,6 +97,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  void _fetchCategory(String category) async {
+    // Fetch the filtered products
+    List<Product> filtered = await ProductService().fetchProductsByCategory(await products, category);
+
+    // Update the state with the filtered products
+    setState(() {
+      filteredProducts = Future.value(filtered);  // Wrap the filtered list in a Future
+    });
   }
 
   Widget buildRecommendSection() {
@@ -166,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildProductGrid(int crossAxisCount) {
     return FutureBuilder<List<Product>>(
-      future: products,
+      future: filteredProducts,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -212,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               setState(() {
                 selectedIndex = index;
+                _fetchCategory(categoryTitles[index]);
               });
             },
             child: Container(

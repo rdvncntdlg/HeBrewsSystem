@@ -31,4 +31,12 @@ class ProductService {
       throw Exception('Error: $e');
     }
   }
+
+  Future<List<Product>> fetchProductsByCategory(List<Product> allProducts, String category) async {
+    if (category == 'Best Sellers') {
+      return allProducts;  // Return all products if category is 'Best Sellers'
+    } else {
+      return allProducts.where((product) => product.category == category).toList();
+    }
+  }
 }
