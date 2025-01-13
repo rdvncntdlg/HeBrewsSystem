@@ -107,7 +107,7 @@ class OrderTrackingScreen extends StatelessWidget {
 
   Widget _buildOrderProgress() {
     final List<Map<String, dynamic>> stages = [
-      {'label': 'Received', 'icon': Icons.assignment_turned_in},
+      {'label': 'Order Received', 'icon': Icons.assignment_turned_in},
       {'label': 'Preparing', 'icon': Icons.kitchen},
       {'label': 'Ready', 'icon': Icons.check_circle_outline},
     ];
@@ -121,45 +121,53 @@ class OrderTrackingScreen extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isCompleted
-                        ? const Color.fromARGB(255, 67, 69, 49)
-                        : Colors.grey.shade300,
-                  ),
-                  child: Icon(
-                    stages[index]['icon'],
-                    size: 18,
-                    color: isCompleted ? Colors.white : Colors.grey,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isCompleted
+                                ? const Color.fromARGB(255, 67, 69, 49)
+                                : Colors.grey.shade300,
+                          ),
+                          child: Icon(
+                            stages[index]['icon'],
+                            size: 18,
+                            color: isCompleted ? Colors.white : Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(width: 12), // Add spacing between icon and text
+                        Text(
+                          stages[index]['label'],
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: isCompleted ? FontWeight.bold : FontWeight.normal,
+                            color: isCompleted ? Colors.black : Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (index < stages.length - 1) // To prevent line after the last stage
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        child: Container(
+                          height: 40,
+                          width: 2,
+                          color: isCompleted
+                              ? const Color.fromARGB(255, 67, 69, 49)
+                              : Colors.grey.shade300,
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    stages[index]['label'],
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: isCompleted ? FontWeight.bold : FontWeight.normal,
-                      color: isCompleted ? Colors.black : Colors.grey,
-                    ),
-                  ),
-                ),
               ],
             ),
-            if (index < stages.length - 1)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: Container(
-                  height: 40,
-                  width: 2,
-                  color: isCompleted
-                      ? const Color.fromARGB(255, 67, 69, 49)
-                      : Colors.grey.shade300,
-                ),
-              ),
           ],
         );
       }),
