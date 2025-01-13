@@ -24,7 +24,7 @@ class ItemsDetails extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "₱${product.price}",
+                  "₱${product.price}0",
                   style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w800,
