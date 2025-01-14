@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class OrderTrackingScreen extends StatelessWidget {
   final String orderId;
@@ -85,7 +86,7 @@ class OrderTrackingScreen extends StatelessWidget {
       children: [
         _buildDetailRow(Icons.location_pin, 'Pick Up Location', branchName),
         const SizedBox(height: 16),
-        _buildDetailRow(Icons.attach_money, 'Total cost', formatter.format(amount)),
+        _buildDetailRow(FontAwesomeIcons.pesoSign, 'Total cost', formatter.format(amount)),
       ],
     );
   }
