@@ -1235,7 +1235,7 @@ app.post('/api/approve-request', async (req, res) => {
   }
 });
 
-app.get('/stocks', authenticateEmployeeToken, async (req, res) => {
+app.get('/api/stocks', authenticateEmployeeToken, async (req, res) => {
   const { branch } = req.user;
 
   try {
