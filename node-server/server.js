@@ -831,7 +831,8 @@ app.delete('/api/branches/:id', async (req, res) => {
 });
 
 app.post('/api/orderitems', async (req, res) => {
-  const { productId, orderId } = req.body;
+  const { productId, orderId, quantity } = req.body;
+  const orderitem_id = generateOrderNumber();
 
   try {
     // Check if the orderId already exists in ordertbl
@@ -852,10 +853,21 @@ app.post('/api/orderitems', async (req, res) => {
       order = existingOrder;
     }
 
+
+
     // Insert into orderitemtbl (regardless of whether orderId was new or existing)
+    const productPriceQuery = await pool.query('SELECT price FROM menutbl WHERE menu_id = $1', [productId]);
+    const productPrice = productPriceQuery.rows[0]?.price;
+
+    if (productPrice === undefined) {
+      throw new Error('Product price not found');
+    }
+
+    const priceTotal = productPrice * quantity;
+
     const result = await pool.query(
-      'INSERT INTO orderitemtbl (order_id, menu_id) VALUES ($1, $2) RETURNING *',
-      [orderId, productId]
+      'INSERT INTO orderitemtbl (orderitem_id, order_id, menu_id, quantity, price_total, total_amount) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [orderitem_id, orderId, productId, quantity, productPrice, priceTotal]
     );
 
     // Respond with both the order and order item information
@@ -902,8 +914,20 @@ app.get('/api/menu', async (req, res) => {
 app.post('/api/order/increase/:orderitem_id', async (req, res) => {
   const { orderitem_id } = req.params;
   try {
+    const itemQuery = await pool.query('SELECT price FROM menutbl WHERE menu_id = (SELECT menu_id FROM orderitemtbl WHERE orderitem_id = $1)', [orderitem_id]);
+
+    if (itemQuery.rowCount === 0) {
+      return res.status(404).send('Item not found');
+    }
+
+    const pricePerItem = Number(itemQuery.rows[0].price);
+    if (isNaN(pricePerItem)) {
+      throw new Error('pricePerItem is not a valid number');
+    }
+    const priceItem = parseFloat(pricePerItem.toFixed(2));
     // Logic to increase quantity in the database
     await pool.query('UPDATE orderitemtbl SET quantity = quantity + 1 WHERE orderitem_id = $1', [orderitem_id]);
+    await pool.query('UPDATE orderitemtbl SET total_amount = quantity * $1 WHERE orderitem_id = $2', [priceItem, orderitem_id]);
     res.status(200).send('Quantity increased');
   } catch (error) {
     console.error('Error increasing quantity:', error);
@@ -972,8 +996,20 @@ app.post('/api/add-stock', async (req, res) => {
 app.post('/api/order/decrease/:orderitem_id', async (req, res) => {
   const { orderitem_id } = req.params;
   try {
+    const itemQuery = await pool.query('SELECT price FROM menutbl WHERE menu_id = (SELECT menu_id FROM orderitemtbl WHERE orderitem_id = $1)', [orderitem_id]);
+
+    if (itemQuery.rowCount === 0) {
+      return res.status(404).send('Item not found');
+    }
+
+    const pricePerItem = Number(itemQuery.rows[0].price);
+    if (isNaN(pricePerItem)) {
+      throw new Error('pricePerItem is not a valid number');
+    }
+    const priceItem = parseFloat(pricePerItem.toFixed(2));
     // Logic to decrease quantity (ensure it doesn't go below 1)
     await pool.query('UPDATE orderitemtbl SET quantity = GREATEST(quantity - 1, 1) WHERE orderitem_id = $1', [orderitem_id]);
+    await pool.query('UPDATE orderitemtbl SET total_amount = quantity * $1 WHERE orderitem_id = $2', [priceItem, orderitem_id]);
     res.status(200).send('Quantity decreased');
   } catch (error) {
     console.error('Error decreasing quantity:', error);
@@ -1372,21 +1408,35 @@ app.post('/api/send-stock', async (req, res) => {
 });
 
 app.post('/api/submit-payment', async (req, res) => {
-  const { orderId, branchId, totalAmount, paymentMethod, invoiceDate, type, employeeId } = req.body;
+  const { orderId, branchId, totalAmount, paymentMethod, invoiceDate, type, employeeId, referenceNumber } = req.body;
+  const invoiceId = orderId.replace("ORD", "INV");
   
   console.log('Incoming request data:', req.body); // Add this to log the request data
 
   try {
-    const updateOrderQuery = 'UPDATE ordertbl SET status = $1, branch_id = $2, type = $3, employee_id = $4 WHERE order_id = $5';
-    await pool.query(updateOrderQuery, ['Preparing',branchId, type, employeeId, orderId]);
+    if (referenceNumber === 'N/A') {
+      const updateOrderQuery = 'UPDATE ordertbl SET status = $1, branch_id = $2, type = $3, employee_id = $4 WHERE order_id = $5';
+      await pool.query(updateOrderQuery, ['Preparing', branchId, type, employeeId, orderId]);
 
-    const insertInvoiceQuery = `
-      INSERT INTO invoicetbl (order_id, invoicedate, totalamount, paymentmethod)
-      VALUES ($1, $2, $3, $4)`;
+      const insertInvoiceQuery = `
+        INSERT INTO invoicetbl (invoice_id, order_id, invoicedate, totalamount, paymentmethod)
+        VALUES ($1, $2, $3, $4, $5)`;
 
-    await pool.query(insertInvoiceQuery, [orderId, invoiceDate, totalAmount, paymentMethod]);
+      await pool.query(insertInvoiceQuery, [invoiceId, orderId, invoiceDate, totalAmount, paymentMethod]);
 
-    res.status(200).json({ success: true, message: 'Payment submitted successfully!' });
+      res.status(200).json({ success: true, message: 'Payment submitted successfully!' });
+    } else {
+      const updateOrderQuery = 'UPDATE ordertbl SET status = $1, branch_id = $2, type = $3, employee_id = $4 WHERE order_id = $5';
+      await pool.query(updateOrderQuery, ['Preparing', branchId, type, employeeId, orderId]);
+
+      const insertInvoiceQuery = `
+        INSERT INTO invoicetbl (invoice_id, order_id, invoicedate, totalamount, paymentmethod, referencenumber)
+        VALUES ($1, $2, $3, $4, $5, $6)`;
+
+      await pool.query(insertInvoiceQuery, [invoiceId, orderId, invoiceDate, totalAmount, paymentMethod, referenceNumber]);
+
+      res.status(200).json({ success: true, message: 'Payment submitted successfully!' });
+    }
   } catch (error) {
     console.error('Error submitting payment:', error); // This should give more details
     res.status(500).json({ success: false, message: 'Error submitting payment' });
