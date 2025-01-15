@@ -1251,7 +1251,7 @@ app.get('/stocks', authenticateEmployeeToken, async (req, res) => {
   }
 });
 
-app.get('/expiring-items', authenticateEmployeeToken, async (req, res) => {
+app.get('/api/expiring-items', authenticateEmployeeToken, async (req, res) => {
   const { branch } = req.user;
 
   try {
@@ -1266,7 +1266,7 @@ app.get('/expiring-items', authenticateEmployeeToken, async (req, res) => {
   }
 });
 
-app.get('/alert-stock', authenticateEmployeeToken, async (req, res) => {
+app.get('/api/alert-stock', authenticateEmployeeToken, async (req, res) => {
   const { branch } = req.user;
 
   try {
@@ -1372,7 +1372,6 @@ app.post('/api/receive-items', async (req, res) => {
 
 app.get('/admin-stocks', authenticateEmployeeToken, async (req, res) => {
   const { branch } = req.user;
-  console.log(req.user);
 
   try {
     // Query the database for stock items of the specific branch
