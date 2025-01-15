@@ -205,7 +205,8 @@ app.post('/admin-login', async (req, res) => {
         username: user.username, 
         firstname: user.firstname, 
         lastname: user.lastname,
-        position: user.position // Include position in the token payload
+        position: user.position, // Include position in the token payload
+        branch: user.branch_id,
       },
       secretKey, // Use the hardcoded secret key
       { expiresIn: '1h' }
@@ -1371,11 +1372,12 @@ app.post('/api/receive-items', async (req, res) => {
 
 app.get('/admin-stocks', authenticateEmployeeToken, async (req, res) => {
   const { branch } = req.user;
+  console.log(req.user);
 
   try {
     // Query the database for stock items of the specific branch
     const result = await pool.query(
-      `SELECT i.inventory_id, i.quantity, i.expirationdate, s.itemname FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = 0`,
+      `SELECT i.inventory_id, i.quantity, i.expirationdate, s.itemname FROM inventorytbl i JOIN stockitemstbl s ON i.item_id = s.item_id WHERE i.branch_id = $1`, [branch]
     );
     res.json(result.rows);
   } catch (error) {
