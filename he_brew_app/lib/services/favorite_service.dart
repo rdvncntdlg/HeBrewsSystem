@@ -8,7 +8,7 @@ class FavoriteService {
   // Fetch user profile to get customer_id
   Future<Map<String, dynamic>> fetchProfile(String token) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/profile'),
+      Uri.parse('$baseUrl/api/profile'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -22,7 +22,7 @@ class FavoriteService {
   // Fetch user's favorite products
   Future<List<Favorite>> fetchFavorites(String customerId, String token) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/customers/$customerId/favorites'),
+      Uri.parse('$baseUrl/api/customers/$customerId/favorites'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
@@ -37,7 +37,7 @@ class FavoriteService {
   // Add a product to favorites
   Future<void> addFavorite(String customerId, Favorite favorite, String token) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/customers/$customerId/favorites'),
+      Uri.parse('$baseUrl/api/customers/$customerId/favorites'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ class FavoriteService {
   // Remove a product from favorites
   Future<void> removeFavorite(String customerId, Favorite favorite, String token) async {
     final response = await http.delete(
-      Uri.parse('$baseUrl/customers/$customerId/favorites/${favorite.menu_id}'),
+      Uri.parse('$baseUrl/api/customers/$customerId/favorites/${favorite.menu_id}'),
       headers: {'Authorization': 'Bearer $token'},
     );
 

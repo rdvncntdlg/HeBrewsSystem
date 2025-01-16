@@ -8,7 +8,7 @@ class ProductService {
 
   Future<List<Product>> fetchProduct(String branchId) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/products?branch_id=$branchId'));
+      final response = await http.get(Uri.parse('$baseUrl/api/products?branch_id=$branchId'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);

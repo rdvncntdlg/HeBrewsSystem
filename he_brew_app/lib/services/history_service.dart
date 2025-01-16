@@ -8,7 +8,7 @@ import 'package:he_brew_app/screens/history/history_item.dart';
 class HistoryService {
   // Method to fetch order history
   Future<List<HistoryItem>> fetchOrderHistory(final customerId) async {
-    final url = 'https://hebrewscafeserver.onrender.com/customer/order-history/$customerId'; // Replace with your API URL
+    final url = 'https://hebrewscafeserver.onrender.com/api/customer/order-history/$customerId'; // Replace with your API URL
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {

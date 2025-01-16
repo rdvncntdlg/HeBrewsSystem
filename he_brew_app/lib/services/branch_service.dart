@@ -7,7 +7,7 @@ class BranchService {
 
   Future<List<Branch>> fetchBranches() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/branches-app'));
+      final response = await http.get(Uri.parse('$baseUrl/api/branches-app'));
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);

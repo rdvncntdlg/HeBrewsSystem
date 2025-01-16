@@ -33,7 +33,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   bool isLoading = false;
 
   Future<void> sendOrder(String orderNumber, String orderType, String selectedBranch, final cartItems, final userProvider, final cartProvider, TextEditingController specialRequest) async {
-    const String url = 'https://hebrewscafeserver.onrender.com/customer/orders'; // Replace <YOUR_IP_ADDRESS> with your machine's IP
+    const String url = 'https://hebrewscafeserver.onrender.com/api/customer/orders'; // Replace <YOUR_IP_ADDRESS> with your machine's IP
 
     try {
       setState(() {
