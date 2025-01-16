@@ -16,6 +16,7 @@ class WebViewPaymentPage extends StatefulWidget {
   final Branch selectedBranch;
   final String paymentMethod;
   final double totalPrice;
+  final TextEditingController specialRequest;
 
   const WebViewPaymentPage({
     Key? key, 
@@ -25,6 +26,7 @@ class WebViewPaymentPage extends StatefulWidget {
     required this.selectedBranch,
     required this.paymentMethod,
     required this.totalPrice,
+    required this.specialRequest,
     }) : super(key: key);
 
   @override
@@ -69,6 +71,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                     orderType: widget.orderType ?? "Unknown",
                     selectedBranch: widget.selectedBranch,
                     totalPrice: widget.totalPrice,
+                    specialRequest: widget.specialRequest,
                   ),
                 ),
               );

@@ -14,6 +14,7 @@ class OrderSuccessScreen extends StatefulWidget {
   final String orderType; // Add this parameter to display the order type
   final Branch selectedBranch; // Pass the selected branch
   final double totalPrice;
+  final TextEditingController specialRequest;
 
   const OrderSuccessScreen({
     super.key,
@@ -21,6 +22,7 @@ class OrderSuccessScreen extends StatefulWidget {
     required this.orderType,
     required this.selectedBranch,
     required this.totalPrice,
+    required this.specialRequest,
   });
 
   @override
@@ -30,7 +32,7 @@ class OrderSuccessScreen extends StatefulWidget {
 class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   bool isLoading = false;
 
-  Future<void> sendOrder(String orderNumber, String orderType, String selectedBranch, final cartItems, final userProvider, final cartProvider) async {
+  Future<void> sendOrder(String orderNumber, String orderType, String selectedBranch, final cartItems, final userProvider, final cartProvider, TextEditingController specialRequest) async {
     const String url = 'http://10.0.2.2:3000/customer/orders'; // Replace <YOUR_IP_ADDRESS> with your machine's IP
 
     try {
@@ -48,6 +50,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
           "cartItems": cartItems,
           "customerId": userProvider.customerId,
           "totalPrice": cartProvider.totalPrice,
+          "specialRequest": specialRequest
         }),
       );
 
@@ -88,6 +91,7 @@ void initState() {
       cartItems,
       userProvider,
       cartProvider,
+      widget.specialRequest,
     );
   });
 }

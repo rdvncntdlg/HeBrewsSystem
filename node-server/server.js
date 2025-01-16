@@ -832,7 +832,7 @@ app.delete('/api/branches/:id', async (req, res) => {
 });
 
 app.post('/api/orderitems', async (req, res) => {
-  const { productId, orderId, quantity } = req.body;
+  const { productId, orderId, quantity, note } = req.body;
   const orderitem_id = generateOrderNumber();
 
   try {
@@ -854,8 +854,6 @@ app.post('/api/orderitems', async (req, res) => {
       order = existingOrder;
     }
 
-
-
     // Insert into orderitemtbl (regardless of whether orderId was new or existing)
     const productPriceQuery = await pool.query('SELECT price FROM menutbl WHERE menu_id = $1', [productId]);
     const productPrice = productPriceQuery.rows[0]?.price;
@@ -867,8 +865,8 @@ app.post('/api/orderitems', async (req, res) => {
     const priceTotal = productPrice * quantity;
 
     const result = await pool.query(
-      'INSERT INTO orderitemtbl (orderitem_id, order_id, menu_id, quantity, price_total, total_amount) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [orderitem_id, orderId, productId, quantity, productPrice, priceTotal]
+      'INSERT INTO orderitemtbl (orderitem_id, order_id, menu_id, quantity, price_total, total_amount, note) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [orderitem_id, orderId, productId, quantity, productPrice, priceTotal, note]
     );
 
     // Respond with both the order and order item information
@@ -1411,8 +1409,6 @@ app.post('/api/send-stock', async (req, res) => {
 app.post('/api/submit-payment', async (req, res) => {
   const { orderId, branchId, totalAmount, paymentMethod, invoiceDate, type, employeeId, referenceNumber } = req.body;
   const invoiceId = orderId.replace("ORD", "INV");
-  
-  console.log('Incoming request data:', req.body); // Add this to log the request data
 
   try {
     if (referenceNumber === 'N/A') {
@@ -1821,7 +1817,7 @@ const checkIfOrderItemIdExists = async (orderitem_id) => {
 };
 
 app.post('/customer/orders', async (req, res) => {
-  const { orderNumber, orderType, selectedBranch, cartItems, customerId, totalPrice } = req.body;
+  const { orderNumber, orderType, selectedBranch, cartItems, customerId, totalPrice, specialRequest } = req.body;
 
   try {
     // Insert order into the ordertbl
@@ -1860,11 +1856,11 @@ app.post('/customer/orders', async (req, res) => {
 
       // Insert the order item into orderitemtbl
       const itemQuery = `
-        INSERT INTO orderitemtbl (orderitem_id, order_id, menu_id, quantity, price_total, total_amount)
+        INSERT INTO orderitemtbl (orderitem_id, order_id, menu_id, quantity, price_total, total_amount, note)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *;
       `;
-      const cartValues = [orderitem_id, orderNumber, menu_id, quantity, price, price * quantity];
+      const cartValues = [orderitem_id, orderNumber, menu_id, quantity, price, price * quantity, specialRequest];
       
       const cartResult = await pool.query(itemQuery, cartValues);
     }

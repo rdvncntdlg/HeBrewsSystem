@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:he_brew_app/screens/history/order_history.dart';
 import 'package:http/http.dart' as http;
 import 'package:he_brew_app/screens/login/login_screen.dart';
 import 'package:he_brew_app/theme.dart';
@@ -169,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const OrderScreen()));
+                            builder: (context) => const HistoryScreen()));
                   },
                 ),
                 const SizedBox(height: 16),

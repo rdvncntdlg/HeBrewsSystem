@@ -10,6 +10,7 @@ class PaymentScreen extends StatefulWidget {
   final Branch selectedBranch;
   final String paymentMethod;
   final double totalPrice;
+  final TextEditingController specialRequest;
 
   const PaymentScreen({
     Key? key,
@@ -18,6 +19,7 @@ class PaymentScreen extends StatefulWidget {
     required this.selectedBranch,
     required this.paymentMethod,
     required this.totalPrice,
+    required this.specialRequest,
   }) : super(key: key);
 
   @override
@@ -30,7 +32,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   bool isLoading = false;
 
-  Future<void> handleGcashPayment(String orderNumber, String orderType, Branch selectedBranch, String paymentMethod, double totalPrice) async {
+  Future<void> handleGcashPayment(String orderNumber, String orderType, Branch selectedBranch, String paymentMethod, double totalPrice, TextEditingController specialRequest) async {
     setState(() {
       isLoading = true;
     });
@@ -74,6 +76,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               selectedBranch: selectedBranch,
               paymentMethod: paymentMethod,
               totalPrice: totalPrice,
+              specialRequest: specialRequest,
             ),
           ),
         );
@@ -95,7 +98,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     // Automatically trigger GCash payment if the paymentMethod is "GCash"
     if (widget.paymentMethod == "GCash") {
-      handleGcashPayment(widget.orderNumber, widget.orderType, widget.selectedBranch, widget.paymentMethod, widget.totalPrice);
+      handleGcashPayment(widget.orderNumber, widget.orderType, widget.selectedBranch, widget.paymentMethod, widget.totalPrice, widget.specialRequest);
     }
   }
 

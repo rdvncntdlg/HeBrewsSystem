@@ -192,6 +192,7 @@ class _SelectionScreenState extends State<SelectionScreen> {
                         selectedBranch: widget.selectedBranch, // Pass the selected branch
                         paymentMethod: "GCash",
                         totalPrice: widget.totalPrice,
+                        specialRequest: specialRequestController,
                       ),
                     ),
                   );
