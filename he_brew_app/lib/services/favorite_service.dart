@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class FavoriteService {
-  final String baseUrl = 'http://10.0.2.2:3000'; // Replace with your API base URL
+  final String baseUrl = 'https://hebrewscafeserver.onrender.com'; // Replace with your API base URL
 
   // Fetch user profile to get customer_id
   Future<Map<String, dynamic>> fetchProfile(String token) async {

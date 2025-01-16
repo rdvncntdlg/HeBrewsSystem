@@ -206,7 +206,7 @@ class OrderTrackingScreen extends StatelessWidget {
 }
 
 Future<void> _updateOrderStatusToCompleted(String orderId) async {
-  final url = Uri.parse('http://10.0.2.2:3000/api/order-received/$orderId');
+  final url = Uri.parse('https://hebrewscafeserver.onrender.com/api/order-received/$orderId');
 
   try {
     final response = await http.put(

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/branch_model.dart';  // Adjust import to your model location
 
 class BranchService {
-  final String baseUrl = 'http://10.0.2.2:3000'; // Replace with your backend URL https://hebrewscafeserver.onrender.com
+  final String baseUrl = 'https://hebrewscafeserver.onrender.com'; // Replace with your backend URL https://hebrewscafeserver.onrender.com http://10.0.2.2:3000
 
   Future<List<Branch>> fetchBranches() async {
     try {
