@@ -50,7 +50,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
           "cartItems": cartItems,
           "customerId": userProvider.customerId,
           "totalPrice": cartProvider.totalPrice,
-          "specialRequest": specialRequest
+          "specialRequest": specialRequest.text,
         }),
       );
 
@@ -170,7 +170,7 @@ void initState() {
                 // Action Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 67, 69, 49),
+                    backgroundColor: const Color.fromARGB(255, 221, 201, 163),
                     padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -190,6 +190,7 @@ void initState() {
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
+                      color: Color.fromARGB(255, 67, 69, 49),
                     ),
                   ),
                 ),

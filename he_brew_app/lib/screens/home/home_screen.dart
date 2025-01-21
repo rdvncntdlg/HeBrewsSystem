@@ -26,6 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Product>> products;
   late Future<List<Product>> recommend;
   late Future<List<Product>> filteredProducts;
+  List<Product> filteredSearchProducts = [];
+  final TextEditingController _searchController = TextEditingController();
 
   final List<String> categoryTitles = [
     "Best Sellers",
@@ -66,6 +68,25 @@ class _HomeScreenState extends State<HomeScreen> {
     recommend = RecommendService().fetchRecommend(customerId ?? '', widget.selectedBranch.branch_id);
   }
 
+  void _handleSearch(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        filteredProducts = products;
+      });
+      return;
+    }
+
+    setState(() {
+      products.then((productList) {
+        final filteredList = productList
+            .where((product) =>
+                product.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+        filteredProducts = Future.value(filteredList);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -83,7 +104,10 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 35),
               HomeAppBar(branchName: widget.selectedBranch.name),
               const SizedBox(height: 20),
-              const MySearchBar(),
+              MySearchBar(
+                controller: _searchController,
+                onSearch: _handleSearch,
+              ),
               const SizedBox(height: 20),
               buildRecommendSection(),
               const SizedBox(height: 20),
@@ -228,6 +252,8 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               setState(() {
                 selectedIndex = index;
+                _searchController.clear();
+                _handleSearch(''); 
                 _fetchCategory(categoryTitles[index]);
               });
             },
