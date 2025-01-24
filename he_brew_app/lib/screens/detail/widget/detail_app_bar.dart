@@ -15,9 +15,11 @@ class DetailAppBar extends StatelessWidget {
     final favorite = Favorite(
       menu_id: product.menu_id,
       name: product.name,
+      description: product.description,
       price: product.price,
       image: product.image,
       category: product.category,
+      quantity: product.quantity,
     );  // Convert product to Favorite
 
     if (token.isNotEmpty) {

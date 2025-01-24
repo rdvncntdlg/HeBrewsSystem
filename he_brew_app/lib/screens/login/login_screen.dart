@@ -7,74 +7,60 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:he_brew_app/screens/branch/branches.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    TextEditingController usernameController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
+  _LoginScreenState createState() => _LoginScreenState();
+}
 
-    bool isValid() {
-      return usernameController.text.isNotEmpty &&
-          passwordController.text.isNotEmpty;
-    }
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
-    Future<void> signIn() async {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      if (isValid()) {
-        final response = await http.post(
-          Uri.parse('https://hebrewscafeserver.onrender.com/api/login'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'username': usernameController.text,
-            'password': passwordController.text,
-          }),
+  bool obscurePassword = true;
+
+  bool isValid() {
+    return usernameController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty;
+  }
+
+  Future<void> signIn() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    if (isValid()) {
+      final response = await http.post(
+        Uri.parse('https://hebrewscafeserver.onrender.com/api/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'username': usernameController.text,
+          'password': passwordController.text,
+        }),
+      );
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success']) {
+        // Extract the token from the response
+        String token = data['token'];
+        userProvider.setCustomerId(data['customer_id']);
+
+        // Save the token using SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token); // Save the token locally
+
+        // Navigate to the branch selection screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const BranchSelection(),
+          ),
         );
-        final data = jsonDecode(response.body);
-
-        if (response.statusCode == 200 && data['success']) {
-          // Extract the token from the response
-          String token = data['token'];
-          userProvider.setCustomerId(data['customer_id']);
-
-          // Save the token using SharedPreferences
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('auth_token', token); // Save the token locally
-
-          // Navigate to the branch selection screen
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const BranchSelection(),
-            ),
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text('Error'),
-                content: Text(data['message'] ?? 'An unknown error occurred'),
-                actions: <Widget>[
-                  TextButton(
-                    child: const Text('OK'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        }
       } else {
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('Error'),
-              content: const Text('Please enter both username and password.'),
+              content: Text(data['message'] ?? 'An unknown error occurred'),
               actions: <Widget>[
                 TextButton(
                   child: const Text('OK'),
@@ -87,8 +73,29 @@ class LoginScreen extends StatelessWidget {
           },
         );
       }
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const Text('Please enter both username and password.'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: primaryColor,
@@ -139,14 +146,23 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       TextFormField(
                         controller: passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          suffixIcon: Icon(
-                            Icons.visibility_off,
-                            color: primaryColor,
+                        obscureText: obscurePassword,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: primaryColor,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                obscurePassword = !obscurePassword;
+                              });
+                            },
                           ),
                           labelText: 'Password',
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                       Align(

@@ -55,7 +55,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
       );
 
       if (response.statusCode == 201) {
-        CartProvider.of(context, listen: false).emptyCart();
+        cartProvider.emptyCart();
         return;
       } else {
         print('Failed to place order. Error: ${response.body}');
@@ -115,7 +115,7 @@ void initState() {
                 SizedBox(
                   height: 150,
                   width: 150,
-                  child: Lottie.asset('animations/Animation_success.lottie'), // Ensure the file exists
+                  child: Lottie.network('https://lottie.host/c4fb4b1f-3ec4-43cf-80b3-76aa3edeb39f/100OP5ixCO.json'), // Ensure the file exists
                 ),
                 const SizedBox(height: 20),
 
