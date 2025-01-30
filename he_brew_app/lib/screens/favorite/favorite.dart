@@ -39,6 +39,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         return Scaffold(
           backgroundColor: contentColor,
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             backgroundColor: contentColor,
             title: const Text(
               "Favorites",

@@ -84,7 +84,7 @@ class _CartScreenState extends State<CartScreen> {
                                   borderRadius: BorderRadius.circular(20),
                                   color: contentColor,
                                 ),
-                                child: Image.network('https://hebrewscafeserver.onrender.com/api/${cartItems.image}'),
+                                child: Image.network('https://hebrewscafeserver.onrender.com/${cartItems.image}'),
                               ),
                               const SizedBox(width: 10),
                               Column(
