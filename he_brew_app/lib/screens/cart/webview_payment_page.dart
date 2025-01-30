@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/models/branch_model.dart';
-import 'package:he_brew_app/screens/cart/carts_screen.dart';
 import 'package:he_brew_app/screens/cart/order_success.dart';
-import 'package:he_brew_app/screens/nav_bar.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
@@ -68,7 +66,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                 MaterialPageRoute(
                   builder: (context) => OrderSuccessScreen(
                     orderNumber: widget.orderNumber,
-                    orderType: widget.orderType ?? "Unknown",
+                    orderType: widget.orderType,
                     selectedBranch: widget.selectedBranch,
                     totalPrice: widget.totalPrice,
                     specialRequest: widget.specialRequest,

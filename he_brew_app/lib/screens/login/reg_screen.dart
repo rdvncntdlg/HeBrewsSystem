@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:he_brew_app/screens/login/terms_dialog.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:he_brew_app/screens/branch/branches.dart';
@@ -37,16 +38,15 @@ class RegistrationForm extends StatefulWidget {
 
 class _RegistrationFormState extends State<RegistrationForm> {
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  bool _agreedToTerms = false;
 
   @override
   void dispose() {
@@ -62,7 +62,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 
   Future<void> _register() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate() && _agreedToTerms) {
       final response = await http.post(
         Uri.parse('https://hebrewscafeserver.onrender.com/api/register'),
         headers: {'Content-Type': 'application/json'},
@@ -80,34 +80,49 @@ class _RegistrationFormState extends State<RegistrationForm> {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data['success']) {
-        // Navigate to BranchSelection screen after successful registration
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) =>
-                const BranchSelection(), // Redirect to BranchSelection
-          ),
+          MaterialPageRoute(builder: (context) => const BranchSelection()),
         );
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: Text(data['message'] ?? 'An unknown error occurred'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        _showErrorDialog(data['message'] ?? 'An unknown error occurred');
       }
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showTermsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return TermsDialog(
+          onAccepted: () {
+            setState(() {
+              _agreedToTerms = true; // Mark as accepted
+            });
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -138,44 +153,20 @@ class _RegistrationFormState extends State<RegistrationForm> {
           const SizedBox(height: 20),
           TextFormField(
             controller: _firstNameController,
-            decoration: const InputDecoration(
-              labelText: 'First Name',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your first name';
-              }
-              return null;
-            },
+            decoration: const InputDecoration(labelText: 'First Name', border: OutlineInputBorder()),
+            validator: (value) => value!.isEmpty ? 'Please enter your first name' : null,
           ),
           const SizedBox(height: 10),
           TextFormField(
             controller: _lastNameController,
-            decoration: const InputDecoration(
-              labelText: 'Last Name',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your last name';
-              }
-              return null;
-            },
+            decoration: const InputDecoration(labelText: 'Last Name', border: OutlineInputBorder()),
+            validator: (value) => value!.isEmpty ? 'Please enter your last name' : null,
           ),
           const SizedBox(height: 10),
           TextFormField(
             controller: _emailController,
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter an email address';
-              }
-              return null;
-            },
+            decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+            validator: (value) => value!.isEmpty ? 'Please enter an email address' : null,
           ),
           const SizedBox(height: 10),
           TextFormField(
@@ -251,21 +242,29 @@ class _RegistrationFormState extends State<RegistrationForm> {
               return null;
             },
           ),
+          const SizedBox(height: 10),
+          CheckboxListTile(
+            title: GestureDetector(
+              onTap: _showTermsDialog,
+              child: const Text(
+                'I agree to the Terms of Service',
+              ),
+            ),
+            value: _agreedToTerms,
+            onChanged: (bool? value) {
+              _showTermsDialog();
+            },
+          ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: _register,
+            onPressed: _agreedToTerms ? _register : null,
             style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all<Color>(Colors.black),
+              backgroundColor: WidgetStateProperty.all<Color>(_agreedToTerms ? Colors.black : Colors.grey),
               minimumSize: WidgetStateProperty.all<Size>(const Size(50, 60)),
             ),
             child: const Text(
               'SIGN UP',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
             ),
           ),
         ],

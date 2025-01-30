@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/provider/customer_provider.dart';
+import 'package:he_brew_app/screens/login/enter_token.dart';
 import 'package:he_brew_app/theme.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -17,6 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
 
   bool obscurePassword = true;
 
@@ -39,15 +41,11 @@ class _LoginScreenState extends State<LoginScreen> {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data['success']) {
-        // Extract the token from the response
         String token = data['token'];
         userProvider.setCustomerId(data['customer_id']);
-
-        // Save the token using SharedPreferences
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', token); // Save the token locally
+        await prefs.setString('auth_token', token);
 
-        // Navigate to the branch selection screen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -55,43 +53,83 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: Text(data['message'] ?? 'An unknown error occurred'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
+        showErrorDialog(data['message'] ?? 'An unknown error occurred');
       }
     } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Please enter both username and password.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      showErrorDialog('Please enter both username and password.');
     }
+  }
+
+  Future<void> forgotPassword() async {
+    final email = emailController.text;
+    if (email.isEmpty) {
+      showErrorDialog('Please enter your email address.');
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('https://hebrewscafeserver.onrender.com/api/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success']) {
+        showSuccessDialog(
+            'A password reset link has been sent to your email.');
+        await Future.delayed(const Duration(seconds: 3));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => EnterToken(email: email)), // Fixed this line
+        );
+      } else {
+        showErrorDialog(data['message'] ?? 'An error occurred.');
+      }
+    } catch (e) {
+      showErrorDialog('Failed to connect to the server. Please try again.');
+    }
+  }
+
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Success'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -175,21 +213,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                 return AlertDialog(
                                   title: const Text('Forgot Password'),
                                   content: TextField(
-                                    controller: usernameController,
+                                    controller: emailController,
                                     decoration: const InputDecoration(
                                       labelText: 'Email',
-                                      labelStyle: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.bold,
-                                        color: primaryColor,
-                                      ),
                                     ),
                                   ),
                                   actions: <Widget>[
                                     TextButton(
-                                      child: const Text('OK'),
+                                      child: const Text('Cancel'),
                                       onPressed: () {
                                         Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text('Submit'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        forgotPassword();
                                       },
                                     ),
                                   ],

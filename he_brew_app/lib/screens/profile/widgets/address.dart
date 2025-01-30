@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:he_brew_app/screens/profile/widgets/add_address_screen.dart';
 
 class AddressScreen extends StatelessWidget {
-  const AddressScreen({super.key});
+  final String? address;
+  const AddressScreen({super.key, required this.address});
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +29,7 @@ class AddressScreen extends StatelessWidget {
           _buildAddressTile(
             context: context,
             title: 'Home',
-            subtitle: 'P. Aguila, Cuta, Batangas City 4200',
-          ),
-          const SizedBox(height: 16),
-          _buildAddressTile(
-            context: context,
-            title: 'Work',
-            subtitle: 'Uranus St., Alangilan, Batangas City 4200',
+            subtitle: address ?? 'Home not available',
           ),
         ],
       ),

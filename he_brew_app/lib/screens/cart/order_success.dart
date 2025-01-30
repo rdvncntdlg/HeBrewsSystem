@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:he_brew_app/provider/add_to_cart_provider.dart';
 import 'package:he_brew_app/provider/customer_provider.dart';
+import 'package:he_brew_app/screens/cart/webview_feedback_page.dart';
 import 'package:lottie/lottie.dart';
 import 'package:he_brew_app/screens/nav_bar.dart';
 import 'package:he_brew_app/models/branch_model.dart'; // Import Branch model
@@ -31,6 +32,7 @@ class OrderSuccessScreen extends StatefulWidget {
 
 class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   bool isLoading = false;
+  final String _feedbackUrl = 'https://hebrewscafe.onrender.com/customer-satisfaction-survey';
 
   Future<void> sendOrder(String orderNumber, String orderType, String selectedBranch, final cartItems, final userProvider, final cartProvider, TextEditingController specialRequest) async {
     const String url = 'https://hebrewscafeserver.onrender.com/api/customer/orders'; // Replace <YOUR_IP_ADDRESS> with your machine's IP
@@ -191,6 +193,33 @@ void initState() {
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                       color: Color.fromARGB(255, 67, 69, 49),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 173, 216, 230), // Light blue background
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WebviewFeedbackPage(selectedBranch: widget.selectedBranch, feedbackUrl: _feedbackUrl, orderNumber: widget.orderNumber),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Give Feedback",
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black,
                     ),
                   ),
                 ),
