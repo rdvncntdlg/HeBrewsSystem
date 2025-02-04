@@ -1895,6 +1895,7 @@ app.get('/customer/order-history/:customerId', async (req, res) => {
       JOIN invoicetbl inv ON o.order_id = inv.order_id  -- Join with invoicetbl based on order_id
       JOIN orderitemtbl oi ON o.order_id = oi.order_id  -- Join with orderitemtbl based on order_id
       JOIN menutbl m ON oi.menu_id = m.menu_id
+      JOIN categorytbl c ON m.category_id = c.category_id
       JOIN branchtbl b ON o.branch_id = b.branch_id
       WHERE o.customer_id = $1  -- Filter for customer ID
       ORDER BY inv.invoicedate DESC;

@@ -61,11 +61,13 @@ class OrderDetail {
   final String item;
   final int quantity;
   final double price;
+  final String categoryName;
 
   OrderDetail({
     required this.item,
     required this.quantity,
     required this.price,
+    required this.categoryName,
   });
 
   factory OrderDetail.fromJson(Map<String, dynamic> json) {
@@ -75,6 +77,7 @@ class OrderDetail {
       price: json['priceTotal'] == null
           ? 0.0
           : double.tryParse(json['priceTotal'].toString()) ?? 0.0,
+      categoryName: json['categoryName'] ?? '',
     );
   }
 }

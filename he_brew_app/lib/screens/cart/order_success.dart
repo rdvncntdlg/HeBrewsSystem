@@ -199,7 +199,7 @@ void initState() {
                 const SizedBox(height: 10),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 173, 216, 230), // Light blue background
+                    backgroundColor: const Color.fromARGB(255, 221, 201, 163), // Light blue background
                     padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -219,7 +219,7 @@ void initState() {
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.black,
+                      color: Color.fromARGB(255, 67, 69, 49),
                     ),
                   ),
                 ),

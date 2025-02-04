@@ -54,6 +54,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
               itemCount: historyList.length,
               itemBuilder: (context, index) {
                 final item = historyList[index];
+                String estimatedTime = 'Preparation Done';
+
+                if (item.status == 'Preparing') {
+                  bool hasPlatter = item.orderDetails?.any((detail) => detail.categoryName == 'Platter') ?? false;
+                  bool hasMediumPrep = item.orderDetails?.any((detail) =>
+                      ['Big Plates', 'Pasta', 'Sandwiches', 'Snacks'].contains(detail.categoryName)) ?? false;
+
+                  if (hasPlatter) {
+                    estimatedTime = '20-30 Minutes'; // Highest priority
+                  } else if (hasMediumPrep) {
+                    estimatedTime = '5-10 Minutes';
+                  } else if (item.orderDetails?.isNotEmpty ?? false) {
+                    estimatedTime = '5 Minutes'; // Only if orderDetails exists
+                  }
+                }
 
                 Color statusColor;
                 String displayStatus;
@@ -140,6 +155,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     orderStatus: item.status ?? 'Unknown',
                                     branchName: item.branchName ?? 'Unknown',
                                     amount: item.amount ?? 0.0,
+                                    estimatedTime: estimatedTime,
                                   ),
                                 ),
                               );

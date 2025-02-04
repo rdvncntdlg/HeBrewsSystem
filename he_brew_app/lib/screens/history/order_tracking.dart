@@ -8,12 +8,14 @@ class OrderTrackingScreen extends StatelessWidget {
   final String orderStatus;
   final String branchName;
   final double amount;
+  final String estimatedTime;
 
   const OrderTrackingScreen({
     required this.orderId,
     required this.orderStatus,
     required this.branchName,
     required this.amount,
+    required this.estimatedTime,
     super.key,
   });
 
@@ -84,6 +86,8 @@ class OrderTrackingScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildDetailRow(Icons.access_time, 'Estimated Time', estimatedTime),
+        const SizedBox(height: 16),
         _buildDetailRow(Icons.location_pin, 'Pick Up Location', branchName),
         const SizedBox(height: 16),
         _buildDetailRow(FontAwesomeIcons.pesoSign, 'Total cost', formatter.format(amount)),
